@@ -18,6 +18,7 @@ yarn = "latest"
 "npm:@anthropic-ai/claude-code" = "latest"
 "npm:ccusage" = "latest"
 task = "latest"
+"npm:@openai/codex" = "latest"
 
 [settings]
 experimental = true
