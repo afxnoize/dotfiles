@@ -16,3 +16,13 @@ cheatsheet/**
 
 # serena
 serena/
+
+{{ if ne .chezmoi.os "linux" }}
+.config/zsh/**
+.config/zabrze/**
+{{ end }}
+
+{{ if ne .chezmoi.os "windows" }}
+Documents
+Documents/PowerShell/**
+{{ end }}
