@@ -12,7 +12,6 @@ allowed-tools:
 ## Default safety
 Always run Codex with:
 - `--sandbox read-only`
-- `--ask-for-approval on-request`
 
 ## How to run
 Use `scripts/codex_run.sh` and pass:

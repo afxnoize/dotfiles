@@ -25,5 +25,4 @@ PROMPT="$(cat "$PROMPT_FILE")"
 
 codex exec \
   --sandbox read-only \
-  --ask-for-approval on-request \
   "$PROMPT"$'\n\n'"User request: $QUERY"
