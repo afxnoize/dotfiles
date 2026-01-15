@@ -19,6 +19,8 @@ yarn = "latest"
 "npm:ccusage" = "latest"
 task = "latest"
 "npm:@openai/codex" = "latest"
+bottom = "latest"
+eza = "latest"
 
 [settings]
 experimental = true
