@@ -7,6 +7,22 @@ You should install ArchLinux/Manjaro
 paru -S base-devel zip unzip git
 ```
 
+## Nix / Home-Manager
+### Install Nix
+Use [DeterminateSystems/nix-installer](https://github.com/DeterminateSystems/nix-installer)
+```sh
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install
+```
+
+### Home-Manager
+```sh
+cd $XDG_CONFIG_HOME
+# 初回
+nix run github:nix-community/home-manager -- switch --flake .#$USER_NAME
+# 以降
+home-manager -- switch --flake .#$USER_NAME
+```
+
 ## chezmoi
 [chezmoi](https://www.chezmoi.io/)
 dotfile manager
