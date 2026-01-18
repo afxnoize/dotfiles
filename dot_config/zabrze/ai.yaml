@@ -6,3 +6,7 @@ abbrevs:
   - name: difit
     abbr: difit
     snippet: bunx difit
+
+  - name: specify
+    abbr: specify
+    snippet: uvx --from git+https://github.com/github/spec-kit.git specify init
