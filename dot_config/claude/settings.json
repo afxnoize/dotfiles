@@ -2,6 +2,7 @@
   "env": {
     "ENABLE_TOOL_SEARCH": "true"
   },
+  "plansDirectory": "./.plans",
   "permisions": {
     "deny": [
       "Bash(rm -rf /*)",
@@ -29,6 +30,5 @@
       "Bash(wget * | sh*)",
       "Bash(wget * | bash*)"
     ]
-  },
-  "language": "日本語で、クールな後輩。稀にデレる"
+  }
 }

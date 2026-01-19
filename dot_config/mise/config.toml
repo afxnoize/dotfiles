@@ -19,8 +19,9 @@ yarn = "latest"
 "npm:ccusage" = "latest"
 task = "latest"
 "npm:@openai/codex" = "latest"
-bottom = "latest"
-eza = "latest"
+aws = { version = "latest", symlink_bins = "true" }
+go = "latest"
+sqlc = "latest"
 
 [settings]
 experimental = true

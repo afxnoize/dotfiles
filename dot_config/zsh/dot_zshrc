@@ -17,6 +17,8 @@ autoload -Uz colors && colors
 # Completion {{{
 # Activate shell completion
 autoload -Uz compinit && compinit
+# for bash_completion
+autoload -U +X bashcompinit && bashcompinit
 
 # menued and select prompt
 zstyle ':completion:*' menu true select
@@ -152,14 +154,11 @@ zinit wait lucid \
 	configure"--disable-utf8proc" make \
 	for @tmux/tmux
 
-# for bash_completion
-autoload -U +X bashcompinit && bashcompinit
-
 # fzf
 # export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
 
 # awscli
-complete -C '/usr/local/bin/aws_completer' aws
+complete -C 'aws_completer' aws
 
 DISTRO=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
 
