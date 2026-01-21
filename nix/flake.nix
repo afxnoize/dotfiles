@@ -12,13 +12,10 @@
 
   outputs = { nixpkgs, home-manager, ... }:
     let
-      system = "x86_64-linux";
-      username = "noize";
-
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
+      system = builtins.currentSystem;
+      pkgs = nixpkgs.legacyPackages.${system};
+      username = builtins.getEnv "USER";
+      homeDirectory = builtins.getEnv "HOME";
     in {
       homeConfigurations.${username} =
         home-manager.lib.homeManagerConfiguration {
@@ -26,6 +23,9 @@
           modules = [
             ./home.nix
           ];
+          extraSpecialArgs = {
+            inherit username homeDirectory;
+          };
         };
     };
 }

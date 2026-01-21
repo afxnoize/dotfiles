@@ -10,3 +10,9 @@ abbrevs:
   - name: specify
     abbr: specify
     snippet: uvx --from git+https://github.com/github/spec-kit.git specify init
+
+  - name: add serena
+    abbr: mcp-add-serena
+    snippet: \-
+      claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena start-mcp-server
+      --context claude-code --mode planning --mode no-onboarding --project-from-cwd

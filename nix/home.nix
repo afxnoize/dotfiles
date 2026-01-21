@@ -1,8 +1,8 @@
-{ config, pkgs, ... }:
+{ config, pkgs, username, homeDirectory, ... }:
 
 {
-  home.username = "noize";
-  home.homeDirectory = "/home/noize";
+  home.username = username;
+  home.homeDirectory = homeDirectory;
 
   home.stateVersion = "25.11";
 
@@ -10,6 +10,7 @@
 
   home.packages = with pkgs; [
     git
+    ghq
     neovim
     fzf
     ripgrep
@@ -18,9 +19,8 @@
     bottom
     eza
     mise
-    ghq
     usage
-    # task
+    bitwarden-cli
   ];
 
   programs.zsh.enable = true;

@@ -24,6 +24,7 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_BIN_HOME="${XDG_BIN_HOME:-$HOME/local/bin}"
 # End of XDG Base Directory }}}
 
 # Zsh Base Directory {{{
@@ -49,11 +50,12 @@ export FCITX_CONFIG_DIR="${FCITX_CONFIG_DIR:-$XDG_CONFIG_HOME/fcitx}"
 # }}}
 
 # Local bin dir {{{
-export LOCAL_BIN_DIR="$HOME/.local/bin"
+export LOCAL_BIN_DIR="$XDG_BIN_HOME"
 # End of Local bin dir }}}
 
 # Misc {{{
 export EDITOR=/usr/bin/nvim
+export SERENA_HOME="$XDG_CONFIGH_HOME/serena"
 # End of Misc }}}
 
 # Paths {{{

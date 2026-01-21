@@ -15,12 +15,13 @@ curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 ```
 
 ### Home-Manager
+環境変数 USER, HOMEを使うため, `--impure`
 ```sh
-cd $XDG_CONFIG_HOME
+cd nix
 # 初回
-nix run github:nix-community/home-manager -- switch --flake .#$USER_NAME
+nix run github:nix-community/home-manager -- switch --flake .#$USER_NAME --impure
 # 以降
-home-manager -- switch --flake .#$USER_NAME
+home-manager -- switch --flake .#$USER_NAME --impure
 ```
 
 ## chezmoi
