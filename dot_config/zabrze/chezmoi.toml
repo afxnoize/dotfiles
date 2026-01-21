@@ -1,0 +1,32 @@
+[[snippets]]
+name = "cz"
+trigger = "cz"
+snippet = "chezmoi"
+
+[[snippets]]
+name = "chezmoi edit"
+trigger-pattern = "^ed?$"
+snippet = "edit"
+global = true
+context = '^chezmoi\s+\S+$'
+
+[[snippets]]
+name = "chezmoi status"
+trigger-pattern = "^st?$"
+snippet = "status"
+global = true
+context = '^chezmoi\s+\S+$'
+
+[[snippets]]
+name = "chezmoi apply"
+trigger-pattern = "^app?$"
+snippet = "apply"
+global = true
+context = '^chezmoi\s+\S+$'
+
+[[snippets]]
+name = "chezmoi add"
+trigger-pattern = "^ad?$"
+snippet = "add"
+global = true
+context = '^chezmoi\s+\S+$'

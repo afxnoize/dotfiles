@@ -1,0 +1,221 @@
+[[snippets]]
+name = "g"
+trigger = "g"
+snippet = "git"
+
+[[snippets]]
+name = "gad"
+trigger = "gad"
+snippet = "git add ."
+
+[[snippets]]
+name = "git add"
+trigger-pattern = "^ad?$"
+snippet = "add"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "add -A"
+trigger = "aa"
+snippet = "add -vA"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git restore"
+trigger-pattern = "^re?s$"
+snippet = "restore"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "ress"
+trigger-pattern = "^re?ss$"
+snippet = "restore --staged"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "--staged"
+trigger = "s"
+snippet = "--staged"
+global = true
+context = '^git\s+restore\s'
+
+[[snippets]]
+name = "git diff"
+trigger = "d"
+snippet = "diff"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git diff --staged"
+trigger = "ds"
+snippet = "diff --staged"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "--staged"
+trigger = "s"
+snippet = "--staged"
+global = true
+context = '^git\s+diff\s'
+
+[[snippets]]
+name = "git commit"
+trigger = "c"
+snippet = "commit"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git commit -m"
+trigger = "cm"
+snippet = "commit -m \"{}\""
+cursor = "{}"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git cam"
+trigger = "cam"
+snippet = "commit --amend --no-edit"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "gpoh"
+trigger = "gpoh"
+snippet = "git push origin HEAD"
+
+[[snippets]]
+name = "git push"
+trigger = "ph"
+snippet = "push"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git push --force-with-lease"
+trigger = "f"
+snippet = "--force-with-lease"
+global = true
+context = '^git\s+push\s'
+
+[[snippets]]
+name = "git fetch"
+trigger-pattern = "^fe?$"
+snippet = "fetch"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git fetch -p"
+trigger = "fp"
+snippet = "fetch -p"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git pull"
+trigger = "pl"
+snippet = "pull"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git branch"
+trigger = "b"
+snippet = "branch"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git branch -v"
+trigger = "br"
+snippet = "branch -v"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "gst"
+trigger = "gst"
+snippet = "git status -sb"
+
+[[snippets]]
+name = "git status"
+trigger-pattern = "^st?$"
+snippet = "status"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "gl"
+trigger = "gl"
+snippet = "git log --pretty=format:\"%C(auto)%h (%C(blue)%cd%C(auto))%d %s $Cblue\" --date=format:\"%Y/%m/%d %H:%M:%S\" -n 10"
+
+[[snippets]]
+name = "git log"
+trigger = "l"
+snippet = "log"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git graph"
+trigger = "gr"
+snippet = "graph"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git log graph"
+trigger = "graph"
+snippet = "log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cn %Cred%d %Creset%s'"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git switch"
+trigger = "sw"
+snippet = "switch"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git stash"
+trigger = "sh"
+snippet = "stash"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git stash push"
+trigger = "ph"
+snippet = "push -m"
+global = true
+context = '^git\s+stash\s+'
+
+[[snippets]]
+name = "git stash push -m"
+trigger = "push"
+snippet = "push -m"
+global = true
+context = '^git\s+stash\s+push'
+
+[[snippets]]
+name = "git worktree"
+trigger = "w"
+snippet = "worktree"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git branch name"
+trigger = "B"
+snippet = "$(git symbolic-ref --short HEAD)"
+evaluate = true
+global = true

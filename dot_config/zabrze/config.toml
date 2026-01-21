@@ -1,0 +1,99 @@
+[[snippets]]
+name = "c"
+trigger = "c"
+snippet = "cdr"
+
+[[snippets]]
+name = ".."
+trigger = ".."
+snippet = "cdr ../"
+
+[[snippets]]
+name = "l"
+trigger = "l"
+snippet = "eza -blF"
+
+[[snippets]]
+name = "ls"
+trigger = "ls"
+snippet = "eza --git --group-directories-first"
+
+[[snippets]]
+name = "la"
+trigger = "la"
+snippet = "eza -a"
+
+[[snippets]]
+name = "ll"
+trigger = "ll"
+snippet = "eza -l"
+
+[[snippets]]
+name = "lla"
+trigger = "lla"
+snippet = "eza -labghimu"
+
+[[snippets]]
+name = "tree"
+trigger = "tree"
+snippet = "eza --tree"
+
+[[snippets]]
+name = "h"
+trigger = "h"
+snippet = "fc -lt '%F %T' 1"
+
+[[snippets]]
+name = "safe"
+trigger-pattern = "^(cp|mv|rm)$"
+snippet = "$abbr -i"
+evaluate = true
+
+[[snippets]]
+name = "mkdir with parents"
+trigger = "mkdir"
+snippet = "mkdir -p"
+
+[[snippets]]
+name = "diff"
+trigger = "diff"
+snippet = "diff -U1"
+
+[[snippets]]
+name = "curl"
+trigger = "curl"
+snippet = "curl --compressed"
+
+[[snippets]]
+name = "tmux -u"
+trigger = "t"
+snippet = "tmux -u"
+
+[[snippets]]
+name = "d"
+trigger = "d"
+snippet = "docker"
+
+[[snippets]]
+name = "dc"
+trigger = "dc"
+snippet = "docker compose"
+
+[[snippets]]
+name = "docker compose"
+trigger-pattern = "^co?$"
+snippet = "compose"
+global = true
+context = '^docker\s+'
+
+[[snippets]]
+name = "uv run python *.py"
+trigger-pattern = '^(?<file>.+\.py)$'
+snippet = "uv run python $file"
+evaluate = true
+
+[[snippets]]
+name = ">/dev/null 2>&1"
+trigger = "null"
+snippet = ">/dev/null 2>&1"
+global = true
