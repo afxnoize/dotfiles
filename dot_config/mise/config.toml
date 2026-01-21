@@ -30,4 +30,4 @@ experimental = true
 uvx = true
 
 [settings.npm]
-bun = true
+package_manager = "bun"
