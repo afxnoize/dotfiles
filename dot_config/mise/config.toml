@@ -5,11 +5,6 @@ bun = "latest"
 uv = "latest"
 python = "latest"
 usage = "latest"
-ghq = "latest"
-fzf = "latest"
-fd = "10.3.0"
-bat = "0.26.0"
-ripgrep = "latest"
 pnpm = "10.9.0"
 yarn = "latest"
 "pipx:tldr" = "latest"
@@ -17,11 +12,8 @@ yarn = "latest"
 "ubi:duckdb/duckdb" = "latest"
 "npm:@anthropic-ai/claude-code" = "latest"
 "npm:ccusage" = "latest"
-task = "latest"
 "npm:@openai/codex" = "latest"
-aws = { version = "latest", symlink_bins = "true" }
 go = "latest"
-sqlc = "latest"
 
 [settings]
 experimental = true
