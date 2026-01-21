@@ -26,3 +26,6 @@ serena/
 Documents
 Documents/PowerShell/**
 {{ end }}
+
+nix
+mcp
