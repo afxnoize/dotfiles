@@ -1,4 +1,4 @@
-{ config, pkgs, username, homeDirectory, ... }:
+{ config, pkgs, pkgs-unstable, username, homeDirectory, ... }:
 
 {
   home.username = username;
@@ -18,8 +18,8 @@
     bat
     bottom
     eza
-    mise
-    usage
+    pkgs-unstable.mise
+    pkgs-unstable.usage
     bitwarden-cli
   ];
 

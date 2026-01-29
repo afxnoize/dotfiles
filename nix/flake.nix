@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
@@ -10,10 +11,11 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, ... }:
     let
       system = builtins.currentSystem;
       pkgs = nixpkgs.legacyPackages.${system};
+      pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
       username = builtins.getEnv "USER";
       homeDirectory = builtins.getEnv "HOME";
     in {
@@ -24,7 +26,7 @@
             ./home.nix
           ];
           extraSpecialArgs = {
-            inherit username homeDirectory;
+            inherit username homeDirectory pkgs-unstable;
           };
         };
     };
