@@ -8,10 +8,11 @@ usage = "latest"
 pnpm = "10.9.0"
 yarn = "latest"
 "pipx:tldr" = "latest"
-"ubi:duckdb/duckdb" = "latest"
+"github:duckdb/duckdb" = "latest"
 "npm:ccusage" = "latest"
 "npm:@moonbit/moonbit-lsp" = "latest"
 go = "latest"
+moonbit = "latest"
 
 [settings]
 experimental = true

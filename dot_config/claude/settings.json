@@ -30,5 +30,8 @@
       "Bash(wget * | sh*)",
       "Bash(wget * | bash*)"
     ]
+  },
+  "enabledPlugins": {
+    "moonbit-practice@moonbit-practice": true
   }
 }
