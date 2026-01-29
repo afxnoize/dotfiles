@@ -3,6 +3,19 @@ if not ok then
 	return
 end
 
+vim.api.nvim_create_autocmd("User", {
+	pattern = "TSUpdate",
+	callback = function()
+		require("nvim-treesitter.parsers").moonbit = {
+			install_info = {
+				url = "https://github.com/moonbitlang/tree-sitter-moonbit",
+				branch = "main",
+				queries = 'queries',
+			}
+		}
+	end
+})
+
 ts.setup({
 	highlight = {
 		enable = true,

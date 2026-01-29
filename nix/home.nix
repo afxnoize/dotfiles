@@ -22,6 +22,7 @@
     pkgs-unstable.usage
     bitwarden-cli
 	devbox
+  just
   ];
 
   programs.zsh.enable = true;

@@ -21,7 +21,7 @@ cd nix
 # 初回
 nix run github:nix-community/home-manager -- switch --flake .#$USER_NAME --impure
 # 以降
-home-manager -- switch --flake .#$USER_NAME --impure
+home-manager switch --flake .#$USER_NAME --impure
 ```
 
 ## chezmoi

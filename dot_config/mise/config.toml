@@ -8,11 +8,9 @@ usage = "latest"
 pnpm = "10.9.0"
 yarn = "latest"
 "pipx:tldr" = "latest"
-"npm:@devcontainers/cli" = "latest"
 "ubi:duckdb/duckdb" = "latest"
-"npm:@anthropic-ai/claude-code" = "latest"
 "npm:ccusage" = "latest"
-"npm:@openai/codex" = "latest"
+"npm:@moonbit/moonbit-lsp" = "latest"
 go = "latest"
 
 [settings]
