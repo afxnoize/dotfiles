@@ -164,7 +164,7 @@ DISTRO=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
 
 # ghq fzf
 function ghq-fzf() {
-	local src=$(ghq list | fzf-tmux -p 80% --preview "${cmd_bat} --style=header,grid --line-range :80 $(ghq root)/{}/README.*")
+	local src=$( (cd "$(ghq root)" && command ls -td $(ghq list)) | fzf-tmux -p 80% --preview "${cmd_bat} --style=header,grid --line-range :80 $(ghq root)/{}/README.*")
 	if [ -n "$src" ]; then
 		BUFFER="cd $(ghq root)/$src && tmux rename-window $(basename $src)"
 		zle accept-line
