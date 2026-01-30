@@ -11,6 +11,7 @@ yarn = "latest"
 "github:duckdb/duckdb" = "latest"
 "npm:ccusage" = "latest"
 "npm:@moonbit/moonbit-lsp" = "latest"
+"npm:tree-sitter-cli" = "latest"
 go = "latest"
 moonbit = "latest"
 

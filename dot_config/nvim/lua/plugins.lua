@@ -177,6 +177,7 @@ lazy.setup({
 	-- treesitter
 	{
 		'nvim-treesitter/nvim-treesitter',
+		branch = 'main',
 		event = 'BufReadPost',
 		build = ':TSUpdate',
 	},
@@ -444,6 +445,22 @@ lazy.setup({
 		end,
 		ft = { "markdown" },
 		-- { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
+	},
+
+	-- moonbit
+	{
+		'moonbit-community/moonbit.nvim',
+		ft = { 'moonbit' },
+		opts = {
+			treesitter = {
+				enabled = true,
+				auto_install = true,
+			},
+			lsp = {
+				on_attach = function(client, bufnr) end,
+				capabilities = vim.lsp.protocol.make_client_capabilities(),
+			}
+		},
 	},
 
 	-- 翻訳
