@@ -1,6 +1,11 @@
-{ config, pkgs, pkgs-unstable, lib, username, homeDirectory, ... }:
+{ config, pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, ... }:
 
 {
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) [
+      "claude-code"
+    ];
+
   home.username = username;
   home.homeDirectory = homeDirectory;
 
@@ -11,7 +16,10 @@
   home.packages = with pkgs; [
     git
     ghq
+    pkgs-unstable.git-wt
+
     neovim
+
     fzf
     ripgrep
     fd
@@ -24,14 +32,10 @@
     zoxide
     devbox
     just
-  ];
 
-  # Claude Code (公式インストーラー経由)
-  home.activation.installClaudeCode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    if ! command -v claude &> /dev/null; then
-      ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | ${pkgs.bash}/bin/bash
-    fi
-  '';
+    claude-code
+    llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.rtk
+  ];
 
   programs.zsh.enable = true;
 
