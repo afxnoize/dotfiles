@@ -1,11 +1,6 @@
 { config, pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, ... }:
 
-let
-  bunxTools = import ./bunx/registry.nix;
-  mkBunxWrapper =
-    import ./bunx/mk-wrappers.nix { inherit pkgs; };
-
-in {
+{
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
       "claude-code"
@@ -17,6 +12,11 @@ in {
   home.stateVersion = "25.11";
 
   programs.home-manager.enable = true;
+
+  imports = [
+    ./modules
+    ./tools
+  ];
 
   home.packages = with pkgs; [
     git
@@ -38,19 +38,8 @@ in {
     devbox
     just
 
-    bun
-
     claude-code
     llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.rtk
     llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.ccusage
-  ]
-  ++ mkBunxWrappers bunxTools;
-
-  programs.zsh.enable = true;
-
-  programs.zsh.initContent = ''
-    if [ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
-      . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-    fi
-  '';
+  ];
 }
