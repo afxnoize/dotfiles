@@ -1,13 +1,9 @@
 { config, pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, ... }:
 
 let
-  bunxTools = import ./bunx-tools.nix;
-  bunxWrapper = name: pkg:
-    pkgs.writeShellScriptBin name ''
-      exec ${pkgs.bun}/bin/bunx --bun ${pkg} "$@"
-    '';
-  bunxPackages =
-    pkgs.lib.mapAttrsToList bunxWrapper bunxTools;
+  bunxTools = import ./bunx/registry.nix;
+  mkBunxWrapper =
+    import ./bunx/mk-wrappers.nix { inherit pkgs; };
 
 in {
   nixpkgs.config.allowUnfreePredicate = pkg:
@@ -48,7 +44,7 @@ in {
     llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.rtk
     llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.ccusage
   ]
-  ++ bunxPackages;
+  ++ mkBunxWrappers bunxTools;
 
   programs.zsh.enable = true;
 
