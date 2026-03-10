@@ -20,3 +20,10 @@ snippet = """
 claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena
 start-mcp-server --context claude-code --mode planning --mode no-onboarding --project-from-cwd
 """
+
+[[snippets]]
+name = "gcommit"
+trigger = "gcommit"
+snippet = """
+git diff --staged | claude -p "Generate a comprehensive conventional commit message for this diff. Format: type(scope): subject\n\nBody explaining why and what.\n\nDiff:"
+"""
