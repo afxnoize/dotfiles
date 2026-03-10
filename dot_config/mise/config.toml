@@ -11,9 +11,13 @@ yarn = "latest"
 go = "latest"
 moonbit = "latest"
 aws = { version = "latest", symlink_bins = "true" }
+"npm:tree-sitter-cli" = "latest"
 
 [settings]
 experimental = true
 
 [settings.pipx]
 uvx = true
+
+[settings.npm]
+package_manager = "bun"
