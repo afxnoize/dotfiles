@@ -25,5 +25,5 @@ start-mcp-server --context claude-code --mode planning --mode no-onboarding --pr
 name = "gcommit"
 trigger = "gcommit"
 snippet = """
-git diff --staged | claude -p "Generate a comprehensive conventional commit message for this diff. Format: type(scope): subject\n\nBody explaining why and what.\n\nDiff:"
+git commit -e -m "$(git diff --staged | claude -p 'Write a comprehensive conventional commit message for this diff:' | sed 's/```//g')"
 """
