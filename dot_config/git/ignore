@@ -1,9 +1,0 @@
-/.vscode
-
-# anyenv local version
-.*-version
-
-# git worktree
-.worktree
-
-**/.claude/settings.local.json
