@@ -55,40 +55,29 @@ vim.api.nvim_create_autocmd('LspAttach', {
 		-- See `:help vim.lsp.*` for documentation on any of the below functions
 		local bufnr = args.bufnr
 		local bufopts = { noremap = true, silent = true, buffer = bufnr }
-		vim.keymap.set('n', '][', '<Cmd>Lspsaga diagnostic_jump_prev<CR>', bufopts)
-		vim.keymap.set('n', ']]', '<Cmd>Lspsaga diagnostic_jump_next<CR>', bufopts)
-		vim.keymap.set('n', ']e', '<Cmd>Lspsaga show_cursor_diagnostics<CR>', bufopts)
+		vim.keymap.set('n', '][', function() vim.diagnostic.jump({ count = -1 }) end, bufopts)
+		vim.keymap.set('n', ']]', function() vim.diagnostic.jump({ count = 1 }) end, bufopts)
+		vim.keymap.set('n', ']e', vim.diagnostic.open_float, bufopts)
 
 		-- Definitions
-		vim.keymap.set('n', ']d', '<Cmd>Lspsaga peek_definition<CR>', bufopts)
-		--vim.keymap.set('n', ']d', '<Cmd>Lspsaga peek_definition<CR>', bufopts)
+		vim.keymap.set('n', ']d', vim.lsp.buf.definition, bufopts)
 		vim.keymap.set('n', ']D', vim.lsp.buf.definition, bufopts)
 		vim.keymap.set('n', ']<C-d>', vim.lsp.buf.definition, bufopts)
 
 		-- Implementations
-		vim.keymap.set('n', ']i', '<Cmd>Lspsaga finder imp<CR>', bufopts)
-		vim.keymap.set('n', ']I', vim.lsp.buf.implementation, bufopts)
+		vim.keymap.set('n', ']i', vim.lsp.buf.implementation, bufopts)
 
-		vim.keymap.set('n', ']f', '<Cmd>Lspsaga finder<CR>', bufopts)
+		-- References
+		vim.keymap.set('n', ']f', vim.lsp.buf.references, bufopts)
 
 		vim.keymap.set('n', 'K', function() -- https://scrapbox.io/vim-jp/better_K_for_neovim_lua
 			if not lua_help() then
-				require('lspsaga.hover'):render_hover_doc()
-				-- vim.lsp.buf.hover()
+				vim.lsp.buf.hover()
 			end
 		end, bufopts)
 		vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-		-- vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-		-- vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-		-- vim.keymap.set('n', '<space>wl', function()
-		--   print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-		-- end, bufopts)
-		-- vim.keymap.set('n', ']tD', vim.lsp.buf.type_definition, bufopts)
-		-- vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-		vim.keymap.set('n', ']r', '<Cmd>Lspsaga rename<CR>', bufopts)
-		-- vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
-		vim.keymap.set('n', ']c', '<Cmd>Lspsaga code_action<CR>', bufopts)
-		-- vim.keymap.set('n', ']r', vim.lsp.buf.references, bufopts)
+		vim.keymap.set('n', ']r', vim.lsp.buf.rename, bufopts)
+		vim.keymap.set('n', ']c', vim.lsp.buf.code_action, bufopts)
 		-- vim.keymap.set('n', '<space>f', vim.lsp.buf.formatting, bufopts)
 		vim.keymap.set('n', ']F', function()
 			vim.lsp.buf.format { async = true }

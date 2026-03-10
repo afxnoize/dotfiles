@@ -6,13 +6,15 @@ end
 -- [lsp]を押しても表示されない. :WhichKey [lsp]には登録されている
 wk.add({
 	mode = {"n"},
-	{ "[lsp]<C-d>", desc = "vim.lsp.buf.definition" },
-	{ "[lsp][", desc = "<Cmd>Lspsaga diagnostic_jump_prev<CR>" },
-	{ "[lsp]]", desc = "<Cmd>Lspsaga diagnostic_jump_next<CR>" },
-	{ "[lsp]e", desc = "<Cmd>Lspsaga show_cursor_diagnostics<CR>" },
-	{ "[lsp]d", desc = "<Cmd>Lspsaga peek_definition<CR>" },
-	{ "[lsp]f", desc = "<Cmd>Lspsaga lsp_finder<CR>" },
-	{ "[lsp]D", desc = "Declaration" },
+	{ "[lsp]<C-d>", desc = "Definition" },
+	{ "[lsp][", desc = "Diagnostic prev" },
+	{ "[lsp]]", desc = "Diagnostic next" },
+	{ "[lsp]e", desc = "Diagnostic float" },
+	{ "[lsp]d", desc = "Definition" },
+	{ "[lsp]f", desc = "References" },
+	{ "[lsp]D", desc = "Definition" },
 	{ "[lsp]F", desc = "Format" },
 	{ "[lsp]i", desc = "Implementation" },
+	{ "[lsp]r", desc = "Rename" },
+	{ "[lsp]c", desc = "Code action" },
 })
