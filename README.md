@@ -69,17 +69,3 @@ Usage
 mise use node@20
 mise use --global node@20
 ```
-
-<!--
-## afx
-[WIP]
-
-[AFX](https://babarot.me/afx/)
-
-
-Install
-```sh
-curl -sL https://raw.githubusercontent.com/b4b4r07/afx/HEAD/hack/install | AFX_BIN_DIR="${LOCAL_BIN_DIR:-$HOME/.local/bin}" bash
-mkdir -p $XDG_CONFIG_HOME/afx
-```
--->
