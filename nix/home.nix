@@ -1,4 +1,4 @@
-{ config, pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, ... }:
+{ pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, ... }:
 
 {
   nixpkgs.config.allowUnfreePredicate = pkg:
@@ -39,7 +39,9 @@
     just
 
     claude-code
-    llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.rtk
-    llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.ccusage
-  ];
+  ]
+  ++ (with llm-agents.packages.${pkgs.stdenv.hostPlatform.system}; [
+    rtk
+    ccusage
+  ]);
 }

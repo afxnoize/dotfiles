@@ -2,5 +2,6 @@
   imports = [
     ./bunx
     ./npx
+    ./cargo
   ];
 }
