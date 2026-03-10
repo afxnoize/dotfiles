@@ -68,7 +68,7 @@
         nocd = false;
       };
 
-      include.path = "~/.gitconfig.local";
+      include.path = "~/.config/git/local.config";
     };
 
     ignores = [

@@ -1,0 +1,6 @@
+[user]
+	email = 22848261+afxnoize@users.noreply.github.com
+[includeIf "gitdir:~/repos/github.com/afxnoize/"]
+	path = ~/repos/github.com/afxnoize/gitconfig
+[includeIf "gitdir:~/repos/github.com/xxx/"]
+	path = ~/repos/github.com/xxx/gitconfig
