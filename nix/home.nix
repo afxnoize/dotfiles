@@ -1,6 +1,15 @@
 { config, pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, ... }:
 
-{
+let
+  bunxTools = import ./bunx-tools.nix;
+  bunxWrapper = name: pkg:
+    pkgs.writeShellScriptBin name ''
+      exec ${pkgs.bun}/bin/bunx --bun ${pkg} "$@"
+    '';
+  bunxPackages =
+    pkgs.lib.mapAttrsToList bunxWrapper bunxTools;
+
+in {
   nixpkgs.config.allowUnfreePredicate = pkg:
     builtins.elem (lib.getName pkg) [
       "claude-code"
@@ -33,9 +42,13 @@
     devbox
     just
 
+    bun
+
     claude-code
     llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.rtk
-  ];
+    llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.ccusage
+  ]
+  ++ bunxPackages;
 
   programs.zsh.enable = true;
 
