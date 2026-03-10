@@ -1,7 +1,6 @@
 [tools]
 node = "latest"
 deno = "latest"
-bun = "latest"
 uv = "latest"
 python = "latest"
 usage = "latest"
@@ -9,16 +8,12 @@ pnpm = "10.9.0"
 yarn = "latest"
 "pipx:tldr" = "latest"
 "github:duckdb/duckdb" = "latest"
-"npm:@moonbit/moonbit-lsp" = "latest"
-"npm:tree-sitter-cli" = "latest"
 go = "latest"
 moonbit = "latest"
+aws = { version = "latest", symlink_bins = "true" }
 
 [settings]
 experimental = true
 
 [settings.pipx]
 uvx = true
-
-[settings.npm]
-package_manager = "bun"
