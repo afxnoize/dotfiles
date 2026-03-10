@@ -22,8 +22,8 @@ start-mcp-server --context claude-code --mode planning --mode no-onboarding --pr
 """
 
 [[snippets]]
-name = "gcommit"
-trigger = "gcommit"
+name = "aicommit"
+trigger = "aicm"
 snippet = """
-git commit -e -m "$(git diff --staged | claude -p 'Write a comprehensive conventional commit message for this diff:' | sed 's/```//g')"
+git commit -e -m "$(git diff --staged | claude -p 'Write a comprehensive conventional commit message for this diff. Output only the message, no markdown or backticks:')"
 """
