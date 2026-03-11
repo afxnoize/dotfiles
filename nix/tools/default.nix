@@ -3,5 +3,6 @@
     ./bunx
     ./npx
     ./cargo
+    ./kakehashi
   ];
 }
