@@ -125,25 +125,12 @@ zinit wait"1c" lucid \
 	atload"source $ZRCDIR/pluginconfig/gh_atload.zsh" \
 	for @cli/cli
 
-# tmux plugin manager
-zinit wait lucid \
-	as"null" id-as"tpm" \
-	atclone"
-		mkdir -p \$XDG_DATA_HOME/tmux/plugins;
-		ln -sf \$ZINIT[PLUGINS_DIR]/tpm \$XDG_DATA_HOME/tmux/plugins/tpm;" \
-	atpull'%atclone' \
-	for @tmux-plugins/tpm
-
 ### End of program }}}
 
 # completions
 zinit wait"2" lucid \
 	as"completion" for \
 	src"contrib/completion/zsh/_docker" depth"1" @docker/cli
-
-zinit wait lucid \
-	configure"--disable-utf8proc" make \
-	for @tmux/tmux
 
 # fzf
 # export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
