@@ -28,13 +28,13 @@ export XDG_BIN_HOME="${XDG_BIN_HOME:-$HOME/.local/bin}"
 # End of XDG Base Directory }}}
 
 # Zsh Base Directory {{{
-export ZDOTDIR=${ZDOTDIR:-"$HOME"/.config/zsh}
-export ZHOMEDIR=${ZDOTDIR:-"$HOME"/.config/zsh}
-export ZSTATEDIR=$XDG_STATE_HOME/zsh
-export ZDATADIR=$XDG_DATA_HOME/zsh
-export ZCACHEDIR=$XDG_CACHE_HOME/zsh
+export ZDOTDIR="${ZDOTDIR:-$HOME/.config/zsh}"
+export ZHOMEDIR="${ZDOTDIR:-$HOME/.config/zsh}"
+export ZSTATEDIR="$XDG_STATE_HOME/zsh"
+export ZDATADIR="$XDG_DATA_HOME/zsh"
+export ZCACHEDIR="$XDG_CACHE_HOME/zsh"
 
-export ZRCDIR=$ZHOMEDIR/rc
+export ZRCDIR="$ZHOMEDIR/rc"
 # End of Zsh Base Directory }}}
 
 # Claude Code {{{
@@ -55,7 +55,7 @@ export LOCAL_BIN_DIR="$XDG_BIN_HOME"
 
 # Misc {{{
 export EDITOR=/usr/bin/nvim
-export SERENA_HOME="$XDG_CONFIGH_HOME/serena"
+export SERENA_HOME="$XDG_CONFIG_HOME/serena"
 # End of Misc }}}
 
 # Paths {{{
