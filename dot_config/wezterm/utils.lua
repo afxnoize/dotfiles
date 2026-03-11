@@ -2,8 +2,10 @@
 
 local M = {}
 
-function M.basename(s)
-	return string.gsub(s, "(.*[/\\])(.*)", "%2")
+function M.merge_config(base, extra)
+	for k, v in pairs(extra) do
+		base[k] = v
+	end
 end
 
 function M.merge_tables(t1, t2)
@@ -17,33 +19,15 @@ function M.merge_tables(t1, t2)
 	return t1
 end
 
-function M.merge_lists(t1, t2)
+function M.merge_lists(a, b)
 	local result = {}
-	for _, v in pairs(t1) do
+	for _, v in ipairs(a) do
 		table.insert(result, v)
 	end
-	for _, v in pairs(t2) do
+	for _, v in ipairs(b) do
 		table.insert(result, v)
 	end
 	return result
-end
-
-function M.exists(tab, element)
-	for _, v in pairs(tab) do
-		if v == element then
-			return true
-		elseif type(v) == "table" then
-			return M.exists(v, element)
-		end
-	end
-	return false
-end
-
-function M.convert_home_dir(path)
-	local cwd = path
-	local home = os.getenv("HOME")
-	cwd = cwd:gsub("^" .. home .. "/", "~/")
-	return cwd
 end
 
 return M
