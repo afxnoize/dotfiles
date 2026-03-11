@@ -1,6 +1,13 @@
-#f45873b3-b655-43a6-b217-97c00aa0db58 PowerToys CommandNotFound module
-
-Import-Module -Name Microsoft.WinGet.CommandNotFound
+#f45873b3-b655-43a6-b217-97c00aa0db58 PowerToys CommandNotFound module (lazy load)
+$canary = $ExecutionContext.SessionState.InvokeCommand.CommandNotFoundAction
+$ExecutionContext.SessionState.InvokeCommand.CommandNotFoundAction = [EventHandler[System.Management.Automation.CommandLookupEventArgs]] {
+    param([object] $sender, [System.Management.Automation.CommandLookupEventArgs] $e)
+    end {
+        Import-Module -Name Microsoft.WinGet.CommandNotFound -ErrorAction SilentlyContinue
+        # Remove this bootstrap handler after first invocation
+        $ExecutionContext.SessionState.InvokeCommand.CommandNotFoundAction = $null
+    }
+}
 #f45873b3-b655-43a6-b217-97c00aa0db58
 
 # Import the Chocolatey Profile that contains the necessary code to enable
@@ -25,11 +32,13 @@ function Optimize-WSL { Optimize-VHD -Path $env:LocalAppData\Docker\wsl\main\ext
 # - Config Terminal fonts
 $env:POSH_SESSION_ID = "7d11e128-fc2a-4a49-80c7-db4979f57ce2";& 'C:\Users\s_kon.ad\AppData\Local\oh-my-posh\init.9595566853615471448.ps1'
 
-Import-Module "$($(Get-Item $(Get-Command scoop.ps1).Path).Directory.Parent.FullName)\modules\posh-git"
+$_scoopModulesDir = "$($(Get-Item $(Get-Command scoop.ps1).Path).Directory.Parent.FullName)\modules"
+Import-Module "$_scoopModulesDir\posh-git"
 Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 
 # Need: scoop install scoop-completion
-Import-Module "$($(Get-Item $(Get-Command scoop.ps1).Path).Directory.Parent.FullName)\modules\scoop-completion"
+Import-Module "$_scoopModulesDir\scoop-completion"
+Remove-Variable _scoopModulesDir
 
 # }}} - omp
 

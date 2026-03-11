@@ -6,12 +6,16 @@
 # Prevent logging out with `Ctrl-D`
 setopt IGNORE_EOF
 
-# Colored
-autoload -Uz colors && colors
-
 # Completion {{{
-# Activate shell completion
-autoload -Uz compinit && compinit
+# Activate shell completion (cache compaudit for 24h)
+autoload -Uz compinit
+local -a _comp_outdated=( $ZCACHEDIR/.zcompdump(N.mh+24) )
+if (( $#_comp_outdated )) || [[ ! -f "$ZCACHEDIR/.zcompdump" ]]; then
+	compinit -d "$ZCACHEDIR/.zcompdump"
+else
+	compinit -C -d "$ZCACHEDIR/.zcompdump"
+fi
+unset _comp_outdated
 # for bash_completion
 autoload -U +X bashcompinit && bashcompinit
 
@@ -121,15 +125,6 @@ zinit wait"1c" lucid \
 	atload"source $ZRCDIR/pluginconfig/gh_atload.zsh" \
 	for @cli/cli
 
-# tmux plugin manager
-zinit wait lucid \
-	as"null" id-as"tpm" \
-	atclone"
-		mkdir -p \$XDG_DATA_HOME/tmux/plugins;
-		ln -sf \$ZINIT[PLUGINS_DIR]/tpm \$XDG_DATA_HOME/tmux/plugins/tpm;" \
-	atpull'%atclone' \
-	for @tmux-plugins/tpm
-
 ### End of program }}}
 
 # completions
@@ -137,17 +132,11 @@ zinit wait"2" lucid \
 	as"completion" for \
 	src"contrib/completion/zsh/_docker" depth"1" @docker/cli
 
-zinit wait lucid \
-	configure"--disable-utf8proc" make \
-	for @tmux/tmux
-
 # fzf
 # export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
 
 # awscli
 complete -C 'aws_completer' aws
-
-DISTRO=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
 
 # ghq fzf
 function ghq-fzf() {
@@ -216,12 +205,6 @@ yq() {
 export GPG_TTY=$(tty)
 complete -o nospace -C /usr/local/bin/bit bit
 
-# The next line enables shell command completion for gcloud.
-if [ -f '$HOME/google-cloud-sdk/path.zsh.inc' ]; then . '$HOME/google-cloud-sdk/path.zsh.inc'; fi
-if [ -f '$HOME/google-cloud-sdk/completion.zsh.inc' ]; then . '$HOME/google-cloud-sdk/completion.zsh.inc'; fi
-if [ -f '$HOME/.cache/paru/clone/google-cloud-sdk/pkg/google-cloud-sdk/opt/google-cloud-sdk/path.zsh.inc' ]; then . '$HOME/.cache/paru/clone/google-cloud-sdk/pkg/google-cloud-sdk/opt/google-cloud-sdk/path.zsh.inc'; fi
-if [ -f '$HOME/.cache/paru/clone/google-cloud-sdk/pkg/google-cloud-sdk/opt/google-cloud-sdk/completion.zsh.inc' ]; then . '$HOME/.cache/paru/clone/google-cloud-sdk/pkg/google-cloud-sdk/opt/google-cloud-sdk/completion.zsh.inc'; fi
-
 # cdr, add-zsh-hook を有効にする
 autoload -Uz chpwd_recent_dirs cdr add-zsh-hook && add-zsh-hook chpwd chpwd_recent_dirs
 
@@ -265,10 +248,6 @@ bindkey '^f^p' zaw-process
 bindkey '^fp' zaw-process
 bindkey '^t' zaw-tmux
 # }}}
-
-# tabtab source for packages
-# uninstall by removing these lines
-[[ -f ~/.config/tabtab/__tabtab.zsh ]] && . ~/.config/tabtab/__tabtab.zsh || true
 
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
 function gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
