@@ -10,8 +10,15 @@ setopt IGNORE_EOF
 autoload -Uz colors && colors
 
 # Completion {{{
-# Activate shell completion
-autoload -Uz compinit && compinit
+# Activate shell completion (cache compaudit for 24h)
+autoload -Uz compinit
+local -a _comp_outdated=( $ZCACHEDIR/.zcompdump(N.mh+24) )
+if (( $#_comp_outdated )) || [[ ! -f "$ZCACHEDIR/.zcompdump" ]]; then
+	compinit -d "$ZCACHEDIR/.zcompdump"
+else
+	compinit -C -d "$ZCACHEDIR/.zcompdump"
+fi
+unset _comp_outdated
 # for bash_completion
 autoload -U +X bashcompinit && bashcompinit
 
