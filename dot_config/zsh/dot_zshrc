@@ -6,9 +6,6 @@
 # Prevent logging out with `Ctrl-D`
 setopt IGNORE_EOF
 
-# Colored
-autoload -Uz colors && colors
-
 # Completion {{{
 # Activate shell completion (cache compaudit for 24h)
 autoload -Uz compinit
