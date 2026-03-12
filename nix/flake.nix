@@ -14,9 +14,10 @@
 
     claude-code.url = "github:sadjow/claude-code-nix";
     llm-agents.url = "github:numtide/llm-agents.nix";
+    cage.url = "github:Warashi/cage";
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, cage, ... }:
     let
       system = builtins.currentSystem;
       pkgs = import nixpkgs {
@@ -37,7 +38,7 @@
             ./home.nix
           ];
           extraSpecialArgs = {
-            inherit username homeDirectory pkgs-unstable llm-agents;
+            inherit username homeDirectory pkgs-unstable llm-agents cage;
           };
         };
     };

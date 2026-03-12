@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, ... }:
+{ pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, cage, ... }:
 
 {
   nixpkgs.config.allowUnfreePredicate = pkg:
@@ -43,6 +43,9 @@
   ++ (with llm-agents.packages.${pkgs.stdenv.hostPlatform.system}; [
     rtk
     ccusage
-  ]);
+  ])
+  ++ [
+    cage.packages.${pkgs.stdenv.hostPlatform.system}.default
+  ];
 
 }
