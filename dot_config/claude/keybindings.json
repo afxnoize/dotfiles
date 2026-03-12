@@ -1,0 +1,78 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-keybindings.json",
+  "$docs": "https://code.claude.com/docs/en/keybindings",
+  "bindings": [
+    {
+      "context": "Help",
+      "bindings": {
+        "q": "help:dismiss"
+      }
+    },
+    {
+      "context": "Transcript",
+      "bindings": {
+        "q": "transcript:exit"
+      }
+    },
+    {
+      "context": "DiffDialog",
+      "bindings": {
+        "q": "diff:dismiss"
+      }
+    },
+    {
+      "context": "Confirmation",
+      "bindings": {
+        "q": "confirm:no"
+      }
+    },
+    {
+      "context": "Select",
+      "bindings": {
+        "q": "select:cancel"
+      }
+    },
+    {
+      "context": "Attachments",
+      "bindings": {
+        "q": "attachments:exit"
+      }
+    },
+    {
+      "context": "Footer",
+      "bindings": {
+        "q": "footer:clearSelection"
+      }
+    },
+    {
+      "context": "Settings",
+      "bindings": {
+        "q": "confirm:no"
+      }
+    },
+    {
+      "context": "MessageSelector",
+      "bindings": {
+        "q": "messageSelector:select"
+      }
+    },
+    {
+      "context": "ThemePicker",
+      "bindings": {
+        "q": "select:cancel"
+      }
+    },
+    {
+      "context": "ModelPicker",
+      "bindings": {
+        "q": "select:cancel"
+      }
+    },
+    {
+      "context": "Plugin",
+      "bindings": {
+        "q": "select:cancel"
+      }
+    }
+  ]
+}
