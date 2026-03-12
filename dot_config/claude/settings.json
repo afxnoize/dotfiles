@@ -1,32 +1,8 @@
 {
   "permissions": {
-    "defaultMode": "auto"
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_CONFIG_DIR/hooks/rtk-rewrite.sh"
-          }
-        ]
-      }
-    ]
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "bunx -y ccstatusline@2.2.4",
-    "padding": 0
-  },
-  "enabledPlugins": {
-    "moonbit-practice@moonbit-practice": true
-  },
-  "plansDirectory": "./.plans",
-  "skipAutoPermissionPrompt": true,
-  "permisions": {
+    "defaultMode": "auto",
     "deny": [
+      "Bash(git push*)",
       "Bash(rm -rf /*)",
       "Bash(rm -rf /)",
       "Bash(sudo rm -rf /*)",
@@ -53,5 +29,32 @@
       "Bash(wget * | bash*)"
     ]
   },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/deny-git-push.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/rtk-rewrite.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bunx -y ccstatusline@2.2.4",
+    "padding": 0
+  },
+  "enabledPlugins": {
+    "moonbit-practice@moonbit-practice": true
+  },
+  "plansDirectory": "./.plans",
+  "skipAutoPermissionPrompt": true,
   "skipDangerousModePermissionPrompt": true
 }
