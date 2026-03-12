@@ -76,6 +76,7 @@
       ".*-version" # anyenv local version
       ".worktrees" # git worktree
       "**/.claude/settings.local.json"
+      ".plans/" # Claude Code plans directory
     ];
   };
 
