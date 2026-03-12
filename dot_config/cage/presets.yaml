@@ -1,0 +1,31 @@
+presets:
+  base:
+    allow:
+      - "." # current
+      - "$XDG_CACHE_HOME" # ~/.cache
+      - "$XDG_STATE_HOME" # ~/.local/state (zsh history, nvim state)
+      - "$TMPDIR"
+      - "/tmp"
+
+  git-enabled:
+    allow-git: true
+
+  claude-code:
+    allow:
+      - "$CLAUDE_CONFIG_DIR"
+      - "$HOME/.serena"
+      - ".serena"
+
+  dev-tools:
+    allow:
+      - "$CARGO_HOME" # Rust/Cargo
+      - "$DENO_DIR" # Deno
+      - "$XDG_DATA_HOME/go" # GOPATH
+
+auto-presets:
+  - command: claude
+    presets:
+      - base
+      - git-enabled
+      - claude-code
+      - dev-tools
