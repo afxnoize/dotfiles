@@ -13,17 +13,6 @@
           }
         ]
       }
-    ],
-    "PostToolUseFailure": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_CONFIG_DIR/hooks/cage-advisor.sh"
-          }
-        ]
-      }
     ]
   },
   "statusLine": {
