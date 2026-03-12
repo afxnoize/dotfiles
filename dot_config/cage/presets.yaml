@@ -4,6 +4,9 @@ presets:
       - "." # current
       - "$XDG_CACHE_HOME" # ~/.cache
       - "$XDG_STATE_HOME" # ~/.local/state (zsh history, nvim state)
+      - "$XDG_DATA_HOME/rtk" # rtk gain
+      - "$XDG_DATA_HOME/zoxide" # rtk gain
+      - "$XDG_DATA_HOME/lesshst"
       - "$TMPDIR"
       - "/tmp"
 
