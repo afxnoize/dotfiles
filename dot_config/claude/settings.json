@@ -1,6 +1,6 @@
 {
-  "env": {
-    "ENABLE_TOOL_SEARCH": "true"
+  "permissions": {
+    "defaultMode": "auto"
   },
   "hooks": {
     "PreToolUse": [
@@ -24,6 +24,7 @@
     "moonbit-practice@moonbit-practice": true
   },
   "plansDirectory": "./.plans",
+  "skipAutoPermissionPrompt": true,
   "permisions": {
     "deny": [
       "Bash(rm -rf /*)",
@@ -51,5 +52,6 @@
       "Bash(wget * | sh*)",
       "Bash(wget * | bash*)"
     ]
-  }
+  },
+  "skipDangerousModePermissionPrompt": true
 }
