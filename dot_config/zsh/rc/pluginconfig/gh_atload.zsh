@@ -1,3 +1,1 @@
-if [[ ! -r $ZHOMEDIR/completions.local/_gh ]]; then
-	gh completion -s zsh > $ZHOMEDIR/completions.local/_gh
-fi
+ensure_completion gh "gh --version" "gh completion -s zsh"

@@ -25,6 +25,28 @@ zstyle ':completion:*' menu true select
 zstyle ':completion:*:rm:*' menu false
 # match lower and upper
 zstyle ':completion:*:(cd|less):*' matcher 'm:{a-z}={A-Z}'
+# Generate/update completion if command version changed
+# Usage: ensure_completion <cmd> <version_cmd> <gen_cmd>
+ensure_completion() {
+	local cmd=$1 version_cmd=$2 gen_cmd=$3
+	local comp_dir="$ZHOMEDIR/completions.local"
+	local ver_dir="$comp_dir/.versions"
+	local comp_file="$comp_dir/_${cmd}"
+	local ver_file="$ver_dir/${cmd}"
+
+	(( ${+commands[$cmd]} )) || return
+
+	local current_ver
+	current_ver=$(eval "$version_cmd" 2>/dev/null) || return
+
+	if [[ -r "$comp_file" ]] && [[ -r "$ver_file" ]] && [[ "$(< "$ver_file")" == "$current_ver" ]]; then
+		return
+	fi
+
+	mkdir -p "$ver_dir"
+	eval "$gen_cmd" > "$comp_file" 2>/dev/null && echo "$current_ver" > "$ver_file"
+}
+
 # End of Completion }}}
 
 # History {{{
@@ -182,7 +204,9 @@ function ghq-tmux() {
 }
 zle -N ghq-tmux
 
-# chezmoi fzf completion (Tab triggers fzf for chezmoi edit only, when no args yet)
+ensure_completion chezmoi "chezmoi --version" "chezmoi completion zsh"
+
+# chezmoi fzf completion (Tab triggers fzf for chezmoi edit/add)
 _fzf_complete_chezmoi() {
 	local subcmd="${words[2]}"
 	if [[ ("$subcmd" == "edit" || "$subcmd" == "add") && ${#words[@]} -eq 2 ]]; then
