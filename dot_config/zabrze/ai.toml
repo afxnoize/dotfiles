@@ -27,3 +27,8 @@ trigger = "aicm"
 snippet = """
 git commit -e -m "$(git diff --staged | claude -p 'Write a comprehensive conventional commit message for this diff. Output only the message, no markdown or backticks:')"
 """
+
+[[snippets]]
+name = "vercel/skills"
+trigger = "skills"
+snippet = "bunx skills add"
