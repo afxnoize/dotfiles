@@ -209,7 +209,8 @@ context = '^git\s+stash\s+push'
 [[snippets]]
 name = "git worktree"
 trigger = "w"
-snippet = "worktree"
+# git-wt
+snippet = "wt"
 global = true
 context = '^git\s+\S+$'
 
