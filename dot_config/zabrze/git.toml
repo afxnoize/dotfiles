@@ -165,6 +165,14 @@ global = true
 context = '^git\s+\S+$'
 
 [[snippets]]
+name = "git log -N"
+trigger-pattern = '^(?<n>\d+)$'
+snippet = "-$n"
+evaluate = true
+global = true
+context = '^git\s+log\s'
+
+[[snippets]]
 name = "git graph"
 trigger = "gr"
 snippet = "graph"
