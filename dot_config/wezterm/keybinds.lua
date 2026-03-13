@@ -9,6 +9,7 @@ local default_keybinds = {
   { key = "Insert", mods = "SHIFT", action = wezterm.action({ PasteFrom = "PrimarySelection" }) },
   { key = "=", mods = "CTRL", action = "ResetFontSize" },
   { key = "+", mods = "CTRL", action = "IncreaseFontSize" },
+  { key = "+", mods = "CTRL|SHIFT", action = "IncreaseFontSize" },
   { key = "-", mods = "CTRL", action = "DecreaseFontSize" },
   { key = " ", mods = "CTRL|SHIFT", action = "QuickSelect" },
   { key = "x", mods = "CTRL|SHIFT", action = "ActivateCopyMode" },
