@@ -71,12 +71,12 @@ keymap.set('n', '<Leader>r', [[<Cmd>source $MYVIMRC<CR>]], { noremap = false })
 
 -- [tab] {{{
 keymap.set('', '[tab]', '<Nop>')
-keymap.set('n', 't', '[tab]', { remap = true })
+keymap.set('n', '<Leader><Tab>', '[tab]', { remap = true })
 
 keymap.set('n', '[tab]n', '<Cmd>tabnext<CR>', { silent = true })
 keymap.set('n', '[tab]p', '<Cmd>tabprevious<CR>', { silent = true })
 keymap.set('n', '[tab]e', '<Cmd>tabedit<CR>', { silent = true })
-keymap.set('n', '[tab]c', '<Cmd>tabclose<CR>', { silent = true })
+keymap.set('n', '[tab]x', '<Cmd>tabclose<CR>', { silent = true })
 keymap.set('n', '[tab]o', '<Cmd>tabonly<CR>', { silent = true })
 -- }}}
 
