@@ -32,7 +32,9 @@ function M.init()
 	}
 	)
 	vim.keymap.set('n', '[telescope]F', builtin('builtin') {})
-	vim.keymap.set('n', '[telescope]g', builtin('live_grep') {})
+	vim.keymap.set('n', '[telescope]g', builtin('live_grep') {
+		hidden = true,
+	})
 	vim.keymap.set('n', '[telescope]b', builtin('buffers') {})
 	vim.keymap.set('n', '[telescope]t', builtin('help_tags') {})
 	vim.keymap.set('n', '[telescope]r', builtin('resume') {})
