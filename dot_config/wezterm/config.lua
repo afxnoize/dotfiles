@@ -15,8 +15,9 @@ config.adjust_window_size_when_changing_font_size = false
 ---------------------------------------------------------------
 config.font = wezterm.font_with_fallback({
 	'Cica',
+	{ family = 'Symbols Nerd Font Mono', scale = 1 },
 	{ family = 'Iosevka Term', weight = 'Regular' },
-	'Fire Code',
+	'Fira Code',
 })
 config.font_size = 14.2
 config.color_scheme = 'iceberg-dark'
