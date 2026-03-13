@@ -106,6 +106,21 @@ keymap.set('n', '[term]n', '<Cmd>FloatermNext<CR>', { silent = true })
 keymap.set('t', '[term]n', '<ESC><Cmd>FloatermNext<CR>', { silent = true })
 keymap.set('n', '[term]t', '<Cmd>FloatermToggle<CR>', { silent = true })
 keymap.set('t', '[term]t', '<ESC><Cmd>FloatermToggle<CR>', { silent = true })
+local function floaterm_kill_and_next()
+	local bufs = vim.fn['floaterm#buflist#gather']()
+	if #bufs > 1 then
+		local cur = vim.api.nvim_get_current_buf()
+		vim.cmd('FloatermPrev')
+		vim.cmd('FloatermKill ' .. cur)
+	else
+		vim.cmd('FloatermToggle')
+	end
+end
+keymap.set('n', '[term]x', floaterm_kill_and_next, { silent = true })
+keymap.set('t', '[term]x', function()
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-\\><C-n>', true, false, true), 'n', false)
+	floaterm_kill_and_next()
+end, { silent = true })
 -- }}}
 
 -- disabled {{{
