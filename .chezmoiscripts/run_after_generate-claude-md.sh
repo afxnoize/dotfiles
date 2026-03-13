@@ -25,12 +25,16 @@ if ! grep -qF "$BEGIN_MARKER" "$CLAUDE_MD"; then
   printf '\n%s\n%s\n' "$BEGIN_MARKER" "$END_MARKER" >> "$CLAUDE_MD"
 fi
 
-# Bitwarden から取得
-bw_json=$(bw get item agent-settings 2>/dev/null)
-if [ -n "$bw_json" ]; then
-  persona=$(echo "$bw_json" | jq -r '.fields[] | select(.name == "persona") | .value // empty' 2>/dev/null)
-  boss_mode=$(echo "$bw_json" | jq -r '.fields[] | select(.name == "bossMode") | .value // empty' 2>/dev/null)
+# Bitwarden から取得（未ログイン/ロック中ならスキップ）
+bw_status=$(bw status 2>/dev/null | jq -r '.status' 2>/dev/null)
+if [ "$bw_status" != "unlocked" ]; then
+  echo "bw not unlocked (status: ${bw_status:-unknown}), skipping CLAUDE.md update"
+  exit 0
 fi
+
+bw_json=$(bw get item agent-settings 2>/dev/null)
+persona=$(echo "$bw_json" | jq -r '.fields[] | select(.name == "persona") | .value // empty' 2>/dev/null)
+boss_mode=$(echo "$bw_json" | jq -r '.fields[] | select(.name == "bossMode") | .value // empty' 2>/dev/null)
 
 # マーカー区間を置換
 block="${BEGIN_MARKER}"
