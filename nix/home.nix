@@ -34,6 +34,7 @@
     pkgs-unstable.mise
     pkgs-unstable.usage
     bitwarden-cli
+    jq
     zoxide
     devbox
     just
