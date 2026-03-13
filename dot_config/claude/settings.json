@@ -72,5 +72,5 @@
   "plansDirectory": "./.plans",
   "skipAutoPermissionPrompt": true,
   "skipDangerousModePermissionPrompt": true,
-  "language": "{{ env "CLAUDE_LANGUAGE" | default "japanese" }}"
+  "language": "japanese"
 }
