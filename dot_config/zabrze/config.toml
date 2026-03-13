@@ -1,12 +1,12 @@
 [[snippets]]
-name = "c"
+name = "zoxide"
 trigger = "c"
-snippet = "cdr"
+snippet = "z"
 
 [[snippets]]
-name = ".."
-trigger = ".."
-snippet = "cdr ../"
+name = "zoxide"
+trigger = "cd"
+snippet = "z"
 
 [[snippets]]
 name = "l"
