@@ -225,6 +225,22 @@ yq() {
 	docker run --rm -i -v "${PWD}":/workdir mikefarah/yq "$@"
 }
 
+# claude — sandbox なしで bypass permissions を検知して警告
+claude() {
+	local sandboxed=0
+	[[ -n "$IN_CAGE" ]] && sandboxed=1
+	# [[ -n "$FIREJAIL_VERSION" ]] && sandboxed=1
+	# [[ -n "$SNAP_NAME" ]] && sandboxed=1
+
+	if (( ! sandboxed )) && [[ " $* " == *" --dangerously-skip-permissions "* ]]; then
+		print -P "%F{yellow}⚠ sandbox なしで --dangerously-skip-permissions が有効です%f"
+		print -P "%F{yellow}  cage claude --dangerously-skip-permissions を推奨%f"
+		read -q "?続行しますか? [y/N] " || { echo; return 1; }
+		echo
+	fi
+	command claude "$@"
+}
+
 # tty
 export GPG_TTY=$(tty)
 complete -o nospace -C /usr/local/bin/bit bit
