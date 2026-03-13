@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "defaultMode": "auto",
+    "defaultMode": "default",
     "deny": [
       "Bash(git push*)",
       "Bash(git add -A*)",
@@ -71,5 +71,6 @@
   },
   "plansDirectory": "./.plans",
   "skipAutoPermissionPrompt": true,
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "language": "{{ env "CLAUDE_LANGUAGE" | default "japanese" }}"
 }
