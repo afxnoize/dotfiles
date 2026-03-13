@@ -20,6 +20,7 @@ config.font = wezterm.font_with_fallback({
 	'Fira Code',
 })
 config.font_size = 14.2
+config.allow_square_glyphs_to_overflow_width = "Always"
 config.color_scheme = 'iceberg-dark'
 config.window_background_opacity = 0.94
 
