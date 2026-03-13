@@ -11,32 +11,46 @@ snippet = "z"
 [[snippets]]
 name = "l"
 trigger = "l"
-snippet = "eza -blF"
+snippet = "eza --group-directories-first"
 
 [[snippets]]
 name = "ls"
 trigger = "ls"
-snippet = "eza --git --group-directories-first"
+snippet = "eza --group-directories-first --git"
 
 [[snippets]]
 name = "la"
 trigger = "la"
-snippet = "eza -a"
+snippet = "eza --group-directories-first -a"
 
 [[snippets]]
 name = "ll"
 trigger = "ll"
-snippet = "eza -l"
+snippet = "eza --group-directories-first --git -l"
 
 [[snippets]]
 name = "lla"
 trigger = "lla"
-snippet = "eza -labghimu"
+snippet = "eza --group-directories-first --git -la"
 
 [[snippets]]
 name = "tree"
 trigger = "tree"
-snippet = "eza --tree"
+snippet = "eza --group-directories-first --tree"
+
+[[snippets]]
+name = "sort newest first"
+trigger = ":n"
+snippet = "-s modified -r"
+global = true
+context = '^eza\s+'
+
+[[snippets]]
+name = "sort largest first"
+trigger = ":s"
+snippet = "-s size -r"
+global = true
+context = '^eza\s+'
 
 [[snippets]]
 name = "h"
