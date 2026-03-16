@@ -293,6 +293,7 @@ bindkey '^t' zaw-tmux
 function gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
 
 eval "$(zoxide init zsh)"
+eval "$(git wt --init zsh)"
 
 zinit wait lucid \
 	as"null" id-as"mise" \

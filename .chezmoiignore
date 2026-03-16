@@ -1,9 +1,13 @@
 README.md
+AGENTS.md
+CLAUDE.md
+**/CONVENTIONS.md
 
 *.txt
-**/*.md
 !.config/claude/CLAUDE.md
 !.config/claude/skills/**/*.md
+
+.chezmoiscripts/*
 
 # nvim lazy lock
 **/nvim/lazy-lock.json
