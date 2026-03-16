@@ -42,13 +42,8 @@ if echo "$CMD" | grep -qE "${PRE}git[[:space:]]+push([[:space:]]|$)"; then
   # Refspec target with main/master segment: feature:hotfix/main
   echo "$PUSH_ARGS" | grep -qE ":[^[:space:]]*/+(main|master)([[:space:]]|/|$)" \
     && deny "$DENY_MSG"
-  # Bare git push (no branch arg) — check current branch
-  if [ -z "$PUSH_ARGS" ] || ! echo "$PUSH_ARGS" | grep -qE "[[:space:]][a-zA-Z0-9_./-]+[[:space:]]+[a-zA-Z0-9_./-]+"; then
-    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
-    if [[ -n "$CURRENT_BRANCH" ]] && echo "$CURRENT_BRANCH" | grep -qE "^${PROTECTED_BRANCH}$"; then
-      deny "Push to protected branch ($CURRENT_BRANCH) is blocked. Ask the user to push manually."
-    fi
-  fi
+  # NOTE: bare git push (no branch arg) is handled by settings.json deny list
+  # Bash(git push) — フックではCWDが不定のため正確なブランチ判定ができない
 fi
 
 echo "$CMD" | grep -qE "${PRE}git[[:space:]]+add[[:space:]]+(-A|--all|\.($|[[:space:];|&]))" \

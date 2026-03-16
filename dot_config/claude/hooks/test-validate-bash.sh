@@ -98,9 +98,9 @@ assert_pass "数字付き fix ブランチを許可する"                "git p
 assert_pass "-u 付きの非保護ブランチ push を許可する"        "git push -u origin feature-x"
 
 echo ""
-echo "# ブランチ未指定の push はブロックしない"
-assert_pass "引数なしの push を許可する"       "git push"
-assert_pass "remote のみ指定の push を許可する" "git push origin"
+echo "# ブランチ未指定の push はフックでは判定しない (settings.json deny list で制御)"
+assert_pass "引数なし push はフック側では許可する (deny list が別途ブロック)"  "git push"
+assert_pass "remote のみ指定の push はフック側では許可する"                   "git push origin"
 
 echo ""
 echo "# チェーンコマンド内の文字列に誤反応しない"

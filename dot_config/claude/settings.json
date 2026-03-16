@@ -2,6 +2,7 @@
   "permissions": {
     "defaultMode": "default",
     "deny": [
+      "Bash(git push)",
       "Bash(git add -A*)",
       "Bash(git add --all*)",
       "Bash(git add .)",
