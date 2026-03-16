@@ -34,6 +34,11 @@ if not ok then return end
 plugin.setup({ ... })
 ```
 
+### ファイラー
+- **oil.nvim**: デフォルトファイルエクスプローラ（`default_file_explorer = true`）
+- **telescope file_browser**: `sf` でカレントバッファのディレクトリを開く（隠しファイル表示、gitignore無視）
+- **fern.vim**: `:Fern` コマンドで利用可能（サイドバー型ファイラー）
+
 ### Gotchas
 - `lua/plugins.lua` は lazy.nvim の spec 定義のみ。setup() は `after/plugin/` か `lua/rc/` で行う
 - LSP設定は `lsp/` に最小限のオプションのみ。keymapは `after/plugin/lsp.rc.lua` の LspAttach で一元管理
