@@ -69,6 +69,14 @@
   "enabledPlugins": {
     "moonbit-practice@moonbit-practice": true
   },
+  "extraKnownMarketplaces": {
+    "anthropics-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    }
+  },
   "plansDirectory": "./.plans",
   "skipAutoPermissionPrompt": true,
   "skipDangerousModePermissionPrompt": true,
