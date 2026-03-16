@@ -24,9 +24,27 @@ deny() {
 # Match command at start of line or after ; & | operators
 PRE='(^|[;&|] *)'
 
-# --- git: destructive / push ---
-echo "$CMD" | grep -qE "${PRE}git[[:space:]]+push([[:space:]]|$)" \
-  && deny "git push is blocked. Ask the user to push manually."
+# --- git: push to protected branches ---
+PROTECTED_BRANCH='(main|master|development|develop|dev|release(/[^[:space:]]*)?)'
+DENY_MSG="Push to protected branch is blocked. Ask the user to push manually."
+if echo "$CMD" | grep -qE "${PRE}git[[:space:]]+push([[:space:]]|$)"; then
+  # Extract only the git push sub-command args (exclude other chained commands)
+  PUSH_ARGS=$(echo "$CMD" | sed -nE 's/.*git[[:space:]]+push([[:space:]][^;&|]*).*/\1/p')
+  # Exact branch: git push origin main, git push origin release/v1.0
+  echo "$PUSH_ARGS" | grep -qE "[[:space:]]${PROTECTED_BRANCH}([[:space:]]|$)" \
+    && deny "$DENY_MSG"
+  # main/master as path segment: git push origin hotfix/main
+  echo "$PUSH_ARGS" | grep -qE "[[:space:]][^[:space:]]*/+(main|master)([[:space:]]|/|$)" \
+    && deny "$DENY_MSG"
+  # Refspec target: git push origin feature:main
+  echo "$PUSH_ARGS" | grep -qE ":${PROTECTED_BRANCH}([[:space:]]|$)" \
+    && deny "$DENY_MSG"
+  # Refspec target with main/master segment: feature:hotfix/main
+  echo "$PUSH_ARGS" | grep -qE ":[^[:space:]]*/+(main|master)([[:space:]]|/|$)" \
+    && deny "$DENY_MSG"
+  # NOTE: bare git push (no branch arg) is handled by settings.json deny list
+  # Bash(git push) — フックではCWDが不定のため正確なブランチ判定ができない
+fi
 
 echo "$CMD" | grep -qE "${PRE}git[[:space:]]+add[[:space:]]+(-A|--all|\.($|[[:space:];|&]))" \
   && deny "git add -A / git add . is blocked. Specify file names explicitly."
