@@ -54,7 +54,7 @@ if echo "$MATCH_CMD" | grep -qE '^git[[:space:]]'; then
     -e 's/--(no-pager|no-optional-locks|bare|literal-pathspecs)[[:space:]]*//g' \
     -e 's/^[[:space:]]+//')
   case "$GIT_SUBCMD" in
-    status|status\ *|diff|diff\ *|log|log\ *|add|add\ *|commit|commit\ *|push|push\ *|pull|pull\ *|branch|branch\ *|fetch|fetch\ *|stash|stash\ *|show|show\ *)
+    status|status\ *|diff|diff\ *|log|log\ *|add|add\ *|commit|commit\ *|pull|pull\ *|branch|branch\ *|fetch|fetch\ *|stash|stash\ *|show|show\ *)
       REWRITTEN="${ENV_PREFIX}rtk $CMD_BODY"
       ;;
   esac

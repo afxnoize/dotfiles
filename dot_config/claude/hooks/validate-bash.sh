@@ -24,9 +24,17 @@ deny() {
 # Match command at start of line or after ; & | operators
 PRE='(^|[;&|] *)'
 
-# --- git: destructive / push ---
-echo "$CMD" | grep -qE "${PRE}git[[:space:]]+push([[:space:]]|$)" \
-  && deny "git push is blocked. Ask the user to push manually."
+# --- git: push to protected branches ---
+PROTECTED_BRANCH='(main|master|development|develop|dev|release(/[^[:space:]]*)?)'
+# Match: git push [flags...] [remote] <protected-branch>
+# Also match refspec format: feature:main
+if echo "$CMD" | grep -qE "${PRE}git[[:space:]]+push[[:space:]]"; then
+  # Check for protected branch as argument or refspec target (:main)
+  echo "$CMD" | grep -qE "[[:space:]]${PROTECTED_BRANCH}([[:space:]]|$)" \
+    && deny "Push to protected branch is blocked. Ask the user to push manually."
+  echo "$CMD" | grep -qE ":${PROTECTED_BRANCH}([[:space:]]|$)" \
+    && deny "Push to protected branch is blocked. Ask the user to push manually."
+fi
 
 echo "$CMD" | grep -qE "${PRE}git[[:space:]]+add[[:space:]]+(-A|--all|\.($|[[:space:];|&]))" \
   && deny "git add -A / git add . is blocked. Specify file names explicitly."
