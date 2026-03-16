@@ -14,15 +14,28 @@ _run() {
   else echo "$result" | jq -r '.hookSpecificOutput.permissionDecision // "pass"'; fi
 }
 
-assert() {
-  local label="$1" cmd="$2" expect="$3"
+assert_deny() {
+  local name="$1" cmd="$2"
   local actual
   actual=$(_run "$cmd")
-  if [ "$actual" = "$expect" ]; then
-    echo "  ✅ $label"
+  if [ "$actual" = "deny" ]; then
+    echo "  ✅ $name"
     PASS=$((PASS + 1))
   else
-    echo "  ❌ $label → $actual (expected: $expect)"
+    echo "  ❌ $name → $actual (expected: deny)"
+    FAIL=$((FAIL + 1))
+  fi
+}
+
+assert_pass() {
+  local name="$1" cmd="$2"
+  local actual
+  actual=$(_run "$cmd")
+  if [ "$actual" = "pass" ]; then
+    echo "  ✅ $name"
+    PASS=$((PASS + 1))
+  else
+    echo "  ❌ $name → $actual (expected: pass)"
     FAIL=$((FAIL + 1))
   fi
 }
@@ -30,92 +43,98 @@ assert() {
 echo "━━━ validate-bash.sh ━━━"
 
 echo ""
-echo "# 保護ブランチへの push → deny"
-assert "git push origin main"          "git push origin main"          deny
-assert "git push origin master"         "git push origin master"        deny
-assert "git push origin develop"        "git push origin develop"       deny
-assert "git push origin development"    "git push origin development"   deny
-assert "git push origin dev"            "git push origin dev"           deny
-assert "git push origin release"        "git push origin release"       deny
-assert "git push origin release/v1.0"   "git push origin release/v1.0"  deny
-assert "git push origin release/hot/x"  "git push origin release/hot/x" deny
+echo "# 保護ブランチへの push をブロックする"
+assert_deny "main ブランチへの push を拒否する"        "git push origin main"
+assert_deny "master ブランチへの push を拒否する"       "git push origin master"
+assert_deny "develop ブランチへの push を拒否する"      "git push origin develop"
+assert_deny "development ブランチへの push を拒否する"  "git push origin development"
+assert_deny "dev ブランチへの push を拒否する"          "git push origin dev"
+assert_deny "release ブランチへの push を拒否する"      "git push origin release"
+assert_deny "release/* ブランチへの push を拒否する"    "git push origin release/v1.0"
+assert_deny "release の深いパスへの push を拒否する"    "git push origin release/hot/x"
 
 echo ""
-echo "# フラグ付き push → deny"
-assert "git push --force origin main"           "git push --force origin main"           deny
-assert "git push -f origin main"                "git push -f origin main"                deny
-assert "git push --force-with-lease origin main" "git push --force-with-lease origin main" deny
-assert "git push -u origin main"                "git push -u origin main"                deny
+echo "# フラグ付きでも保護ブランチへの push をブロックする"
+assert_deny "--force 付きでもブロックする"              "git push --force origin main"
+assert_deny "-f 短縮形でもブロックする"                 "git push -f origin main"
+assert_deny "--force-with-lease 付きでもブロックする"   "git push --force-with-lease origin main"
+assert_deny "-u 付きでもブロックする"                   "git push -u origin main"
 
 echo ""
-echo "# main/master パスセグメント → deny"
-assert "git push origin hotfix/main"      "git push origin hotfix/main"      deny
-assert "git push origin hotfix/master"     "git push origin hotfix/master"    deny
-assert "git push origin bugfix/main"       "git push origin bugfix/main"      deny
-assert "git push origin feature/sub/main"  "git push origin feature/sub/main" deny
+echo "# main/master をパスセグメントに含むブランチもブロックする"
+assert_deny "hotfix/main への push を拒否する"          "git push origin hotfix/main"
+assert_deny "hotfix/master への push を拒否する"         "git push origin hotfix/master"
+assert_deny "bugfix/main への push を拒否する"           "git push origin bugfix/main"
+assert_deny "深いパスの main への push を拒否する"       "git push origin feature/sub/main"
 
 echo ""
-echo "# refspec ターゲット → deny"
-assert "git push origin feature:main"       "git push origin feature:main"       deny
-assert "git push origin feature:release/v1" "git push origin feature:release/v1" deny
+echo "# refspec のターゲットが保護ブランチならブロックする"
+assert_deny "feature:main の refspec を拒否する"         "git push origin feature:main"
+assert_deny "feature:release/v1 の refspec を拒否する"   "git push origin feature:release/v1"
 
 echo ""
-echo "# refspec ソースが保護名でもターゲットが非保護 → pass"
-assert "git push origin main:feature" "git push origin main:feature" pass
+echo "# refspec のソースが保護名でもターゲットが非保護なら許可する"
+assert_pass "main:feature はターゲットが非保護なので許可する" "git push origin main:feature"
 
 echo ""
-echo "# 境界値: 保護名を含むが別ブランチ → pass"
-assert "git push origin dev-feature"   "git push origin dev-feature"   pass
-assert "git push origin main-feature"  "git push origin main-feature"  pass
-assert "git push origin developer"     "git push origin developer"     pass
-assert "git push origin release-notes" "git push origin release-notes" pass
-assert "git push origin my-dev-branch" "git push origin my-dev-branch" pass
+echo "# 保護名を前方一致で含むだけの別ブランチは許可する"
+assert_pass "dev-feature は dev とは別ブランチなので許可する"     "git push origin dev-feature"
+assert_pass "main-feature は main とは別ブランチなので許可する"   "git push origin main-feature"
+assert_pass "developer は develop とは別ブランチなので許可する"   "git push origin developer"
+assert_pass "release-notes は release/ ではないので許可する"      "git push origin release-notes"
+assert_pass "my-dev-branch は dev を途中に含むだけなので許可する" "git push origin my-dev-branch"
 
 echo ""
-echo "# main/master 以外はセグメントでも pass"
-assert "git push origin hotfix/develop" "git push origin hotfix/develop" pass
-assert "git push origin hotfix/dev"     "git push origin hotfix/dev"     pass
-assert "git push origin hotfix/release" "git push origin hotfix/release" pass
+echo "# main/master 以外の保護名はパスセグメント内なら許可する"
+assert_pass "hotfix/develop はセグメント検出対象外なので許可する" "git push origin hotfix/develop"
+assert_pass "hotfix/dev はセグメント検出対象外なので許可する"     "git push origin hotfix/dev"
+assert_pass "hotfix/release はセグメント検出対象外なので許可する" "git push origin hotfix/release"
 
 echo ""
-echo "# 非保護ブランチ → pass"
-assert "git push origin feature-branch"  "git push origin feature-branch" pass
-assert "git push origin feat/rtk-hook"   "git push origin feat/rtk-hook"  pass
-assert "git push origin fix/bug-123"     "git push origin fix/bug-123"    pass
-assert "git push -u origin feature-x"    "git push -u origin feature-x"   pass
+echo "# 非保護ブランチへの push を許可する"
+assert_pass "feature ブランチへの push を許可する"           "git push origin feature-branch"
+assert_pass "スラッシュ付き feature ブランチを許可する"      "git push origin feat/rtk-hook"
+assert_pass "数字付き fix ブランチを許可する"                "git push origin fix/bug-123"
+assert_pass "-u 付きの非保護ブランチ push を許可する"        "git push -u origin feature-x"
 
 echo ""
-echo "# 引数なし / remote のみ → pass"
-assert "git push (引数なし)" "git push"        pass
-assert "git push origin"     "git push origin" pass
+echo "# ブランチ未指定の push はブロックしない"
+assert_pass "引数なしの push を許可する"       "git push"
+assert_pass "remote のみ指定の push を許可する" "git push origin"
 
 echo ""
-echo "# チェーンコマンド誤検知防止"
-assert "commit msg に main → pass"  "git commit -m 'fix main bug' && git push origin feat/x"  pass
-assert "commit msg に push → pass"  "git commit -m 'push to prod' && git push origin feat/x"  pass
-assert "echo main → pass"           "echo main && git push origin feat/x"                      pass
+echo "# チェーンコマンド内の文字列に誤反応しない"
+assert_pass "コミットメッセージ内の main に反応しない"   "git commit -m 'fix main bug' && git push origin feat/x"
+assert_pass "コミットメッセージ内の push に反応しない"   "git commit -m 'push to prod' && git push origin feat/x"
+assert_pass "echo コマンド内の main に反応しない"        "echo main && git push origin feat/x"
 
 echo ""
-echo "# チェーン内の push が保護ブランチ → deny"
-assert "chain + main"         "git status && git push origin main"         deny
-assert "chain + hotfix/main"  "git diff && git push origin hotfix/main"    deny
+echo "# チェーン内でも push 部分が保護ブランチならブロックする"
+assert_deny "チェーン後の main push を拒否する"          "git status && git push origin main"
+assert_deny "チェーン後の hotfix/main push を拒否する"   "git diff && git push origin hotfix/main"
 
 echo ""
-echo "# 他の危険コマンド → deny"
-assert "git add -A"            "git add -A"                  deny
-assert "git add --all"         "git add --all"               deny
-assert "git add ."             "git add ."                   deny
-assert "git reset --hard"      "git reset --hard HEAD~1"     deny
-assert "git clean -f"          "git clean -f"                deny
-assert "git checkout -- file"  "git checkout -- src/main.rs" deny
-assert "git branch -D"         "git branch -D feature"       deny
-assert "gh pr merge"           "gh pr merge 1"               deny
-assert "gh pr close"           "gh pr close 1"               deny
-assert "gh issue close"        "gh issue close 1"            deny
-assert "gh issue delete"       "gh issue delete 1"           deny
-assert "gh repo delete"        "gh repo delete owner/repo"   deny
-assert "gh repo archive"       "gh repo archive owner/repo"  deny
-assert "gh release delete"     "gh release delete v1.0"      deny
+echo "# 広範囲ステージングをブロックする"
+assert_deny "git add -A を拒否する"     "git add -A"
+assert_deny "git add --all を拒否する"  "git add --all"
+assert_deny "git add . を拒否する"      "git add ."
+
+echo ""
+echo "# 破壊的 git 操作をブロックする"
+assert_deny "git reset --hard を拒否する"    "git reset --hard HEAD~1"
+assert_deny "git clean -f を拒否する"        "git clean -f"
+assert_deny "git checkout -- を拒否する"     "git checkout -- src/main.rs"
+assert_deny "git branch -D を拒否する"       "git branch -D feature"
+
+echo ""
+echo "# 状態変更を伴う gh 操作をブロックする"
+assert_deny "gh pr merge を拒否する"       "gh pr merge 1"
+assert_deny "gh pr close を拒否する"       "gh pr close 1"
+assert_deny "gh issue close を拒否する"    "gh issue close 1"
+assert_deny "gh issue delete を拒否する"   "gh issue delete 1"
+assert_deny "gh repo delete を拒否する"    "gh repo delete owner/repo"
+assert_deny "gh repo archive を拒否する"   "gh repo archive owner/repo"
+assert_deny "gh release delete を拒否する" "gh release delete v1.0"
 
 # --- summary ---
 echo ""
