@@ -1,4 +1,2 @@
+@CLAUDE.local.md
 @RTK.md
-
-<!-- bw:begin -->
-<!-- bw:end -->
