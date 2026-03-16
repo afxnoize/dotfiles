@@ -46,6 +46,7 @@ fi
 REWRITTEN=""
 
 # --- Git commands ---
+# Skip dangerous git subcommands to let validate-bash.sh handle them
 if echo "$MATCH_CMD" | grep -qE '^git[[:space:]]'; then
   GIT_SUBCMD=$(echo "$MATCH_CMD" | sed -E \
     -e 's/^git[[:space:]]+//' \
@@ -53,6 +54,15 @@ if echo "$MATCH_CMD" | grep -qE '^git[[:space:]]'; then
     -e 's/--[a-z-]+=[^[:space:]]+[[:space:]]*//g' \
     -e 's/--(no-pager|no-optional-locks|bare|literal-pathspecs)[[:space:]]*//g' \
     -e 's/^[[:space:]]+//')
+  # Bail out for subcommands that validate-bash.sh may deny
+  case "$GIT_SUBCMD" in
+    push|push\ *)           exit 0 ;;  # protected branch check
+    add\ -A*|add\ --all*|add\ .) exit 0 ;;  # broad staging
+    reset\ --hard*)         exit 0 ;;
+    clean\ -f*)             exit 0 ;;
+    checkout\ --\ *)        exit 0 ;;
+    branch\ -D*)            exit 0 ;;
+  esac
   case "$GIT_SUBCMD" in
     status|status\ *|diff|diff\ *|log|log\ *|add|add\ *|commit|commit\ *|pull|pull\ *|branch|branch\ *|fetch|fetch\ *|stash|stash\ *|show|show\ *)
       REWRITTEN="${ENV_PREFIX}rtk $CMD_BODY"
@@ -60,7 +70,14 @@ if echo "$MATCH_CMD" | grep -qE '^git[[:space:]]'; then
   esac
 
 # --- GitHub CLI (added: api, release) ---
+# Skip dangerous gh subcommands to let validate-bash.sh handle them
 elif echo "$MATCH_CMD" | grep -qE '^gh[[:space:]]+(pr|issue|run|api|release)([[:space:]]|$)'; then
+  case "$MATCH_CMD" in
+    *pr\ merge*|*pr\ close*)       exit 0 ;;
+    *issue\ close*|*issue\ delete*) exit 0 ;;
+    *release\ delete*)              exit 0 ;;
+    *repo\ delete*|*repo\ archive*) exit 0 ;;
+  esac
   REWRITTEN="${ENV_PREFIX}$(echo "$CMD_BODY" | sed 's/^gh /rtk gh /')"
 
 # --- Cargo ---
