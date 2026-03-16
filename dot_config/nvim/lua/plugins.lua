@@ -57,7 +57,7 @@ lazy.setup({
 		config = true,
 	},
 
-	-- filter
+	-- filer
 	{
 		'lambdalisue/fern.vim',
 		dependencies = {
@@ -66,6 +66,27 @@ lazy.setup({
 		},
 		cmd = 'Fern',
 		-- todo: add <Plug>(fern-*) ※いまは:Fernのみ
+	},
+	{
+		'stevearc/oil.nvim',
+		---@module 'oil'
+		---@type oil.SetupOpts
+		opts = {
+			default_file_explorer = true,
+			columns = { "icon" },
+			delete_to_trash = true,
+			skip_confirm_for_simple_edits = true,
+			view_options = {
+				show_hidden = false,
+			},
+			keymaps = {
+				["q"] = "actions.close",
+			},
+		},
+		lazy = false,
+		config = function(_, opts)
+			require('oil').setup(opts)
+		end,
 	},
 
 	-- lsp
