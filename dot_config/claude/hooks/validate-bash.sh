@@ -26,14 +26,28 @@ PRE='(^|[;&|] *)'
 
 # --- git: push to protected branches ---
 PROTECTED_BRANCH='(main|master|development|develop|dev|release(/[^[:space:]]*)?)'
-# Match: git push [flags...] [remote] <protected-branch>
-# Also match refspec format: feature:main
-if echo "$CMD" | grep -qE "${PRE}git[[:space:]]+push[[:space:]]"; then
-  # Check for protected branch as argument or refspec target (:main)
+DENY_MSG="Push to protected branch is blocked. Ask the user to push manually."
+if echo "$CMD" | grep -qE "${PRE}git[[:space:]]+push([[:space:]]|$)"; then
+  # Exact branch: git push origin main, git push origin release/v1.0
   echo "$CMD" | grep -qE "[[:space:]]${PROTECTED_BRANCH}([[:space:]]|$)" \
-    && deny "Push to protected branch is blocked. Ask the user to push manually."
+    && deny "$DENY_MSG"
+  # main/master as path segment: git push origin hotfix/main
+  echo "$CMD" | grep -qE "[[:space:]][^[:space:]]*/+(main|master)([[:space:]]|/|$)" \
+    && deny "$DENY_MSG"
+  # Refspec target: git push origin feature:main
   echo "$CMD" | grep -qE ":${PROTECTED_BRANCH}([[:space:]]|$)" \
-    && deny "Push to protected branch is blocked. Ask the user to push manually."
+    && deny "$DENY_MSG"
+  # Refspec target with main/master segment: feature:hotfix/main
+  echo "$CMD" | grep -qE ":[^[:space:]]*/+(main|master)([[:space:]]|/|$)" \
+    && deny "$DENY_MSG"
+  # Bare git push (no branch arg) — check current branch
+  # Matches: "git push", "git push origin", "git push -u origin"
+  if ! echo "$CMD" | grep -qE "[[:space:]][a-zA-Z0-9_./-]+[[:space:]]+[a-zA-Z0-9_./-]+([[:space:]]|$)"; then
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+    if [[ -n "$CURRENT_BRANCH" ]] && echo "$CURRENT_BRANCH" | grep -qE "^${PROTECTED_BRANCH}$"; then
+      deny "Push to protected branch ($CURRENT_BRANCH) is blocked. Ask the user to push manually."
+    fi
+  fi
 fi
 
 echo "$CMD" | grep -qE "${PRE}git[[:space:]]+add[[:space:]]+(-A|--all|\.($|[[:space:];|&]))" \
