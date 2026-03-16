@@ -3,6 +3,7 @@ README.md
 *.txt
 **/*.md
 !.config/claude/CLAUDE.md
+!.config/claude/skills/**/*.md
 
 # nvim lazy lock
 **/nvim/lazy-lock.json
