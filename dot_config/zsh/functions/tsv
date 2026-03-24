@@ -1,0 +1,9 @@
+local name="$1"
+if [[ "$2" =~ ^[0-9]+$ ]]; then
+	local port="$2"
+else
+	local out=$("$@" 2>&1)
+	local port=$(echo "$out" | grep -oP 'localhost:\K\d+' | head -1)
+	[[ -z "$port" ]] && { echo "tsv: port not found"; return 1; }
+fi
+tailscale serve --bg --set-path "/$name" "http://localhost:$port"
