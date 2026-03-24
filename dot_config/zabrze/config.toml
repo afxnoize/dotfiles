@@ -112,6 +112,11 @@ snippet = "uv run python $file"
 evaluate = true
 
 [[snippets]]
+name = "mo"
+trigger = "mo"
+snippet = "mo --no-open"
+
+[[snippets]]
 name = ">/dev/null 2>&1"
 trigger = "null"
 snippet = ">/dev/null 2>&1"

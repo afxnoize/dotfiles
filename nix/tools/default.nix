@@ -4,5 +4,6 @@
     ./npx
     ./cargo
     ./kakehashi
+    ./mo
   ];
 }
