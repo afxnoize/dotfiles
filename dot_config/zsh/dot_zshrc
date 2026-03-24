@@ -25,27 +25,6 @@ zstyle ':completion:*' menu true select
 zstyle ':completion:*:rm:*' menu false
 # match lower and upper
 zstyle ':completion:*:(cd|less):*' matcher 'm:{a-z}={A-Z}'
-# Generate/update completion if command version changed
-# Usage: ensure_completion <cmd> <version_cmd> <gen_cmd>
-ensure_completion() {
-	local cmd=$1 version_cmd=$2 gen_cmd=$3
-	local comp_dir="$ZHOMEDIR/completions.local"
-	local ver_dir="$comp_dir/.versions"
-	local comp_file="$comp_dir/_${cmd}"
-	local ver_file="$ver_dir/${cmd}"
-
-	(( ${+commands[$cmd]} )) || return
-
-	local current_ver
-	current_ver=$(eval "$version_cmd" 2>/dev/null) || return
-
-	if [[ -r "$comp_file" ]] && [[ -r "$ver_file" ]] && [[ "$(< "$ver_file")" == "$current_ver" ]]; then
-		return
-	fi
-
-	mkdir -p "$ver_dir"
-	eval "$gen_cmd" > "$comp_file" 2>/dev/null && echo "$current_ver" > "$ver_file"
-}
 
 # End of Completion }}}
 
@@ -160,86 +139,19 @@ zinit wait"2" lucid \
 # awscli
 complete -C 'aws_completer' aws
 
-# ghq fzf
-function ghq-fzf() {
-	local ghq_root=$(ghq root)
-	local src=$( (cd "$ghq_root" && command ls -td $(ghq list)) | fzf-tmux -p 80% --preview "bat --style=header,grid --line-range :80 $ghq_root/{}/README.*")
-	if [ -n "$src" ]; then
-		BUFFER="cd $ghq_root/$src"
-		zle accept-line
-	fi
-	zle -R -c
-}
+# Autoload functions {{{
+autoload -Uz ensure_completion ghq-fzf ghq-updated-fzf git-status ghq-tmux \
+	_fzf_complete_chezmoi yq claude gi tsv
+
+# zle widgets
 zle -N ghq-fzf
-
-function ghq-updated-fzf() {
-	local ghq_root=$(ghq root)
-	local sorted=$(ghq list | python -c "import os; import sys; print(''.join(sorted(sys.stdin.readlines(), key=lambda path: os.stat(f'$ghq_root/{path.strip()}').st_mtime, reverse=True)))")
-	local src=$(echo $sorted | fzf-tmux -p 80% --preview "bat --style=header,grid --line-range :80 $ghq_root/{}/README.*")
-	if [ -n "$src" ]; then
-		BUFFER="cd $ghq_root/$src"
-		zle accept-line
-	fi
-	zle -R -c
-}
 zle -N ghq-updated-fzf
-
-function git-status() {
-	if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" = 'true' ]; then
-		echo git status -sb
-		git status -sb
-	fi
-	zle -R
-}
 zle -N git-status
-
-# fzf-select-ghq-tmux
-function ghq-tmux() {
-  local selected_dir=$(ghq list -p | fzf-tmux -p 80% --reverse --query "$LBUFFER" --preview 'bat --color=always --style=plain $(find {} -maxdepth 1 | grep -i -e "readme\(.\.*\)\?")')
-  if [ -n "$selected_dir" ]; then
-	local repo=$(basename ${selected_dir})
-	BUFFER="tmux neww -S -n $repo -c $selected_dir"
-	zle accept-line
-  fi
-}
 zle -N ghq-tmux
 
 ensure_completion chezmoi "chezmoi --version" "chezmoi completion zsh"
-
-# chezmoi fzf completion (Tab triggers fzf for chezmoi edit/add)
-_fzf_complete_chezmoi() {
-	local subcmd="${words[2]}"
-	if [[ ("$subcmd" == "edit" || "$subcmd" == "add") && ${#words[@]} -eq 2 ]]; then
-		local target=$(chezmoi managed --include=files | fzf-tmux -p 80% --preview "bat --color=always --style=header,grid --line-range :80 $HOME/{}")
-		if [ -n "$target" ]; then
-			compadd -P '~/' -U -f -Q -- "$target"
-		fi
-	else
-		_chezmoi "$@"
-	fi
-}
 compdef _fzf_complete_chezmoi chezmoi
-
-# yq
-yq() {
-	docker run --rm -i -v "${PWD}":/workdir mikefarah/yq "$@"
-}
-
-# claude — sandbox なしで bypass permissions を検知して警告
-claude() {
-	local sandboxed=0
-	[[ -n "$IN_CAGE" ]] && sandboxed=1
-	# [[ -n "$FIREJAIL_VERSION" ]] && sandboxed=1
-	# [[ -n "$SNAP_NAME" ]] && sandboxed=1
-
-	if (( ! sandboxed )) && [[ " $* " == *" --dangerously-skip-permissions "* ]]; then
-		print -P "%F{yellow}⚠ sandbox なしで --dangerously-skip-permissions が有効です%f"
-		print -P "%F{yellow}  cage claude --dangerously-skip-permissions を推奨%f"
-		read -q "?続行しますか? [y/N] " || { echo; return 1; }
-		echo
-	fi
-	command claude "$@"
-}
+# End of Autoload functions }}}
 
 # tty
 export GPG_TTY=$(tty)
@@ -290,7 +202,6 @@ bindkey '^t' zaw-tmux
 # }}}
 
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
-function gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
 
 eval "$(zoxide init zsh)"
 eval "$(git wt --init zsh)"

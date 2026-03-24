@@ -1,0 +1,6 @@
+local selected_dir=$(ghq list -p | fzf-tmux -p 80% --reverse --query "$LBUFFER" --preview 'bat --color=always --style=plain $(find {} -maxdepth 1 | grep -i -e "readme\(.\.*\)\?")')
+if [ -n "$selected_dir" ]; then
+	local repo=$(basename ${selected_dir})
+	BUFFER="tmux neww -S -n $repo -c $selected_dir"
+	zle accept-line
+fi

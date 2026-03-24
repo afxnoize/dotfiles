@@ -70,6 +70,7 @@ export PATH
 typeset -U PATH
 
 fpath=(
+	$ZHOMEDIR/functions(N-/)
 	$ZHOMEDIR/completions.local(N-/)
 	$ZHOMEDIR/completions(N-/)
 	$fpath
