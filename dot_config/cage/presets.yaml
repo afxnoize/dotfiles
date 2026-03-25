@@ -7,8 +7,10 @@ presets:
       - "$XDG_DATA_HOME/rtk" # rtk gain
       - "$XDG_DATA_HOME/zoxide" # zoxide db
       - "$XDG_DATA_HOME/lesshst"
+      - "$XDG_DATA_HOME/pnpm"
       - "$TMPDIR"
       - "/tmp"
+      - "/dev/ptmx" # pseudo-terminal allocation
 
   git-enabled:
     allow-git: true
