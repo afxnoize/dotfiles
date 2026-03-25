@@ -44,7 +44,7 @@ const gitBranch = (() => {
   }
 })();
 
-const line1Parts = [`${C(188)}󰉋 ${R} ${fishPath(cwd)}`];
+const line1Parts = [`${C(188)}󰉋 ${R}${fishPath(cwd)}`];
 if (gitRoot) line1Parts.push(`${C(30)}${basename(gitRoot)}${R}`);
 if (gitBranch) line1Parts.push(`${C(96)}⎇ ${gitBranch}${R}`);
 const line1 = line1Parts.join(` ${C(7)}|${R} `);
@@ -70,7 +70,7 @@ const fmt = (label, pct) => {
 };
 
 const model = data.model?.display_name ?? "Claude";
-const line2Parts = [`${C(188)}󰧑 ${R} ${BOLD}${model}${R}`];
+const line2Parts = [`${C(188)}󰧑 ${R}${BOLD}${model}${R}`];
 
 const ctx = data.context_window?.used_percentage;
 if (ctx != null) line2Parts.push(fmt("ctx", ctx));
