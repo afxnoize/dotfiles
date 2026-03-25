@@ -36,6 +36,7 @@
     bitwarden-cli
     jq
     zoxide
+    pnpm
     devbox
     just
 

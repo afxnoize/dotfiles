@@ -32,7 +32,7 @@ git commit -e -m "$(git diff --staged | claude -p 'Write a comprehensive convent
 name = "cage claude"
 trigger = "ccc"
 snippet = "cage claude --dangerously-skip-permissions"
-#snippet = "cage claude --permission-mode auto"
+#snippet = "cage claude --enable-auto-mode --permission-mode auto"
 
 [[snippets]]
 name = "vercel/skills"
