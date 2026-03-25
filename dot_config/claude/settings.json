@@ -27,7 +27,6 @@
       "Bash(mkfs*)",
       "Bash(fdisk*)",
       "Bash(parted*)",
-      "Bash(:(){ :|:& };:*)",
       "Bash(*fork*bomb*)",
       "Bash(> /dev/sda*)",
       "Bash(> /dev/nvme*)",
@@ -63,7 +62,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bunx -y ccstatusline@2.2.4",
+    "command": "bun ~/.config/claude/statusline.js",
     "padding": 0
   },
   "enabledPlugins": {
