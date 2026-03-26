@@ -10,7 +10,8 @@ presets:
       - "$XDG_DATA_HOME/pnpm"
       - "$TMPDIR"
       - "/tmp"
-      - "/dev/ptmx" # pseudo-terminal allocation
+      - "/dev/ptmx" # pseudo-terminal master
+      - "/dev/pts" # pseudo-terminal slaves
 
   git-enabled:
     allow-git: true
