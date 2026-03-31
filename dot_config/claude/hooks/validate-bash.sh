@@ -42,8 +42,9 @@ if echo "$CMD" | grep -qE "${PRE}git[[:space:]]+push([[:space:]]|$)"; then
   # Refspec target with main/master segment: feature:hotfix/main
   echo "$PUSH_ARGS" | grep -qE ":[^[:space:]]*/+(main|master)([[:space:]]|/|$)" \
     && deny "$DENY_MSG"
-  # NOTE: bare git push (no branch arg) is handled by settings.json deny list
-  # Bash(git push) — フックではCWDが不定のため正確なブランチ判定ができない
+  # Bare git push (no branch arg) — block unconditionally
+  [[ -z "$PUSH_ARGS" || "$PUSH_ARGS" =~ ^[[:space:]]*$ ]] \
+    && deny "Bare git push is blocked. Specify remote and branch explicitly, or ask the user to push."
 fi
 
 echo "$CMD" | grep -qE "${PRE}git[[:space:]]+add[[:space:]]+(-A|--all|\.($|[[:space:];|&]))" \
