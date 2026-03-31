@@ -6,13 +6,12 @@
 2. [Commands](#commands)
 3. [Flags & Options](#flags--options)
 4. [Configuration](#configuration)
-5. [Environment Variables](#environment-variables)
-6. [Shell Integration](#shell-integration)
-7. [File Copying](#file-copying)
-8. [Lifecycle Hooks](#lifecycle-hooks)
-9. [Bare Repository Support](#bare-repository-support)
-10. [Workflows](#workflows)
-11. [Directory Structure](#directory-structure)
+5. [Shell Integration](#shell-integration)
+6. [File Copying](#file-copying)
+7. [Lifecycle Hooks](#lifecycle-hooks)
+8. [Bare Repository Support](#bare-repository-support)
+9. [Workflows](#workflows)
+10. [Directory Structure](#directory-structure)
 
 ---
 
@@ -39,27 +38,13 @@ Requirements: Git 2.0+
 
 ```bash
 git wt              # テーブル形式（現在のworktreeは * マーク）
-git wt --json       # JSON形式
-```
-
-JSON output:
-```json
-[
-  {
-    "path": "/absolute/path/to/worktree",
-    "branch": "feature-branch",
-    "head": "abc123def456",
-    "current": true,
-    "bare": false
-  }
-]
 ```
 
 ### Create / Switch
 
 ```bash
 git wt <branch>              # ブランチ＋worktree作成、既存なら切替
-git wt <branch> <start-point> # 特定のコミットから作成
+git wt <branch> <start-point> # 特定のコミットから作成（例: origin/main）
 ```
 
 ターゲット引数の解決順序:
@@ -70,11 +55,12 @@ git wt <branch> <start-point> # 特定のコミットから作成
 ### Delete
 
 ```bash
-git wt -d <branch>   # 安全な削除（マージ済みチェック、未マージなら失敗）
-git wt -D <branch>   # 強制削除（マージ状態無視）
+git wt -d <branch>...  # 安全な削除（マージ済みチェック、未マージなら失敗）
+git wt -D <branch>...  # 強制削除（マージ状態無視）
 ```
 
 - main/master ブランチはデフォルトで削除不可（`--allow-delete-default` で解除）
+- 複数ブランチの一括削除に対応
 
 ---
 
@@ -86,19 +72,17 @@ git wt -D <branch>   # 強制削除（マージ状態無視）
 | `--copyignored` | `.gitignore` 対象ファイルをコピー |
 | `--copyuntracked` | 未追跡ファイルをコピー |
 | `--copymodified` | 変更済みファイルをコピー |
-| `--copy <pattern>` | コピー対象パターン（gitignore構文） |
-| `--nocopy <pattern>` | コピー除外パターン |
-| `--hook <cmd>` | 作成後に実行するコマンド |
-| `--deletehook <cmd>` | 削除前に実行するコマンド |
-| `--nocd` | 自動ディレクトリ切替を無効化 |
-| `--no-switch-directory` | `--nocd` の deprecated エイリアス |
-| `--relative` | 現在のサブディレクトリパスを出力に付加（対象サブディレクトリが存在しない場合はworktreeルートにフォールバック） |
+| `--copy <pattern>` | コピー対象パターン（gitignore構文、複数指定可） |
+| `--nocopy <pattern>` | コピー除外パターン（複数指定可） |
+| `--hook <cmd>` | 作成後に実行するコマンド（複数指定可） |
+| `--nocd` | 自動ディレクトリ切替を無効化（`--init` と併用で `git()` ラッパーも無効化） |
 | `--allow-delete-default` | デフォルトブランチの削除を許可 |
-| `--json` | JSON形式で出力 |
-| `--version` | バージョン表示 |
-| `--help` | ヘルプ表示 |
+| `-d` / `--delete` | 安全な削除 |
+| `-D` / `--force-delete` | 強制削除 |
+| `-v` / `--version` | バージョン表示 |
+| `-h` / `--help` | ヘルプ表示 |
 
-**注意**: `--hook`, `--deletehook`, `--remover` 等のフラグは git config の値を**完全に置き換える**（追加ではない）。
+**注意**: `--hook`, `--copy`, `--nocopy` 等のフラグは git config の値を**完全に置き換える**（追加ではない）。
 
 ---
 
@@ -110,17 +94,14 @@ git wt -D <branch>   # 強制削除（マージ状態無視）
 
 | Key | Default | Purpose |
 |-----|---------|---------|
-| `wt.basedir` | `../{gitroot}-wt` | worktree配置先テンプレート |
+| `wt.basedir` | `.wt` | worktree配置先（`{gitroot}` テンプレート対応） |
 | `wt.copyignored` | `false` | gitignored ファイルのコピー |
 | `wt.copyuntracked` | `false` | 未追跡ファイルのコピー |
 | `wt.copymodified` | `false` | 変更済みファイルのコピー |
-| `wt.copy` | (empty) | コピー対象パターン |
-| `wt.nocopy` | (empty) | コピー除外パターン |
+| `wt.copy` | (empty) | コピー対象パターン（gitignore構文） |
+| `wt.nocopy` | (empty) | コピー除外パターン（gitignore構文） |
 | `wt.hook` | (empty) | 作成後フック |
-| `wt.deletehook` | (empty) | 削除前フック |
-| `wt.remover` | (empty) | カスタム削除コマンド（実行後 `git worktree prune` が自動実行） |
 | `wt.nocd` | `false` | 自動cd制御（`false`: 常にcd / `true` or `all`: 常に無効 / `create`: 新規作成時のみ無効） |
-| `wt.relative` | `false` | サブディレクトリ付加 |
 
 ### Examples
 
@@ -133,22 +114,15 @@ git config wt.copyignored true
 git config wt.copyuntracked true
 
 # パターン指定
-git config --add wt.copy "*.env"
+git config --add wt.copy "*.code-workspace"
 git config --add wt.copy ".vscode/"
-git config --add wt.nocopy "node_modules/"
+git config --add wt.nocopy "*.log"
+git config --add wt.nocopy "vendor/"
 
 # フック設定
 git config --add wt.hook "npm install"
-git config --add wt.hook "npm run build"
+git config --add wt.hook "go generate ./..."
 ```
-
----
-
-## Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `GIT_WT_SHELL_INTEGRATION=1` | シェル統合ラッパーが自動設定。現在worktree削除時にメインリポジトリパスを出力する等の挙動に影響 |
 
 ---
 
@@ -158,16 +132,16 @@ git config --add wt.hook "npm run build"
 
 ```bash
 # Zsh — ~/.zshrc に追加
-eval "$(git wt --init zsh)"
+eval "$(git-wt --init zsh)"
 
 # Bash — ~/.bashrc に追加
-eval "$(git wt --init bash)"
+eval "$(git-wt --init bash)"
 
 # Fish — ~/.config/fish/config.fish に追加
-git wt --init fish | source
+git-wt --init fish | source
 
 # PowerShell — $PROFILE に追加
-Invoke-Expression (git wt --init powershell | Out-String)
+Invoke-Expression (git-wt --init powershell | Out-String)
 ```
 
 ### What It Provides
@@ -216,18 +190,6 @@ git config --add wt.hook "code ."
 
 - 定義順に順次実行、失敗時は後続処理を中断（worktree自体は作成済み）
 - 出力は stderr に送られる
-
-### Deletion Hooks (`wt.deletehook`)
-
-worktree削除前に、削除対象のworktreeディレクトリ内で実行。
-
-```bash
-git config --add wt.deletehook "git push origin HEAD"
-git config --add wt.deletehook "npm run cleanup"
-```
-
-- 定義順に順次実行、失敗時は削除を中止（`-d` / `-D` 共通）
-- `-d` vs `-D` の違いはブランチ削除時のマージチェック有無のみ
 
 ---
 
@@ -292,13 +254,12 @@ git wt feature-branch          # 作成後に自動で npm install && build
 
 ## Directory Structure
 
-リポジトリ名 `myproject` の場合（デフォルト設定）:
+リポジトリ名 `myproject` の場合（デフォルト設定 `wt.basedir = .wt`）:
 
 ```
-parent/
-├── myproject/              # メインworktree
-│   └── .git/
-└── myproject-wt/           # basedir (default: ../{gitroot}-wt)
+myproject/                 # メインworktree
+├── .git/
+└── .wt/                   # basedir (default: .wt)
     ├── feature-x/
     │   └── .git
     ├── bugfix-123/
@@ -306,4 +267,3 @@ parent/
     └── experimental/
         └── .git
 ```
-

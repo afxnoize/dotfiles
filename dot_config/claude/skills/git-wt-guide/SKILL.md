@@ -11,7 +11,7 @@ user-invocable: true
 # git-wt Reference
 
 git-wt は `git worktree` をラップし、直感的なインターフェースと自動化機能を提供するGitサブコマンド。
-このドキュメントは **v0.14.2** 時点の情報に基づく。
+このドキュメントは **v0.17.0** 時点の情報に基づく。
 
 ## Quick Reference
 
@@ -21,7 +21,6 @@ git wt <branch>           # 作成 or 切替（なければブランチも新規
 git wt <branch> <start>   # 特定のコミット/ブランチから作成
 git wt -d <branch>        # 安全な削除（マージ済みのみ）
 git wt -D <branch>        # 強制削除
-git wt --json             # JSON形式で一覧
 git wt --init <shell>     # シェル統合の初期化
 ```
 
@@ -37,10 +36,10 @@ git wt --init <shell>     # シェル統合の初期化
 git config の `wt.*` 名前空間で設定。CLI フラグ → git config → デフォルト の優先順。
 
 主要設定:
-- `wt.basedir` — worktree配置先（デフォルト: `../{gitroot}-wt`）
+- `wt.basedir` — worktree配置先（デフォルト: `.wt`）
 - `wt.copyuntracked` / `wt.copyignored` / `wt.copymodified` — ファイルコピー制御
 - `wt.copy` / `wt.nocopy` — gitignore構文のパターンマッチ
-- `wt.hook` / `wt.deletehook` — ライフサイクルフック
+- `wt.hook` — 作成後フック
 
 詳細なコマンドリファレンス・設定・ワークフロー例は [reference.md](reference.md) を参照。
 トラブルシューティングは [troubleshooting.md](troubleshooting.md) を参照。
