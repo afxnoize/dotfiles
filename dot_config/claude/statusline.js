@@ -69,11 +69,29 @@ const fmt = (label, pct) => {
   return `${DIM}${label}${R} ${gradient(pct)}${ring(pct)} ${p}%${R}`;
 };
 
+const kFmt = (n) => {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}k`;
+  return `${n}`;
+};
+
 const model = data.model?.display_name ?? "Claude";
 const line2Parts = [`${C(188)}󰧑 ${R}${BOLD}${model}${R}`];
 
-const ctx = data.context_window?.used_percentage;
-if (ctx != null) line2Parts.push(fmt("ctx", ctx));
+const ctxPct = data.context_window?.used_percentage;
+const ctxSize = data.context_window?.context_window_size;
+const ctxUsage = data.context_window?.current_usage;
+if (ctxPct != null && ctxUsage && ctxSize) {
+  const used =
+    (ctxUsage.input_tokens ?? 0) +
+    (ctxUsage.cache_creation_input_tokens ?? 0) +
+    (ctxUsage.cache_read_input_tokens ?? 0);
+  line2Parts.push(
+    `${DIM}ctx${R} ${gradient(ctxPct)}${ring(ctxPct)} ${kFmt(used)}/${kFmt(ctxSize)}${R}`,
+  );
+} else if (ctxPct != null) {
+  line2Parts.push(fmt("ctx", ctxPct));
+}
 
 const five = data.rate_limits?.five_hour?.used_percentage;
 if (five != null) line2Parts.push(fmt("5h", five));
