@@ -27,6 +27,7 @@ presets:
       - "$CARGO_HOME" # Rust/Cargo
       - "$DENO_DIR" # Deno
       - "$XDG_DATA_HOME/go" # GOPATH
+      - "$HOME/.docker"
 
 auto-presets:
   - command: claude
