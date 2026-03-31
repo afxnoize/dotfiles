@@ -42,9 +42,12 @@ if echo "$CMD" | grep -qE "${PRE}git[[:space:]]+push([[:space:]]|$)"; then
   # Refspec target with main/master segment: feature:hotfix/main
   echo "$PUSH_ARGS" | grep -qE ":[^[:space:]]*/+(main|master)([[:space:]]|/|$)" \
     && deny "$DENY_MSG"
-  # Bare git push (no branch arg) — block unconditionally
-  [[ -z "$PUSH_ARGS" || "$PUSH_ARGS" =~ ^[[:space:]]*$ ]] \
-    && deny "Bare git push is blocked. Specify remote and branch explicitly, or ask the user to push."
+  # Strip shell redirections and flags, then check positional args
+  PUSH_POSITIONAL=$(echo "$PUSH_ARGS" | sed -E 's/[0-9]*>&[0-9]+//g; s/[0-9]*>>[[:space:]]*[^[:space:]]*//g; s/[0-9]*>[[:space:]]*[^[:space:]]*//g; s/[0-9]*<[[:space:]]*[^[:space:]]*//g; s/(^|[[:space:]])-[^[:space:]]*//g')
+  # Count positional args (need at least 2: remote and branch)
+  PUSH_ARGC=$(echo "$PUSH_POSITIONAL" | xargs -n1 2>/dev/null | wc -l)
+  [[ "$PUSH_ARGC" -lt 2 ]] \
+    && deny "Bare git push is blocked. Specify remote and branch explicitly (e.g. git push origin <branch>), or ask the user to push."
 fi
 
 echo "$CMD" | grep -qE "${PRE}git[[:space:]]+add[[:space:]]+(-A|--all|\.($|[[:space:];|&]))" \
