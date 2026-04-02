@@ -1,5 +1,6 @@
+# scaffolding {{{
 [[snippets]]
-name = "cc-sdd"
+name = "cc-sdd (system design doc)"
 trigger-pattern = "^(?:cc)?-?sdd$"
 snippet = "bunx cc-sdd@latest --lang ja"
 
@@ -9,32 +10,37 @@ trigger = "difit"
 snippet = "bunx difit"
 
 [[snippets]]
-name = "specify"
+name = "specify init"
 trigger = "specify"
 snippet = "uvx --from git+https://github.com/github/spec-kit.git specify init"
 
 [[snippets]]
-name = "add serena"
+name = "mcp add serena"
 trigger = "mcp-add-serena"
 snippet = """
 claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena
 start-mcp-server --context claude-code --mode planning --mode no-onboarding --project-from-cwd
 """
+# }}}
 
+# commit / review {{{
 [[snippets]]
-name = "aicommit"
+name = "ai commit message"
 trigger = "aicm"
 snippet = """
 git commit -e -m "$(git diff --staged | claude -p 'Write a comprehensive conventional commit message for this diff. Output only the message, no markdown or backticks:')"
 """
+# }}}
 
+# execution {{{
 [[snippets]]
-name = "cage claude"
+name = "cage claude --dangerously-skip-permissions"
 trigger = "ccc"
 snippet = "cage claude --dangerously-skip-permissions"
 #snippet = "cage claude --enable-auto-mode --permission-mode auto"
 
 [[snippets]]
-name = "vercel/skills"
+name = "skills add"
 trigger = "skills"
 snippet = "bunx skills add"
+# }}}

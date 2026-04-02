@@ -1,5 +1,6 @@
+# tailscale {{{
 [[snippets]]
-name = "ts"
+name = "tailscale"
 trigger = "ts"
 snippet = "tailscale"
 
@@ -15,25 +16,26 @@ name = "tailscale serve status"
 trigger = "st"
 snippet = "status"
 global = true
-context = '^tailscale\s+serve\s'
+context = '^tailscale\s+serve\s+'
 
 [[snippets]]
 name = "tailscale serve --bg"
 trigger-pattern = "^bg?$"
 snippet = "--bg"
 global = true
-context = '^tailscale\s+serve\s'
+context = '^tailscale\s+serve\s+'
 
 [[snippets]]
 name = "tailscale serve --set-path"
 trigger-pattern = "^pa?t?h?$"
 snippet = "--set-path"
 global = true
-context = '^tailscale\s+(serve|funnel)\s'
+context = '^tailscale\s+(serve|funnel)\s+'
 
 [[snippets]]
-name = "tailscale funnel"
+name = "tailscale funnel --bg"
 trigger-pattern = "^fn?$"
 snippet = "funnel --bg"
 global = true
 context = '^tailscale\s+\S+$'
+# }}}

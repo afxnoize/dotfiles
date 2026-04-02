@@ -1,5 +1,6 @@
+# chezmoi {{{
 [[snippets]]
-name = "cz"
+name = "chezmoi"
 trigger = "cz"
 snippet = "chezmoi"
 
@@ -30,3 +31,4 @@ trigger-pattern = "^ad?$"
 snippet = "add"
 global = true
 context = '^chezmoi\s+\S+$'
+# }}}

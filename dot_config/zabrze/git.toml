@@ -1,13 +1,28 @@
+# basics {{{
 [[snippets]]
-name = "g"
+name = "git"
 trigger = "g"
 snippet = "git"
 
 [[snippets]]
-name = "gad"
+name = "git status -sb"
+trigger = "gst"
+snippet = "git status -sb"
+
+[[snippets]]
+name = "git status"
+trigger-pattern = "^st?$"
+snippet = "status"
+global = true
+context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git add ."
 trigger = "gad"
 snippet = "git add ."
+# }}}
 
+# staging / restore {{{
 [[snippets]]
 name = "git add"
 trigger-pattern = "^ad?$"
@@ -16,54 +31,47 @@ global = true
 context = '^git\s+\S+$'
 
 [[snippets]]
-name = "add -A"
+name = "git add -vA"
 trigger = "aa"
 snippet = "add -vA"
 global = true
 context = '^git\s+\S+$'
 
 [[snippets]]
-name = "git restore"
-trigger-pattern = "^re?s$"
-snippet = "restore"
+name = "git restore [--staged]"
+trigger-pattern = "^re?s(?<staged>s)?$"
+snippet = "restore${staged+ --staged}"
+
 global = true
 context = '^git\s+\S+$'
 
 [[snippets]]
-name = "ress"
-trigger-pattern = "^re?ss$"
-snippet = "restore --staged"
-global = true
-context = '^git\s+\S+$'
-
-[[snippets]]
-name = "--staged"
+name = "git restore --staged (flag)"
 trigger = "s"
 snippet = "--staged"
 global = true
 context = '^git\s+restore\s'
+# }}}
 
+# diff {{{
 [[snippets]]
-name = "git diff"
-trigger = "d"
-snippet = "diff"
+name = "git diff [--staged] [--ignore-all-space]"
+trigger-pattern = "^df?(?<staged>s)?(?<ignore>i)?$"
+snippet = "diff${staged+ --staged}${ignore+ --ignore-all-space}"
+evaluate = true
 global = true
 context = '^git\s+\S+$'
 
 [[snippets]]
-name = "git diff --staged"
-trigger = "ds"
-snippet = "diff --staged"
-global = true
-context = '^git\s+\S+$'
-
-[[snippets]]
-name = "--staged"
-trigger = "s"
-snippet = "--staged"
+name = "git diff HEAD~N HEAD"
+trigger-pattern = '^(?<n>\d+)$'
+snippet = "HEAD~$n HEAD"
+evaluate = true
 global = true
 context = '^git\s+diff\s'
+# }}}
 
+# commit {{{
 [[snippets]]
 name = "git commit"
 trigger = "c"
@@ -80,14 +88,32 @@ global = true
 context = '^git\s+\S+$'
 
 [[snippets]]
-name = "git cam"
+name = "git commit --amend --no-edit"
 trigger = "cam"
 snippet = "commit --amend --no-edit"
 global = true
 context = '^git\s+\S+$'
+# }}}
+
+# rebase / merge / cherry-pick {{{
+[[snippets]]
+name = "git rebase|merge|cherry-pick --abort"
+trigger = "a"
+snippet = "--abort"
+global = true
+context = '^git\s+(cherry-pick|rebase|merge)\s'
 
 [[snippets]]
-name = "gpoh"
+name = "git rebase|merge|cherry-pick --continue"
+trigger = "c"
+snippet = "--continue"
+global = true
+context = '^git\s+(cherry-pick|rebase|merge)\s'
+# }}}
+
+# push {{{
+[[snippets]]
+name = "git push origin HEAD"
 trigger = "gpoh"
 snippet = "git push origin HEAD"
 
@@ -104,18 +130,14 @@ trigger = "f"
 snippet = "--force-with-lease"
 global = true
 context = '^git\s+push\s'
+# }}}
 
+# fetch / pull {{{
 [[snippets]]
-name = "git fetch"
-trigger-pattern = "^fe?$"
-snippet = "fetch"
-global = true
-context = '^git\s+\S+$'
-
-[[snippets]]
-name = "git fetch -p"
-trigger = "fp"
-snippet = "fetch -p"
+name = "git fetch [--prune]"
+trigger-pattern = "^fe?(?<prune>p)?$"
+snippet = "fetch${prune+ --prune}"
+evalueate = true
 global = true
 context = '^git\s+\S+$'
 
@@ -125,7 +147,9 @@ trigger = "pl"
 snippet = "pull"
 global = true
 context = '^git\s+\S+$'
+# }}}
 
+# branch / switch {{{
 [[snippets]]
 name = "git branch"
 trigger = "b"
@@ -141,19 +165,16 @@ global = true
 context = '^git\s+\S+$'
 
 [[snippets]]
-name = "gst"
-trigger = "gst"
-snippet = "git status -sb"
-
-[[snippets]]
-name = "git status"
-trigger-pattern = "^st?$"
-snippet = "status"
+name = "git switch"
+trigger = "sw"
+snippet = "switch"
 global = true
 context = '^git\s+\S+$'
+# }}}
 
+# log / graph {{{
 [[snippets]]
-name = "gl"
+name = "git log -n 10 (formatted)"
 trigger = "gl"
 snippet = "git log --pretty=format:\"%C(auto)%h (%C(blue)%cd%C(auto))%d %s $Cblue\" --date=format:\"%Y/%m/%d %H:%M:%S\" -n 10"
 
@@ -173,26 +194,14 @@ global = true
 context = '^git\s+log\s'
 
 [[snippets]]
-name = "git graph"
-trigger = "gr"
-snippet = "graph"
-global = true
-context = '^git\s+\S+$'
-
-[[snippets]]
-name = "git log graph"
-trigger = "graph"
+name = "git log --graph"
+trigger-pattern = "gr|graph"
 snippet = "log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cn %Cred%d %Creset%s'"
 global = true
 context = '^git\s+\S+$'
+# }}}
 
-[[snippets]]
-name = "git switch"
-trigger = "sw"
-snippet = "switch"
-global = true
-context = '^git\s+\S+$'
-
+# stash {{{
 [[snippets]]
 name = "git stash"
 trigger = "sh"
@@ -201,30 +210,63 @@ global = true
 context = '^git\s+\S+$'
 
 [[snippets]]
-name = "git stash push"
+name = "git stash push -m"
 trigger = "ph"
 snippet = "push -m"
 global = true
 context = '^git\s+stash\s+'
+# }}}
 
+# worktree {{{
 [[snippets]]
-name = "git stash push -m"
-trigger = "push"
-snippet = "push -m"
-global = true
-context = '^git\s+stash\s+push'
-
-[[snippets]]
-name = "git worktree"
+name = "git wt"
 trigger = "w"
 # git-wt
 snippet = "wt"
 global = true
 context = '^git\s+\S+$'
+# }}}
 
+# refs {{{
 [[snippets]]
-name = "git branch name"
+name = "git current branch name"
 trigger = "B"
 snippet = "$(git symbolic-ref --short HEAD)"
 evaluate = true
 global = true
+context = '^git\s+'
+
+[[snippets]]
+name = "git main/master"
+trigger = "M"
+snippet = "$(git show-ref --verify --quiet refs/head/main && echo main || echo master)"
+evaluate = true
+global = true
+context = '^git\s+'
+# }}}
+
+# tag version bump {{{
+[[snippets]]
+name = "git tag patch bump"
+trigger = "T+"
+snippet = '$(semver -i patch "$(git describe --abbrev=0 --tags @ 2>/dev/null)")'
+evaluate = true
+global = true
+context = '^git\s'
+
+[[snippets]]
+name = "git tag minor bump"
+trigger = "T++"
+snippet = '$(semver -i minor "$(git describe --abbrev=0 --tags @ 2>/dev/null)")'
+evaluate = true
+global = true
+context = '^git\s'
+
+[[snippets]]
+name = "git tag major bump"
+trigger = "T!"
+snippet = '$(semver -i major "$(git describe --abbrev=0 --tags @ 2>/dev/null)")'
+evaluate = true
+global = true
+context = '^git\s'
+# }}}

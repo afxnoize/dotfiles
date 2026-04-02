@@ -1,3 +1,4 @@
+# navigation {{{
 [[snippets]]
 name = "zoxide"
 trigger = "c"
@@ -7,77 +8,89 @@ snippet = "z"
 name = "zoxide"
 trigger = "cd"
 snippet = "z"
+# }}}
 
+# listing (eza) {{{
 [[snippets]]
-name = "l"
+name = "eza"
 trigger = "l"
 snippet = "eza --group-directories-first"
 
 [[snippets]]
-name = "ls"
+name = "eza --git"
 trigger = "ls"
 snippet = "eza --group-directories-first --git"
 
 [[snippets]]
-name = "la"
+name = "eza -a"
 trigger = "la"
 snippet = "eza --group-directories-first -a"
 
 [[snippets]]
-name = "ll"
+name = "eza --git -l"
 trigger = "ll"
 snippet = "eza --group-directories-first --git -l"
 
 [[snippets]]
-name = "lla"
+name = "eza --git -la"
 trigger = "lla"
 snippet = "eza --group-directories-first --git -la"
 
 [[snippets]]
-name = "tree"
+name = "eza --tree"
 trigger = "tree"
 snippet = "eza --group-directories-first --tree"
 
 [[snippets]]
-name = "sort newest first"
+name = "eza sort newest first"
 trigger = ":n"
 snippet = "-s modified -r"
 global = true
 context = '^eza\s+'
 
 [[snippets]]
-name = "sort largest first"
+name = "eza sort largest first"
 trigger = ":s"
 snippet = "-s size -r"
 global = true
 context = '^eza\s+'
+# }}}
 
+# shell / coreutils {{{
 [[snippets]]
-name = "h"
+name = "history"
 trigger = "h"
 snippet = "fc -lt '%F %T' 1"
 
 [[snippets]]
-name = "safe"
+name = "cp/mv/rm -i"
 trigger-pattern = "^(cp|mv|rm)$"
 snippet = "$abbr -i"
 evaluate = true
 
 [[snippets]]
-name = "mkdir with parents"
+name = "mkdir -p"
 trigger = "mkdir"
 snippet = "mkdir -p"
 
 [[snippets]]
-name = "diff"
+name = "diff -U1"
 trigger = "diff"
 snippet = "diff -U1"
 
 [[snippets]]
-name = "curl"
+name = "curl --compressed"
 trigger = "curl"
 snippet = "curl --compressed"
 
+[[snippets]]
+name = ">/dev/null 2>&1"
+trigger = "null"
+snippet = ">/dev/null 2>&1"
+global = true
+# }}}
+
+# tools {{{
 [[snippets]]
 name = "tmux -u"
 trigger = "t"
@@ -89,12 +102,19 @@ trigger = "dv"
 snippet = "devbox"
 
 [[snippets]]
-name = "d"
+name = "mo --no-open"
+trigger = "mo"
+snippet = "mo --no-open"
+# }}}
+
+# docker {{{
+[[snippets]]
+name = "docker"
 trigger = "d"
 snippet = "docker"
 
 [[snippets]]
-name = "dc"
+name = "docker compose"
 trigger = "dc"
 snippet = "docker compose"
 
@@ -104,20 +124,30 @@ trigger-pattern = "^co?$"
 snippet = "compose"
 global = true
 context = '^docker\s+'
+# }}}
 
+# python {{{
 [[snippets]]
 name = "uv run python *.py"
 trigger-pattern = '^(?<file>.+\.py)$'
 snippet = "uv run python $file"
 evaluate = true
+# }}}
 
+# awk column shorthand {{{
 [[snippets]]
-name = "mo"
-trigger = "mo"
-snippet = "mo --no-open"
-
-[[snippets]]
-name = ">/dev/null 2>&1"
-trigger = "null"
-snippet = ">/dev/null 2>&1"
+name = "awk print $N"
+trigger-pattern = '^\.\d+$'
+snippet = "awk '{ print ${trigger/./$} }'"
+evaluate = true
 global = true
+# }}}
+
+# date {{{
+[[snippets]]
+name = "yyyymmdd date expansion"
+trigger-pattern = '^yyyy(?<sep1>.?)mm(?<sep2>.?)dd(?<diff>[+-]\d+)?$'
+snippet = '$(date "+%Y${sep1}%m${sep2}%d" -d "${diff:-0}day")'
+evaluate = true
+global = true
+# }}}
