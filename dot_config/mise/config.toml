@@ -10,8 +10,9 @@ yarn = "latest"
 "github:duckdb/duckdb" = "latest"
 go = "latest"
 moonbit = "latest"
-aws = { version = "latest", symlink_bins = "true" }
 "npm:tree-sitter-cli" = "latest"
+"npm:@openai/codex" = "latest"
+aws = { version = "latest", symlink_bins = "true" }
 
 [settings]
 experimental = true
