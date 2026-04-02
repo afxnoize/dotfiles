@@ -7,7 +7,7 @@ Image=docker.io/vaultwarden/server:latest
 AutoUpdate=registry
 Volume=vaultwarden-data.volume:/data
 Network=container:systemd-vaultwarden-ts
-Environment=SIGNUPS_ALLOWED=false
+Environment=SIGNUPS_ALLOWED=true
 Environment=DOMAIN=https://vaultwarden.tail47db7.ts.net
 
 [Service]
