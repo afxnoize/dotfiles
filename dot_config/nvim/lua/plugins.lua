@@ -77,7 +77,7 @@ lazy.setup({
 			delete_to_trash = true,
 			skip_confirm_for_simple_edits = true,
 			view_options = {
-				show_hidden = false,
+				show_hidden = true,
 			},
 			keymaps = {
 				["q"] = "actions.close",

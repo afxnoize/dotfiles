@@ -41,6 +41,7 @@
     pnpm
     devbox
     just
+    yazi
 
     claude-code
   ]

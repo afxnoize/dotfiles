@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "defaultMode": "default",
     "deny": [
       "Bash(git push)",
       "Bash(git add -A*)",
@@ -41,7 +40,8 @@
       "Bash(curl * | bash*)",
       "Bash(wget * | sh*)",
       "Bash(wget * | bash*)"
-    ]
+    ],
+    "defaultMode": "default"
   },
   "hooks": {
     "PreToolUse": [
@@ -78,10 +78,22 @@
         "source": "github",
         "repo": "anthropics/skills"
       }
+    },
+    "agent-plugins-for-aws": {
+      "source": {
+        "source": "github",
+        "repo": "awslabs/agent-plugins"
+      }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
     }
   },
+  "language": "japanese",
   "plansDirectory": "./.plans",
-  "skipAutoPermissionPrompt": true,
   "skipDangerousModePermissionPrompt": true,
-  "language": "japanese"
+  "skipAutoPermissionPrompt": true
 }
