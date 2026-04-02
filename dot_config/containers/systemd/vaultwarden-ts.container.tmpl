@@ -1,0 +1,15 @@
+[Container]
+Image=docker.io/tailscale/tailscale:latest
+Volume=vaultwarden-ts-state.volume:/var/lib/tailscale
+{{- $secrets := secret "-d" (joinPath .chezmoi.sourceDir "dot_config/containers/systemd/vaultwarden-secrets.yaml") | fromYaml }}
+Environment=TS_AUTHKEY={{ $secrets.ts_authkey }}
+Environment=TS_HOSTNAME=vaultwarden
+Environment=TS_SERVE_CONFIG=/config/serve.json
+Environment=TS_USERSPACE=true
+Volume=%h/.config/containers/systemd/vaultwarden-ts-serve.json:/config/serve.json:ro
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

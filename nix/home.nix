@@ -35,6 +35,8 @@
     pkgs-unstable.usage
     bitwarden-cli
     jq
+    sops
+    age
     zoxide
     pnpm
     devbox
