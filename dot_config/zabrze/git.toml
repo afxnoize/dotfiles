@@ -50,7 +50,7 @@ name = "git restore --staged (flag)"
 trigger = "s"
 snippet = "--staged"
 global = true
-context = '^git\s+restore\s'
+context = '^git\s+restore\s+'
 # }}}
 
 # diff {{{
@@ -68,7 +68,7 @@ trigger-pattern = '^(?<n>\d+)$'
 snippet = "HEAD~$n HEAD"
 evaluate = true
 global = true
-context = '^git\s+diff\s'
+context = '^git\s+diff\s+'
 # }}}
 
 # commit {{{
@@ -101,14 +101,14 @@ name = "git rebase|merge|cherry-pick --abort"
 trigger = "a"
 snippet = "--abort"
 global = true
-context = '^git\s+(cherry-pick|rebase|merge)\s'
+context = '^git\s+(cherry-pick|rebase|merge)\s+'
 
 [[snippets]]
 name = "git rebase|merge|cherry-pick --continue"
 trigger = "c"
 snippet = "--continue"
 global = true
-context = '^git\s+(cherry-pick|rebase|merge)\s'
+context = '^git\s+(cherry-pick|rebase|merge)\s+'
 # }}}
 
 # push {{{
@@ -129,7 +129,7 @@ name = "git push --force-with-lease"
 trigger = "f"
 snippet = "--force-with-lease"
 global = true
-context = '^git\s+push\s'
+context = '^git\s+push\s+'
 # }}}
 
 # fetch / pull {{{
@@ -137,7 +137,7 @@ context = '^git\s+push\s'
 name = "git fetch [--prune]"
 trigger-pattern = "^fe?(?<prune>p)?$"
 snippet = "fetch${prune+ --prune}"
-evalueate = true
+evaluate = true
 global = true
 context = '^git\s+\S+$'
 
@@ -151,18 +151,20 @@ context = '^git\s+\S+$'
 
 # branch / switch {{{
 [[snippets]]
-name = "git branch"
-trigger = "b"
-snippet = "branch"
+name = "git branch [-v/-vv]"
+trigger-pattern = "^br?(?<verbose>v{1,2})?$"
+snippet = "branch${verbose+ -$verbose}"
+evaluate = true
 global = true
 context = '^git\s+\S+$'
 
 [[snippets]]
-name = "git branch -v"
-trigger = "br"
-snippet = "branch -v"
+name = "git branch [-v/-vv] (flag)"
+trigger-pattern = "^(v{1,2})$"
+snippet = "-$abbr"
+evaluate = true
 global = true
-context = '^git\s+\S+$'
+context = '^git\s+branch\s+'
 
 [[snippets]]
 name = "git switch"
@@ -176,12 +178,13 @@ context = '^git\s+\S+$'
 [[snippets]]
 name = "git log -n 10 (formatted)"
 trigger = "gl"
-snippet = "git log --pretty=format:\"%C(auto)%h (%C(blue)%cd%C(auto))%d %s $Cblue\" --date=format:\"%Y/%m/%d %H:%M:%S\" -n 10"
+snippet = "git log --pretty=format:\"%C(auto)%h (%C(blue)%cd%C(auto))%d %s %C(blue)%cn%Creset\" --date=format:\"%Y/%m/%d %H:%M:%S\" -n 10"
 
 [[snippets]]
-name = "git log"
-trigger = "l"
-snippet = "log"
+name = "git log [--oneline] [--name-status]"
+trigger-pattern = "^l(?<oneline>o)?(?<filename>f)?$"
+snippet = "log${oneline+ --oneline}${filename+ --name-status}"
+evaluate = true
 global = true
 context = '^git\s+\S+$'
 
@@ -191,7 +194,7 @@ trigger-pattern = '^(?<n>\d+)$'
 snippet = "-$n"
 evaluate = true
 global = true
-context = '^git\s+log\s'
+context = '^git\s+log\s+'
 
 [[snippets]]
 name = "git log --graph"
@@ -199,6 +202,15 @@ trigger-pattern = "gr|graph"
 snippet = "log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cn %Cred%d %Creset%s'"
 global = true
 context = '^git\s+\S+$'
+
+[[snippets]]
+name = "git log --grep"
+trigger-pattern = 'gp?'
+snippet = "--grep=\"{}\""
+cursor = "{}"
+evaluate = true
+global = true
+context = '^git\s+log\s+'
 # }}}
 
 # stash {{{
@@ -239,7 +251,7 @@ context = '^git\s+'
 [[snippets]]
 name = "git main/master"
 trigger = "M"
-snippet = "$(git show-ref --verify --quiet refs/head/main && echo main || echo master)"
+snippet = "$(git show-ref --verify --quiet refs/heads/main && echo main || echo master)"
 evaluate = true
 global = true
 context = '^git\s+'
@@ -252,7 +264,7 @@ trigger = "T+"
 snippet = '$(semver -i patch "$(git describe --abbrev=0 --tags @ 2>/dev/null)")'
 evaluate = true
 global = true
-context = '^git\s'
+context = '^git\s+'
 
 [[snippets]]
 name = "git tag minor bump"
@@ -260,7 +272,7 @@ trigger = "T++"
 snippet = '$(semver -i minor "$(git describe --abbrev=0 --tags @ 2>/dev/null)")'
 evaluate = true
 global = true
-context = '^git\s'
+context = '^git\s+'
 
 [[snippets]]
 name = "git tag major bump"
@@ -268,5 +280,5 @@ trigger = "T!"
 snippet = '$(semver -i major "$(git describe --abbrev=0 --tags @ 2>/dev/null)")'
 evaluate = true
 global = true
-context = '^git\s'
+context = '^git\s+'
 # }}}
