@@ -4,5 +4,6 @@
     ./git
     ./tmux
     ./agent-skills
+    ./kopia
   ];
 }

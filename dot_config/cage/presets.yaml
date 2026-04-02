@@ -29,6 +29,11 @@ presets:
       - "$XDG_DATA_HOME/go" # GOPATH
       - "$HOME/.docker"
 
+  cloud-storage:
+    allow:
+      - "$XDG_CONFIG_HOME/b2"
+      - "$XDG_CONFIG_HOME/kopia"
+
 auto-presets:
   - command: claude
     presets:
@@ -36,3 +41,4 @@ auto-presets:
       - git-enabled
       - claude-code
       - dev-tools
+      - cloud-storage
