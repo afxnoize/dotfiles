@@ -93,10 +93,16 @@ zinit light-mode for \
 
 ### End of Zinit's installer chunk }}}
 
-zinit wait"1c" lucid \
+zinit wait"0a" lucid \
 	blockf light-mode for \
-	@zsh-users/zsh-completions \
-	@zsh-users/zsh-autosuggestions \
+	@zsh-users/zsh-autosuggestions
+
+zinit wait"0c" lucid \
+	blockf light-mode for \
+	@zsh-users/zsh-completions
+
+zinit wait"1a" lucid \
+	blockf light-mode for \
 	@zsh-users/zaw \
 	@zdharma-continuum/history-search-multi-word
 
@@ -106,25 +112,12 @@ zinit \
 	for @sindresorhus/pure
 
 # abbreviation
-# 依存コマンドの読み込み完了を待つため2z
-zinit wait"2z" blockf light-mode \
+zinit wait"0b" blockf light-mode \
 	as"program" from"gh-r" for \
 	atload"source $ZRCDIR/pluginconfig/zabrze_atload.zsh" \
 	Ryooooooga/zabrze
 
 # program {{{
-
-# github-cli
-zinit wait"1c" lucid \
-	blockf nocompletions \
-	from"gh-r" \
-	mv"gh* -> gh" \
-	sbin"gh/bin/gh" \
-	atclone'
-		mkdir -p $ZPFX/man/man1;
-		cp -vf gh/share/man/man1/* $ZPFX/man/man1;' \
-	atload"source $ZRCDIR/pluginconfig/gh_atload.zsh" \
-	for @cli/cli
 
 ### End of program }}}
 
@@ -150,6 +143,7 @@ zle -N git-status
 zle -N ghq-tmux
 
 ensure_completion chezmoi "chezmoi --version" "chezmoi completion zsh"
+ensure_completion gh "gh --version" "gh completion -s zsh"
 compdef _fzf_complete_chezmoi chezmoi
 # End of Autoload functions }}}
 
@@ -206,7 +200,7 @@ bindkey '^t' zaw-tmux
 eval "$(zoxide init zsh)"
 eval "$(git wt --init zsh)"
 
-zinit wait lucid \
+zinit wait"2" lucid \
 	as"null" id-as"mise" \
 	atload"source $ZRCDIR/pluginconfig/mise.zsh" \
 	light-mode for @zdharma-continuum/null

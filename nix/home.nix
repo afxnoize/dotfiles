@@ -20,6 +20,7 @@
 
   home.packages = with pkgs; [
     git
+    gh
     ghq
     pkgs-unstable.git-wt
 
