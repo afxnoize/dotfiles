@@ -88,7 +88,7 @@ name = ">/dev/null 2>&1"
 trigger = "null"
 snippet = ">/dev/null 2>&1"
 global = true
-# }}}
+# End of shell / coreutils }}}
 
 # tools {{{
 [[snippets]]
@@ -105,7 +105,43 @@ snippet = "devbox"
 name = "mo --no-open"
 trigger = "mo"
 snippet = "mo --no-open"
-# }}}
+# End of tools }}}
+
+# nvim {{{
+[[snippets]]
+name = "nvim"
+trigger = "ni"
+snippet = "nvim"
+
+[[snippets]]
+name = "nvim ."
+trigger = "nid"
+snippet = "nvim ."
+# End of nvim }}}
+
+# nix {{{
+[[snippets]]
+name = "nix"
+trigger = "nx"
+snippet = "nix"
+
+[[snippets]]
+name = "nix develop"
+trigger-pattern = "ni?d"
+snippet = "nix develop"
+
+[[snippets]]
+name = "nix develop -c zsh (shorthand)"
+trigger-pattern = "ni?d?z"
+snippet = "nix develop -c zsh"
+
+[[snippets]]
+name = "nix develop -c zsh"
+trigger = "z"
+snippet = "-c zsh"
+global = true
+context = '^nix\s+develop\s+'
+# End of nix }}}
 
 # docker {{{
 [[snippets]]
@@ -124,7 +160,7 @@ trigger-pattern = "^co?$"
 snippet = "compose"
 global = true
 context = '^docker\s+'
-# }}}
+# End of docker }}}
 
 # python {{{
 [[snippets]]
@@ -132,7 +168,7 @@ name = "uv run python *.py"
 trigger-pattern = '^(?<file>.+\.py)$'
 snippet = "uv run python $file"
 evaluate = true
-# }}}
+# End of python }}}
 
 # awk column shorthand {{{
 [[snippets]]
@@ -141,7 +177,7 @@ trigger-pattern = '^\.\d+$'
 snippet = "awk '{ print ${trigger/./$} }'"
 evaluate = true
 global = true
-# }}}
+# End of awk }}}
 
 # date {{{
 [[snippets]]
