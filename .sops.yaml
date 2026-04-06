@@ -1,0 +1,3 @@
+creation_rules:
+  - path_regex: mcp/secrets\.yaml$
+    age: age1juuhykhva94kwg6ajntxk366zlpvwr0rxfcnkwkgmwmzm2qhg4ls97yeaz

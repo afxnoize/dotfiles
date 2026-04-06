@@ -1,0 +1,33 @@
+#!/bin/bash
+# chezmoi modify script: merge MCP servers into existing $CLAUDE_CONFIG_DIR/.claude.json
+set -euo pipefail
+
+existing=$(cat)
+if [ -z "$existing" ] || [ "$existing" = "{}" ]; then
+  existing='{}'
+fi
+
+{{ $secrets := output "sops" "-d" "--output-type" "json" (joinPath .chezmoi.sourceDir "mcp/secrets.yaml") | fromJson -}}
+
+jq \
+  --arg tavily_key '{{ $secrets.tavily_api_key }}' \
+  --arg context7_key '{{ $secrets.context7_api_key }}' \
+  '
+  .mcpServers.tavily = {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "tavily-mcp@latest"],
+    "env": {
+      "TAVILY_API_KEY": $tavily_key
+    }
+  }
+  |
+  .mcpServers.context7 = {
+    "type": "stdio",
+    "command": "bunx",
+    "args": ["-y", "@upstash/context7-mcp"],
+    "env": {
+      "CONTEXT7_API_KEY": $context7_key
+    }
+  }
+  ' <<< "$existing"
