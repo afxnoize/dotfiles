@@ -16,9 +16,10 @@ presets:
   git-enabled:
     allow-git: true
 
-  claude-code:
+  ai-coding:
     allow:
       - "$CLAUDE_CONFIG_DIR"
+      - "$CODEX_HOME"
       - "$HOME/.serena"
       - ".serena"
 
@@ -29,10 +30,16 @@ presets:
       - "$XDG_DATA_HOME/go" # GOPATH
       - "$HOME/.docker"
 
+  cloud-storage:
+    allow:
+      - "$XDG_CONFIG_HOME/b2"
+      - "$XDG_CONFIG_HOME/kopia"
+
 auto-presets:
   - command: claude
     presets:
       - base
       - git-enabled
-      - claude-code
+      - ai-coding
       - dev-tools
+      - cloud-storage
