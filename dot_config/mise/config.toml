@@ -13,6 +13,7 @@ moonbit = "latest"
 "npm:tree-sitter-cli" = "latest"
 "npm:@openai/codex" = "latest"
 aws = { version = "latest", symlink_bins = "true" }
+"pipx:b2" = "4.6.0"
 
 [settings]
 experimental = true
