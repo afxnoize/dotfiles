@@ -68,6 +68,83 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude activity-log"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude notification"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude stop"
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude stop-failure"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude user-prompt-submit"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude session-start"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude session-end"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
