@@ -144,6 +144,7 @@ zle -N ghq-tmux
 
 ensure_completion chezmoi "chezmoi --version" "chezmoi completion zsh"
 ensure_completion gh "gh --version" "gh completion -s zsh"
+ensure_completion just "just --version" "just --completions zsh"
 compdef _fzf_complete_chezmoi chezmoi
 # End of Autoload functions }}}
 
