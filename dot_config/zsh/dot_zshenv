@@ -39,6 +39,7 @@ export ZRCDIR="$ZHOMEDIR/rc"
 
 # AI Agents {{{
 export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$XDG_CONFIG_HOME/claude}"
+export CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1
 export CODEX_HOME="${CODEX_HOME:-$XDG_CONFIG_HOME/codex}"
 # End of AI Agents }}}
 
