@@ -205,12 +205,11 @@ context = '^git\s+\S+$'
 
 [[snippets]]
 name = "git log --grep"
-trigger-pattern = 'gp?'
-snippet = "--grep=\"{}\""
+trigger-pattern = '^gp?$'
+snippet = '--grep="{}"'
 cursor = "{}"
-evaluate = true
 global = true
-context = '^git\s+log\s+'
+context = '^git\s+log\s+\S+$'
 # }}}
 
 # stash {{{

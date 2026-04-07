@@ -105,6 +105,11 @@ snippet = "devbox"
 name = "mo --no-open"
 trigger = "mo"
 snippet = "mo --no-open"
+
+[[snippets]]
+name = "just"
+trigger = "j"
+snippet = "just"
 # End of tools }}}
 
 # nvim {{{
