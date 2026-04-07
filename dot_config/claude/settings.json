@@ -58,7 +58,13 @@
           },
           {
             "type": "command",
-            "command": "$CLAUDE_CONFIG_DIR/hooks/validate-aws.sh"
+            "if": "Bash(aws *)",
+            "command": "bun $CLAUDE_CONFIG_DIR/hooks/validate-cloud.ts aws"
+          },
+          {
+            "type": "command",
+            "if": "Bash(b2 *)",
+            "command": "bun $CLAUDE_CONFIG_DIR/hooks/validate-cloud.ts b2"
           }
         ]
       }
