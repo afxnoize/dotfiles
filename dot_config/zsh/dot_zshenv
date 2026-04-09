@@ -81,3 +81,7 @@ export FPATH
 # deduplicate
 typeset -U FPATH
 # End of Paths }}}
+
+# Local {{{
+source "$ZDOTDIR/.zshenv.local"(N) 2>/dev/null
+# }}}

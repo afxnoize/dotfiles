@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1"
+  },
   "permissions": {
     "deny": [
       "Bash(git push)",
@@ -43,6 +46,7 @@
     ],
     "defaultMode": "default"
   },
+  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -58,13 +62,13 @@
           },
           {
             "type": "command",
-            "if": "Bash(aws *)",
-            "command": "bun $CLAUDE_CONFIG_DIR/hooks/validate-cloud.ts aws"
+            "command": "bun $CLAUDE_CONFIG_DIR/hooks/validate-cloud.ts aws",
+            "if": "Bash(aws *)"
           },
           {
             "type": "command",
-            "if": "Bash(b2 *)",
-            "command": "bun $CLAUDE_CONFIG_DIR/hooks/validate-cloud.ts b2"
+            "command": "bun $CLAUDE_CONFIG_DIR/hooks/validate-cloud.ts b2",
+            "if": "Bash(b2 *)"
           }
         ]
       }
@@ -153,7 +157,9 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "moonbit-practice@moonbit-practice": true
+    "moonbit-practice@moonbit-practice": true,
+    "telegram@claude-plugins-official": true,
+    "voltagent-research@voltagent-subagents": true
   },
   "extraKnownMarketplaces": {
     "anthropics-skills": {
@@ -173,9 +179,16 @@
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
       }
+    },
+    "voltagent-subagents": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/VoltAgent/awesome-claude-code-subagents.git"
+      }
     }
   },
   "language": "japanese",
+  "effortLevel": "high",
   "plansDirectory": "./.plans",
   "skipDangerousModePermissionPrompt": true,
   "skipAutoPermissionPrompt": true

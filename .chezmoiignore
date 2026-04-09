@@ -36,5 +36,8 @@ Documents/PowerShell/**
 nix
 mcp
 
+# sops secrets (used by templates at apply time, not deployed)
+**/secrets.yaml
+
 # nix result
 result

@@ -1,0 +1,8 @@
+{
+  "dmPolicy": "allowlist",
+  "allowFrom": [
+    "{{ output "sops" "-d" "--extract" "[\"telegram_allow_from\"]" (joinPath .chezmoi.sourceDir "dot_config/claude/channels/telegram/secrets.yaml") | trim }}"
+  ],
+  "groups": {},
+  "pending": {}
+}

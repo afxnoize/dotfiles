@@ -8,4 +8,16 @@
     source = "anthropics/claude-plugins-official";
     path = "plugins/claude-md-management";
   };
+  just-pro = {
+    source = "rbergman/dark-matter-marketplace";
+    path = "plugins/language-pro/skills/just-pro";
+  };
+  justfile-style = {
+    source = "julianobarbosa/claude-code-skills";
+    path = "skills/justfile-skill";
+  };
+  justfile-expert = {
+    source = "laurigates/claude-plugins";
+    path = "tools-plugin/skills/justfile-expert";
+  };
 }
