@@ -191,5 +191,5 @@
   "effortLevel": "high",
   "plansDirectory": "./.plans",
   "skipDangerousModePermissionPrompt": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": false
 }
