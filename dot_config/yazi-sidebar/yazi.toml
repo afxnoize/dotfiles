@@ -1,0 +1,8 @@
+[mgr]
+ratio = [0, 1, 0]
+show_hidden = true
+
+[opener]
+edit = [
+    { run = '$XDG_CONFIG_HOME/yazi-sidebar/scripts/open-in-pane "$@"', block = true, for = "unix" }
+]

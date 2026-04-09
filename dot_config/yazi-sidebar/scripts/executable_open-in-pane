@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Open files in the adjacent tmux pane (sidebar mode) or directly (standalone)
+
+if [ "$YAZI_SIDEBAR" = "1" ] && [ -n "$TMUX" ]; then
+    args=""
+    for f in "$@"; do
+        args="$args '$(realpath "$f")'"
+    done
+    tmux send-keys -t '{right}' C-u
+    tmux send-keys -t '{right}' "${EDITOR:-nvim} --$args" Enter
+else
+    exec ${EDITOR:-nvim} "$@"
+fi
