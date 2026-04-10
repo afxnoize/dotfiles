@@ -43,9 +43,16 @@ export CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1
 export CODEX_HOME="${CODEX_HOME:-$XDG_CONFIG_HOME/codex}"
 # End of AI Agents }}}
 
-# Golang {{{
+# Programing Langs {{{
+# Golang {{{2
 export GOPATH="${GOPATH:-$XDG_DATA_HOME/go}"
-# End of Golang }}}
+# End of Golang 2}}}
+
+# Rust {{{2
+export CARGO_HOME="${CARGO_HOME:-$XDG_DATA_HOME/cargo}"
+export RUSTUP_HOME="${RUSTUP_HOME:-$XDG_DATA_HOME/rustup}"
+# End of Rust 2}}}
+# End of Programing Langs }}}
 
 # FCITX {{{
 export FCITX_CONFIG_DIR="${FCITX_CONFIG_DIR:-$XDG_CONFIG_HOME/fcitx}"

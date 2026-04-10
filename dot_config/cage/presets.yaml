@@ -25,9 +25,9 @@ presets:
 
   dev-tools:
     allow:
-      - "$CARGO_HOME" # Rust/Cargo
-      - "$DENO_DIR" # Deno
-      - "$XDG_DATA_HOME/go" # GOPATH
+      - "$CARGO_HOME"
+      - "$DENO_DIR"
+      - "$GOPATH"
       - "$HOME/.docker"
 
   cloud-storage:
