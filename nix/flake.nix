@@ -15,15 +15,22 @@
     claude-code.url = "github:sadjow/claude-code-nix";
     llm-agents.url = "github:numtide/llm-agents.nix";
     cage.url = "github:Warashi/cage";
+    mise.url = "github:jdx/mise";
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, cage, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, cage, mise, ... }:
     let
       system = builtins.currentSystem;
       pkgs = import nixpkgs {
         overlays = [
           neovim-nightly-overlay.overlays.default
           claude-code.overlays.default
+          (final: prev: {
+            mise = mise.packages.${system}.default;
+            cage = cage.packages.${system}.default;
+            rtk = llm-agents.packages.${system}.rtk;
+            ccusage = llm-agents.packages.${system}.ccusage;
+          })
         ];
         inherit system;
       };
@@ -38,7 +45,7 @@
             ./home.nix
           ];
           extraSpecialArgs = {
-            inherit username homeDirectory pkgs-unstable llm-agents cage;
+            inherit username homeDirectory pkgs-unstable;
           };
         };
     };

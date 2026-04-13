@@ -1,4 +1,4 @@
-{ config, pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, cage, ... }:
+{ config, pkgs, pkgs-unstable, lib, username, homeDirectory, ... }:
 
 {
   nixpkgs.config.allowUnfreePredicate = pkg:
@@ -38,7 +38,7 @@
     bat
     bottom
     eza
-    pkgs-unstable.mise
+    mise
     bitwarden-cli
     jq
     sops
@@ -50,13 +50,9 @@
     yazi
 
     claude-code
-  ]
-  ++ (with llm-agents.packages.${pkgs.stdenv.hostPlatform.system}; [
     rtk
     ccusage
-  ])
-  ++ [
-    cage.packages.${pkgs.stdenv.hostPlatform.system}.default
+    cage
   ];
 
 }
