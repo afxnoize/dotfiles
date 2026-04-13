@@ -60,16 +60,23 @@ chmod 600 ~/.config/sops/age/keys.txt
 
 ### 5. chezmoi の初期化と適用
 
+chezmoi と symlink（`~/.local/share/chezmoi` → リポジトリ）は Step 3 の Home-Manager で設定済み。
+適用時に mise のグローバルツール（rust, node, go, python 等）も自動インストールされる。
+
 ```sh
-BINDIR="$HOME/.local/bin" sh -c "$(curl -fsLS get.chezmoi.io)"
-chezmoi init --apply --source ~/repos/github.com/afxnoize/dotfiles
+chezmoi apply
 ```
 
 ### 6. デフォルトシェルを Zsh に変更
 
+Zsh は Step 3 の Home-Manager で Nix 経由でインストール済み。
+`chsh` は `/etc/shells` に登録されたシェルしか受け付けないため、Nix の zsh パスを追加する。
+
 ```sh
+echo "$HOME/.nix-profile/bin/zsh" | sudo tee -a /etc/shells
+sudo mkdir -p /etc/zsh
 echo 'export ZDOTDIR="$HOME"/.config/zsh' | sudo tee /etc/zsh/zshenv
-chsh -s "$(which zsh)"
+chsh -s "$HOME/.nix-profile/bin/zsh"
 ```
 
 ログインし直すと Zsh が起動する。zinit プラグインは初回起動時に自動インストールされる。

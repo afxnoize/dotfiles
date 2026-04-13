@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, cage, ... }:
+{ config, pkgs, pkgs-unstable, lib, username, homeDirectory, llm-agents, cage, ... }:
 
 {
   nixpkgs.config.allowUnfreePredicate = pkg:
@@ -12,6 +12,11 @@
   home.stateVersion = "25.11";
 
   programs.home-manager.enable = true;
+
+  home.file.".local/share/chezmoi" = {
+    source = config.lib.file.mkOutOfStoreSymlink "${homeDirectory}/repos/github.com/afxnoize/dotfiles";
+    force = true;
+  };
 
   imports = [
     ./modules
@@ -34,15 +39,14 @@
     bottom
     eza
     pkgs-unstable.mise
-    pkgs-unstable.usage
     bitwarden-cli
     jq
     sops
     age
     zoxide
-    pnpm
     devbox
     just
+    chezmoi
     yazi
 
     claude-code
