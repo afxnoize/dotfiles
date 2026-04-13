@@ -1,71 +1,111 @@
-# README
-You should install ArchLinux/Manjaro
+# dotfiles
 
-## dependencies
-[WIP]
+chezmoi + Nix Home-Manager による設定ファイル管理リポジトリ。
+
+## ブートストラップ（WSL / Linux 新規セットアップ）
+
+新しい環境を最小工数で構築する手順。
+
+### 1. リポジトリのクローン
+
 ```sh
-paru -S base-devel zip unzip git
+# Ubuntu の場合（git/curl が無ければ）
+sudo apt update && sudo apt install -y git curl
+
+# Arch/Manjaro の場合
+# paru -S git curl
+
+git clone https://github.com/afxnoize/dotfiles.git ~/repos/github.com/afxnoize/dotfiles
+cd ~/repos/github.com/afxnoize/dotfiles
 ```
 
-## Nix / Home-Manager
-### Install Nix
-Use [DeterminateSystems/nix-installer](https://github.com/DeterminateSystems/nix-installer)
+### 2. Nix のインストール
+
+[Determinate Systems installer](https://github.com/DeterminateSystems/nix-installer) を使用する（標準の NixOS installer ではない）。
+
 ```sh
 curl -fsSL https://install.determinate.systems/nix | sh -s -- install
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 ```
 
-### Home-Manager
-環境変数 USER, HOMEを使うため, `--impure`
+### 3. Home-Manager の初回適用
+
+全ツール（git, neovim, fzf, ripgrep, sops, age, mise, claude-code 等）が一括でインストールされる。
+
 ```sh
-cd nix
-# 初回
-nix run github:nix-community/home-manager -- switch --flake .#$USER_NAME --impure
-# 以降
-home-manager switch --flake .#$USER_NAME --impure
+cd ~/repos/github.com/afxnoize/dotfiles/nix
+nix run github:nix-community/home-manager -- switch --flake .#$USER --impure
 ```
 
-## chezmoi
-[chezmoi](https://www.chezmoi.io/)
-dotfile manager
+> `--impure` は必須。flake.nix が `builtins.getEnv` で `$USER` / `$HOME` を参照するため。
 
-Install
+以降の更新:
+
 ```sh
-BINDIR="${LOCAL_BIN_DIR:-$HOME/.local/bin}" sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply $GITHUB_USERNAME
-chezmoi update
+home-manager switch --flake .#$USER --impure
 ```
 
-## Zsh
-[Zsh](https://www.zsh.org/)
-shell
+### 4. age 秘密鍵の配置
 
-Install
+chezmoi のテンプレートが SOPS + age で暗号化された secrets を復号する。秘密鍵がないと `chezmoi apply` が失敗する。
+
 ```sh
-chsh -s $(which zsh)
+mkdir -p ~/.config/sops/age
+# 秘密鍵を安全な場所からコピー（Bitwarden, USB 等）
+cp /path/to/keys.txt ~/.config/sops/age/keys.txt
+chmod 600 ~/.config/sops/age/keys.txt
 ```
 
-Config
+対応する公開鍵: `age1juuhykhva94kwg6ajntxk366zlpvwr0rxfcnkwkgmwmzm2qhg4ls97yeaz`
+
+### 5. chezmoi の初期化と適用
+
 ```sh
-# /etc/zsh/zshenv
-export ZDOTDIR="$HOME"/.config/zsh
+BINDIR="$HOME/.local/bin" sh -c "$(curl -fsLS get.chezmoi.io)"
+chezmoi init --apply --source ~/repos/github.com/afxnoize/dotfiles
 ```
 
-### zinit
-Auto installed
+### 6. デフォルトシェルを Zsh に変更
 
-zsh plugin manager
-[zdharma-continuum/zinit: 🌻 Flexible and fast ZSH plugin manager](https://github.com/zdharma-continuum/zinit)
-
-
-## mise
-[mise-en-place](https://mise.jdx.dev/)
-
-Install
 ```sh
-curl https://mise.run | MISE_INSTALL_PATH="${LOCAL_BIN_DIR:-$HOME/.local/bin}/mise" sh
+echo 'export ZDOTDIR="$HOME"/.config/zsh' | sudo tee /etc/zsh/zshenv
+chsh -s "$(which zsh)"
 ```
 
-Usage
+ログインし直すと Zsh が起動する。zinit プラグインは初回起動時に自動インストールされる。
+
+## 日常の操作
+
 ```sh
-mise use node@20
-mise use --global node@20
+# 設定ファイルの差分確認・適用
+chezmoi diff
+chezmoi apply
+
+# 実環境のファイルをリポジトリ管理下に追加
+chezmoi add ~/.config/X
+
+# Nix パッケージの更新
+cd ~/repos/github.com/afxnoize/dotfiles/nix
+home-manager switch --flake .#$USER --impure
 ```
+
+## ディレクトリ構成
+
+| パス | 説明 |
+|------|------|
+| `nix/` | Flake & Home-Manager 設定 |
+| `dot_config/nvim/` | Neovim 設定 |
+| `dot_config/tmux/` | tmux 設定（tpm, continuum, resurrect） |
+| `dot_config/zsh/` | Zsh 設定（zinit, completions） |
+| `dot_config/wezterm/` | WezTerm ターミナル設定 |
+| `dot_config/zabrze/` | スニペット展開（git, chezmoi, AI 用） |
+| `dot_config/claude/` | Claude Code 設定・スキル・hooks |
+| `.chezmoiscripts/` | chezmoi ライフサイクルスクリプト |
+
+## 注意事項
+
+- Nix ビルドには常に `--impure` が必須
+- `dot_` プレフィクスは chezmoi が `.` に変換する（`dot_config/` → `~/.config/`）
+- `.chezmoiignore` で OS 別に管理対象を分岐している。ファイル追加時は対象 OS を確認すること
+- secrets は SOPS + age で暗号化。`chezmoi apply` 時にテンプレート内で復号される
+- flake.lock は GitHub Actions で毎週自動更新される
