@@ -7,7 +7,7 @@ let
     ''
       if [ ! -d "${skillsDir}/${name}" ]; then
         echo "Installing skill: ${name} from ${entry.source}"
-        ${lib.getExe pkgs.bun} x skills add ${entry.source} -s ${name} -a claude-code -g -y
+        ${lib.getExe pkgs.bun} x skills add ${entry.source} -s ${name} -a claude-code -g -y || echo "WARNING: failed to install skill: ${name}"
       fi
     ''
   ) (import ./registry.nix));

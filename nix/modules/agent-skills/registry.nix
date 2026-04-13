@@ -14,7 +14,7 @@
   };
   justfile-style = {
     source = "julianobarbosa/claude-code-skills";
-    path = "skills/justfile-skill";
+    path = "skills/justfile-style";
   };
   justfile-expert = {
     source = "laurigates/claude-plugins";
