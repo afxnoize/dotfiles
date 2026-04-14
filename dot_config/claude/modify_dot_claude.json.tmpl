@@ -30,4 +30,4 @@ jq \
       "CONTEXT7_API_KEY": $context7_key
     }
   }
-  ' <<< "$existing"
+  ' <<< "$existing" | head -c -1

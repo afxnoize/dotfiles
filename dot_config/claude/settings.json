@@ -149,6 +149,105 @@
           }
         ]
       }
+    ],
+    "CwdChanged": [
+      {
+        "hooks": [
+          {
+            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude cwd-changed",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "hooks": [
+          {
+            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude permission-denied",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude subagent-start",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude subagent-stop",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-completed",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "TaskCreated": [
+      {
+        "hooks": [
+          {
+            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-created",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude teammate-idle",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-create",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "WorktreeRemove": [
+      {
+        "hooks": [
+          {
+            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-remove",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
     ]
   },
   "statusLine": {
