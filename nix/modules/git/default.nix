@@ -8,7 +8,7 @@
         email = "22848261+afxnoize@users.noreply.github.com";
       };
 
-      aliases = {
+      alias = {
         graph = "log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cn %Cred%d %Creset%s'";
         gr = "graph";
         b = "branch";
