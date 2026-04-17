@@ -90,7 +90,7 @@ snippet = ">/dev/null 2>&1"
 global = true
 # End of shell / coreutils }}}
 
-# tools {{{
+# tools {{{1
 [[snippets]]
 name = "tmux -u"
 trigger = "t"
@@ -101,16 +101,47 @@ name = "devbox"
 trigger = "dv"
 snippet = "devbox"
 
+# k1LoW/mo {{{2
 [[snippets]]
 name = "mo --no-open"
-trigger = "mo"
+trigger = "mon"
 snippet = "mo --no-open"
+
+[[snippets]]
+name = "mo --no-open"
+trigger = "n"
+snippet = "--no-open"
+context = '^mo\s+'
+global = true
+
+[[snippets]]
+name = "mo --all"
+trigger = 'a'
+snippet = '**/*.md'
+context = '^mo\s+'
+global = true
+
+[[snippets]]
+name = "mo --target"
+trigger = 't'
+snippet = '--target'
+context = '^mo\s+'
+global = true
+
+[[snippets]]
+name = "mo --target <repository>"
+trigger = 'r'
+snippet = '$(basename $(git rev-parse --show-toplevel))'
+evaluate = true
+global = true
+context = '^mo\s+--target\s+'
+# End of k1LoW/mo 2}}}
 
 [[snippets]]
 name = "just"
 trigger = "j"
 snippet = "just"
-# End of tools }}}
+# End of tools 1}}}
 
 # nvim {{{
 [[snippets]]
@@ -132,12 +163,12 @@ snippet = "nix"
 
 [[snippets]]
 name = "nix develop"
-trigger-pattern = "ni?d"
+trigger-pattern = "^ni?d"
 snippet = "nix develop"
 
 [[snippets]]
 name = "nix develop -c zsh (shorthand)"
-trigger-pattern = "ni?d?z"
+trigger-pattern = "^ni?d?z"
 snippet = "nix develop -c zsh"
 
 [[snippets]]
