@@ -1,11 +1,6 @@
 { config, pkgs, pkgs-unstable, lib, username, homeDirectory, ... }:
 
 {
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [
-      "claude-code"
-    ];
-
   home.username = username;
   home.homeDirectory = homeDirectory;
 
@@ -38,7 +33,7 @@
     bat
     bottom
     eza
-    mise
+    pkgs-unstable.mise
     bitwarden-cli
     jq
     sops
@@ -49,7 +44,6 @@
     chezmoi
     yazi
 
-    claude-code
     rtk
     ccusage
     cage

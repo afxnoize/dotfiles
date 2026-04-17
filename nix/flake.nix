@@ -1,6 +1,15 @@
 {
   description = "Home Manager configuration (Linux, Determinate Nix)";
 
+  nixConfig = {
+    extra-substituters = [
+      "https://cache.numtide.com"
+    ];
+    extra-trusted-public-keys = [
+      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -12,21 +21,17 @@
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
 
-    claude-code.url = "github:sadjow/claude-code-nix";
     llm-agents.url = "github:numtide/llm-agents.nix";
     cage.url = "github:Warashi/cage";
-    mise.url = "github:jdx/mise";
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, cage, mise, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, llm-agents, cage, ... }:
     let
       system = builtins.currentSystem;
       pkgs = import nixpkgs {
         overlays = [
           neovim-nightly-overlay.overlays.default
-          claude-code.overlays.default
           (final: prev: {
-            mise = mise.packages.${system}.default;
             cage = cage.packages.${system}.default;
             rtk = llm-agents.packages.${system}.rtk;
             ccusage = llm-agents.packages.${system}.ccusage;
