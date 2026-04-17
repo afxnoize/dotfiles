@@ -3,6 +3,5 @@
     ./bunx
     ./npx
     ./kakehashi
-    ./mo
   ];
 }

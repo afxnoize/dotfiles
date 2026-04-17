@@ -2,19 +2,26 @@
 node = "latest"
 deno = "latest"
 uv = "latest"
-python = "latest"
+python = "3.12"
 usage = "latest"
 pnpm = "10.9.0"
 yarn = "latest"
 "pipx:tldr" = "latest"
 "github:duckdb/duckdb" = "latest"
 go = "latest"
-rust = "latest"
 moonbit = "latest"
 "npm:tree-sitter-cli" = "latest"
 "npm:@openai/codex" = "latest"
 aws = { version = "latest", symlink_bins = "true" }
 "pipx:b2" = "4.6.0"
+"aqua:charmbracelet/crush" = "latest"
+"aqua:k1LoW/mo" = "latest"
+"github:sst/opencode" = "latest"
+"pipx:aider-chat" = "latest"
+"pipx:oci-cli" = "latest"
+rust = "latest"
+"npm:@anthropic-ai/claude-code" = "2.1.98"
+
 
 [settings]
 experimental = true
