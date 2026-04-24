@@ -133,7 +133,7 @@ zinit wait"2" lucid \
 complete -C 'aws_completer' aws
 
 # Autoload functions {{{
-autoload -Uz ensure_completion ghq-fzf ghq-updated-fzf git-status ghq-tmux \
+autoload -Uz ensure_completion ensure_integration ghq-fzf ghq-updated-fzf git-status ghq-tmux \
 	_fzf_complete_chezmoi yq claude gi tsv apm
 
 # zle widgets
@@ -198,8 +198,9 @@ bindkey '^t' zaw-tmux
 
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
 
-eval "$(zoxide init zsh)"
-eval "$(git wt --init zsh)"
+ensure_integration direnv 'direnv version' 'direnv hook zsh'
+ensure_integration zoxide 'zoxide --version' 'zoxide init zsh'
+ensure_integration git-wt 'git wt --version' 'git wt --init zsh'
 
 zinit wait"2" lucid \
 	as"null" id-as"mise" \
