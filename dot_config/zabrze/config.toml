@@ -215,6 +215,38 @@ evaluate = true
 global = true
 # End of awk }}}
 
+# XDG base directory {{{
+[[snippets]]
+name = "$XDG_CACHE_HOME"
+trigger = "x-ca"
+snippet = '$XDG_CACHE_HOME'
+global = true
+
+[[snippets]]
+name = "$XDG_CONFIG_HOME"
+trigger = "x-co"
+snippet = '$XDG_CONFIG_HOME'
+global = true
+
+[[snippets]]
+name = "$XDG_DATA_HOME"
+trigger = "x-da"
+snippet = '$XDG_DATA_HOME'
+global = true
+
+[[snippets]]
+name = "$XDG_STATE_HOME"
+trigger = "x-st"
+snippet = '$XDG_STATE_HOME'
+global = true
+
+[[snippets]]
+name = "$XDG_BIN_HOME"
+trigger = "x-bi"
+snippet = '$XDG_BIN_HOME'
+global = true
+# }}}
+
 # date {{{
 [[snippets]]
 name = "yyyymmdd date expansion"
