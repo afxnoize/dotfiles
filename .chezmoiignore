@@ -41,3 +41,6 @@ mcp
 
 # nix result
 result
+
+# repo-level tests (not shipped to user)
+tests

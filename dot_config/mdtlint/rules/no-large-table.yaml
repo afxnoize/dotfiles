@@ -1,0 +1,7 @@
+id: no-large-table
+severity: error
+message: "table has {cols} column(s); use a list instead"
+rule:
+  kind: table
+  cols:
+    gt: 2
