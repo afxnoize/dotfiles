@@ -1,0 +1,45 @@
+emulate -L zsh
+
+command apm "$@"
+local ret=$?
+(( ret == 0 )) || return $ret
+
+case "$1" in
+	install|update|uninstall) ;;
+	*) return 0 ;;
+esac
+
+[[ -f apm.lock.yaml && -f .gitignore ]] || return 0
+
+local begin="# >>> apm deployed_files >>>"
+local end="# <<< apm deployed_files <<<"
+
+local deployed
+deployed=$(yq -r '.dependencies[].deployed_files[]?' apm.lock.yaml 2>/dev/null | sort -u)
+
+local tmpfile="${TMPDIR:-/tmp}/apm-gitignore.$$"
+awk -v b="$begin" -v e="$end" '
+	$0 == b { skip=1; next }
+	skip && $0 == e { skip=0; next }
+	!skip {
+		n++
+		lines[n] = $0
+		if ($0 != "") last = n
+	}
+	END {
+		for (i = 1; i <= last; i++) print lines[i]
+	}
+' .gitignore > "$tmpfile"
+
+if [[ -n "$deployed" ]]; then
+	print >> "$tmpfile"
+	print -r -- "$begin" >> "$tmpfile"
+	print -r -- "$deployed" >> "$tmpfile"
+	print -r -- "$end" >> "$tmpfile"
+fi
+
+mv "$tmpfile" .gitignore
+
+local count=0
+[[ -n "$deployed" ]] && count=$(print -r -- "$deployed" | wc -l | tr -d ' ')
+print -u2 -P "%F{cyan}apm:%f synced .gitignore ($count entries)"

@@ -134,7 +134,7 @@ complete -C 'aws_completer' aws
 
 # Autoload functions {{{
 autoload -Uz ensure_completion ghq-fzf ghq-updated-fzf git-status ghq-tmux \
-	_fzf_complete_chezmoi yq claude gi tsv
+	_fzf_complete_chezmoi yq claude gi tsv apm
 
 # zle widgets
 zle -N ghq-fzf
