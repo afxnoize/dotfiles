@@ -26,7 +26,10 @@ case "$mode" in
         if [ -n "$yazi_pane" ]; then
             tmux kill-pane -t "$yazi_pane"
         else
-            tmux split-window -t "$window_id" -hb -l 20% -c "${git_root:-$current_path}" \
+            width=$(tmux show-options -gv @sidebar_width 2>/dev/null)
+            leftmost_pane=$(tmux list-panes -t "$window_id" -F '#{pane_left} #{pane_id}' 2>/dev/null | \
+                sort -n | head -n1 | awk '{print $2}')
+            tmux split-window -t "${leftmost_pane:-$window_id}" -hfb -l "${width:-15%}" -c "${git_root:-$current_path}" \
                 "tmux set -p @pane_role yazi; YAZI_CONFIG_HOME='${XDG_CONFIG_HOME:-$HOME/.config}/yazi-sidebar' YAZI_SIDEBAR=1 yazi"
         fi
         ;;
