@@ -1,6 +1,8 @@
 {
   "env": {
-    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1"
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": true,
+    "CLAUDE_CODE_FORK_SUBAGENT": true,
+    "CLAUDE_CODE_HIDE_CWD": true
   },
   "permissions": {
     "deny": [
@@ -257,7 +259,7 @@
   },
   "enabledPlugins": {
     "moonbit-practice@moonbit-practice": true,
-    "telegram@claude-plugins-official": true,
+    "telegram@claude-plugins-official": false,
     "voltagent-research@voltagent-subagents": true
   },
   "extraKnownMarketplaces": {
