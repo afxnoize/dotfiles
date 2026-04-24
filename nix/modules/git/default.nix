@@ -67,9 +67,11 @@
         basedir = ".worktrees";
         nocd = false;
       };
-
-      include.path = "~/.config/git/local.config";
     };
+
+    includes = [
+      { path = "~/.config/git/local.config"; }
+    ];
 
     ignores = [
       "/.vscode"
