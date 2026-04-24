@@ -3,6 +3,11 @@ export FZF_TMUX=1 # enable
 export FZF_TMUX_OPTS='-p 80%' # popup
 export TMUX_FZF_OPTIONS='-p -w 73% -h 73% -m'
 
+# WSL: open URLs with the Windows default browser via wslu
+if [[ -n "$WSL_DISTRO_NAME" ]]; then
+  export BROWSER=wslview
+fi
+
 # xclipを使いたかった名残
 # 結局うまくいかなかった
 #IFS=' '
