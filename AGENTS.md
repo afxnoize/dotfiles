@@ -13,7 +13,10 @@ nix build --impure 'path:./nix#homeConfigurations.'$USER'.activationPackage'
 ```
 
 ## Project Overview
-chezmoi + Nix Home-Manager によるdotfiles管理リポジトリ。
+chezmoi + Nix Home-Manager の二段構成 dotfiles リポジトリ。役割分担は以下のとおり。
+
+- chezmoi: 設定ファイルの配布・テンプレート展開・OS 別の差分管理
+- Nix Home-Manager: 宣言的なパッケージ管理と再現可能な環境構築
 
 ## Directory Guide
 - `nix/` - Flake & Home-Manager 設定 → 詳細は [`nix/CONVENTIONS.md`](nix/CONVENTIONS.md)
@@ -27,16 +30,16 @@ chezmoi + Nix Home-Manager によるdotfiles管理リポジトリ。
 - `dosbin/` - Windows用バッチファイル
 
 ## 設定ファイル編集ルール
-- **必ずこのリポジトリ内のソースファイル（`dot_*` 等）を編集すること。** `~/.config/` や `~/` 等の実体ファイルを直接編集してはならない
-- 未管理ファイルの新規作成時は、リポジトリに追加するかユーザーに確認すること
-- 反映は `chezmoi apply` でユーザーが行う
+- 編集対象はリポジトリ内の `dot_*` ソースファイル。`~/.config/` 配下は chezmoi apply で生成される派生物なので、直接編集しても次の apply で上書きされる
+- 未管理ファイルの新規作成時は、リポジトリに追加するかユーザーに確認する
+- 反映は `chezmoi apply` でユーザーが行う（Claude 自身は実行しない）
 
 ## Commit Rules
-- Conventional Commits を使うこと
+- Conventional Commits 形式を使う
 - type/scope は英語（feat, fix, docs など）
 - subject / body は日本語で書く
-- subject は短く（句点なし）
-- Write a comprehensive body based on `git diff --staged`
+- subject は短く、句点を付けない
+- body は `git diff --staged` の内容にもとづき、変更点（何を）と動機（なぜ）を網羅的に書く
 
 ## Key Patterns
 - **Nix modules**: `nix/modules/` 配下にgit・zsh等をモジュール分割
