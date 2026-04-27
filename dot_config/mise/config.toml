@@ -12,10 +12,7 @@ moonbit = "latest"
 "npm:tree-sitter-cli" = "latest"
 "npm:@openai/codex" = "latest"
 aws = { version = "latest", symlink_bins = "true" }
-"aqua:charmbracelet/crush" = "latest"
 "aqua:k1LoW/mo" = "latest"
-"github:sst/opencode" = "latest"
-"pipx:aider-chat" = "latest"
 "pipx:oci-cli" = "latest"
 pnpm = "10.28.1"
 rust = "latest"
@@ -24,7 +21,6 @@ rust = "latest"
 "github:fwdcloudsec/granted" = "latest"
 direnv = "latest"
 "github:microsoft/apm" = "latest"
-
 
 [settings]
 experimental = true
