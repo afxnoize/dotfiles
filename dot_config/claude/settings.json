@@ -86,28 +86,6 @@
         ]
       }
     ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude notification"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude stop"
-          }
-        ]
-      }
-    ],
     "StopFailure": [
       {
         "matcher": "",
@@ -289,8 +267,7 @@
     }
   },
   "language": "japanese",
-  "effortLevel": "high",
-  "plansDirectory": "./.plans",
+  "cleanupPeriodDays": 30,
   "skipDangerousModePermissionPrompt": true,
   "skipAutoPermissionPrompt": false
 }

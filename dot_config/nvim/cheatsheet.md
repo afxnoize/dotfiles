@@ -3,17 +3,18 @@
 - In INSERT mode
   - `Ctrl-W`: delete word (back cursor)
 - In CommandLine mode
-  - `Ctrl-R` + `register`: paster resigter
-- `]␣`: **FuzzyMotion**
-- `mf`/`<Plug>(lsp)f`: format using null-ls
+  - `Ctrl-R` + `register`: paste register
+- `m<Space>`: **FuzzyMotion** (`m` is `[motion]` prefix)
+- `]F`: format using LSP (`vim.lsp.buf.format`)
 
 ## memo
 
 - `zo`, `zO`: opening the fold
-- `,tt`: termianl open
+- `,tt`: terminal toggle (floaterm)
 - `,r`: source myvimrc
+- `,?`: open this cheatsheet
 
-## new plugins [2023/01/26]
+## plugins
 
 - `<C-a>`,`<C-x>`強化: `monaqa/dial.nvim`
 - overviewer `stevearc/aerial.nvim` `:AerialOpen`
@@ -34,6 +35,12 @@
 
 - `,fF`: **telescope** builtin
 - `sf`: file browser
+
+## markdown preview (md-render.nvim)
+
+- `,pp`: preview (toggle)
+- `,pt`: preview in tab (toggle)
+- `,pd`: render demo
 
 ## quickfix
 

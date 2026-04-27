@@ -1,13 +1,13 @@
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
-	vim.fn.system({
-		"git",
-		"clone",
-		"--filter=blob:none",
-		"https://github.com/folke/lazy.nvim.git",
-		"--branch=stable", -- latest stable release
+	vim.fn.system {
+		'git',
+		'clone',
+		'--filter=blob:none',
+		'https://github.com/folke/lazy.nvim.git',
+		'--branch=stable', -- latest stable release
 		lazypath,
-	})
+	}
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -29,7 +29,6 @@ lazy.setup({
 		'stevearc/dressing.nvim',
 		lazy = false,
 	},
-
 
 	-- statusline
 	{
@@ -73,14 +72,14 @@ lazy.setup({
 		---@type oil.SetupOpts
 		opts = {
 			default_file_explorer = true,
-			columns = { "icon" },
+			columns = { 'icon' },
 			delete_to_trash = true,
 			skip_confirm_for_simple_edits = true,
 			view_options = {
 				show_hidden = true,
 			},
 			keymaps = {
-				["q"] = "actions.close",
+				['q'] = 'actions.close',
 			},
 		},
 		lazy = false,
@@ -97,9 +96,8 @@ lazy.setup({
 		dependencies = {
 			{ 'mason-org/mason.nvim', opts = {} },
 			'neovim/nvim-lspconfig',
-		}
+		},
 	},
-
 
 	-- complete
 	{
@@ -113,11 +111,11 @@ lazy.setup({
 			'hrsh7th/cmp-cmdline',
 			-- snippet engine
 			{
-				"L3MON4D3/LuaSnip",
+				'L3MON4D3/LuaSnip',
 				-- follow latest release.
-				version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+				version = 'v2.*', -- Replace <CurrentMajor> by the latest released major (first number of latest release)
 				-- install jsregexp (optional!).
-				build = "make install_jsregexp"
+				build = 'make install_jsregexp',
 			},
 			'rafamadriz/friendly-snippets',
 			'saadparwaiz1/cmp_luasnip',
@@ -142,9 +140,8 @@ lazy.setup({
 		},
 		config = function()
 			require('rc/cmp').config()
-		end
+		end,
 	},
-
 
 	-- linter formatter
 	{
@@ -155,15 +152,15 @@ lazy.setup({
 			-- 'williamboman/mason.nvim',
 		},
 		config = function()
-			require('mason-null-ls').setup({
+			require('mason-null-ls').setup {
 				ensure_installed = { 'prettier', 'stylua' },
 				automatic_installation = false,
 				automatic_setup = true,
 				handlers = {},
-			})
-			require('null-ls').setup({
+			}
+			require('null-ls').setup {
 				capabilities = vim.lsp.protocol.make_client_capabilities(),
-			})
+			}
 		end,
 	},
 
@@ -172,7 +169,7 @@ lazy.setup({
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
 		cmd = {
 			'Trouble',
-			'TroubleToggle'
+			'TroubleToggle',
 		},
 		config = true,
 	},
@@ -195,7 +192,7 @@ lazy.setup({
 			'AerialOpenAll',
 			'AerialGo',
 			'AerialInfo',
-		}
+		},
 		-- support api on lazy
 	},
 
@@ -203,27 +200,27 @@ lazy.setup({
 	{
 		'windwp/nvim-ts-autotag',
 		config = function()
-			require('nvim-ts-autotag').setup({
+			require('nvim-ts-autotag').setup {
 				opts = {
 					enable_close = true,
 					enable_rename = true,
-					enable_close_on_slash = false
+					enable_close_on_slash = false,
 				},
 				per_filetype = {
 					['html'] = {
-						enable_close = false
-					}
-				}
-			})
+						enable_close = false,
+					},
+				},
+			}
 		end,
 	},
 
 	{
 		'windwp/nvim-autopairs',
 		config = function()
-			require('nvim-autopairs').setup({
+			require('nvim-autopairs').setup {
 				disable_filetype = { 'telescopeprompt', 'vim', 'fern' },
-			})
+			}
 		end,
 	},
 	-- auto closer
@@ -261,7 +258,7 @@ lazy.setup({
 		keys = {
 			'<Plug>(operator-surround-append)',
 			'<Plug>(operator-surround-delete)',
-			'<Plug>(operator-surround-replace)'
+			'<Plug>(operator-surround-replace)',
 		},
 		dependencies = 'kana/vim-operator-user',
 	},
@@ -297,14 +294,14 @@ lazy.setup({
 	{
 		'monaqa/dial.nvim',
 		keys = {
-			{ '<C-a>',  nil, { 'n', 'v' } },
-			{ '<C-x>',  nil, { 'n', 'v' } },
+			{ '<C-a>', nil, { 'n', 'v' } },
+			{ '<C-x>', nil, { 'n', 'v' } },
 			{ 'g<C-a>', nil, { 'n', 'v' } },
 			{ 'g<C-x>', nil, { 'n', 'v' } },
 		},
 		config = function()
 			require('rc/dial').config()
-		end
+		end,
 	},
 
 	-- search
@@ -341,7 +338,7 @@ lazy.setup({
 				'nvim-telescope/telescope-file-browser.nvim',
 				dependencies = {
 					'nvim-tree/nvim-web-devicons',
-				}
+				},
 			},
 			'tsakirist/telescope-lazy.nvim',
 		},
@@ -350,9 +347,8 @@ lazy.setup({
 		end,
 		config = function()
 			require('rc/telescope').config()
-		end
+		end,
 	},
-
 
 	-- easy motions
 	{
@@ -401,7 +397,7 @@ lazy.setup({
 			'BuffergatorOpen',
 			'BuffergatorToggle',
 			'BuffergatorTabsOpen',
-			'BuffergatorTabsToggle'
+			'BuffergatorTabsToggle',
 		},
 		init = function()
 			vim.g.buffergator_suppress_keymaps = 1
@@ -428,10 +424,24 @@ lazy.setup({
 		'iamcco/markdown-preview.nvim',
 		build = 'cd app && yarn install',
 		init = function()
-			vim.g.mkdp_filetypes = { "markdown" }
+			vim.g.mkdp_filetypes = { 'markdown' }
 		end,
-		ft = { "markdown" },
+		ft = { 'markdown' },
 		-- { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
+	},
+
+	{
+		'delphinus/md-render.nvim',
+		version = '*',
+		dependencies = {
+			{ 'nvim-tree/nvim-web-devicons', version = '*' }, -- optional: file type icons in code blocks
+			{ 'delphinus/budoux.lua', version = '*' }, -- optional: CJK phrase-level line breaking
+		},
+		keys = {
+			{ '<leader>pp', '<Plug>(md-render-preview)', desc = 'Markdown preview (toggle)' },
+			{ '<leader>pt', '<Plug>(md-render-preview-tab)', desc = 'Markdown preview in tab (toggle)' },
+			{ '<leader>pd', '<Plug>(md-render-demo)', desc = 'Markdown render demo' },
+		},
 	},
 
 	-- moonbit
@@ -446,7 +456,7 @@ lazy.setup({
 			lsp = {
 				on_attach = function(client, bufnr) end,
 				capabilities = vim.lsp.protocol.make_client_capabilities(),
-			}
+			},
 		},
 	},
 
@@ -504,9 +514,9 @@ lazy.setup({
 	{
 		'epwalsh/obsidian.nvim',
 		lazy = false,
-		ft = "markdown",
+		ft = 'markdown',
 		dependencies = {
-			"nvim-lua/plenary.nvim"
+			'nvim-lua/plenary.nvim',
 		},
 	},
 
@@ -539,8 +549,8 @@ lazy.setup({
 	{
 		'eandrju/cellular-automaton.nvim',
 		cmd = {
-			'CellularAutomaton'
-		}
+			'CellularAutomaton',
+		},
 	},
 
 	-- clorscheme
@@ -552,13 +562,14 @@ lazy.setup({
 		'AlexvZyl/nordic.nvim',
 		'RRethy/nvim-base16',
 		{
-			'catppuccin/nvim', name = 'catppuccin',
+			'catppuccin/nvim',
+			name = 'catppuccin',
 		},
-	}
+	},
 }, {
 	defaults = {
 		lazy = true, -- should plugins be lazy-loaded?
-	}
+	},
 })
 
 -- colorscheme
