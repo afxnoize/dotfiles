@@ -49,4 +49,9 @@
     cage
   ];
 
+  services.pueue = {
+    enable = true;
+    package = pkgs-unstable.pueue;
+  };
+
 }

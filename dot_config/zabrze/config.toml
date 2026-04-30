@@ -141,6 +141,11 @@ context = '^mo\s+--target\s+'
 name = "just"
 trigger = "j"
 snippet = "just"
+
+[[snippets]]
+name = "pueue"
+trigger = "q"
+snippet = "pueue"
 # End of tools 1}}}
 
 # nvim {{{
