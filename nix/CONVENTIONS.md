@@ -21,11 +21,6 @@
 - `home.activation.*` で DAG 順序制御を使用
 - 必ず `lib.hm.dag.entryAfter [ "writeBoundary" ]` で実行順を指定すること
 
-### Agent Skills モジュール
-- `modules/agent-skills/default.nix` で Claude Code スキルの自動インストールを管理
-- インストール先は `$CLAUDE_CONFIG_DIR/skills/`（デフォルト: `~/.config/claude/skills/`）
-- 作業ディレクトリは `$XDG_STATE_HOME` 配下に分離
-
 ### パッケージソース
 - **nixpkgs (stable)**: 通常のパッケージ
 - **nixpkgs-unstable**: 最新版が必要なパッケージ（mise, git-wt 等）

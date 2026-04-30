@@ -1,0 +1,7 @@
+#!/bin/bash
+# apm.yml hash: {{ include "dot_apm/apm.yml" | sha256sum }}
+set -euo pipefail
+
+if command -v apm &>/dev/null; then
+  apm install -g -t claude
+fi

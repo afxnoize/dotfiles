@@ -4,6 +4,5 @@
     ./git
     ./tmux
     ./direnv
-    ./agent-skills
   ];
 }

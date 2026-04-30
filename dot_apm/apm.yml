@@ -1,0 +1,12 @@
+name: noize
+version: 1.0.0
+description: APM project for noize
+author: noize
+dependencies:
+  apm:
+    - vercel-labs/skills/skills/find-skills
+    - anthropics/claude-plugins-official/plugins/claude-md-management/skills/claude-md-improver
+    - rbergman/dark-matter-marketplace/plugins/language-pro/skills/just-pro
+    - laurigates/claude-plugins/tools-plugin/skills/justfile-expert
+  mcp: []
+scripts: {}
