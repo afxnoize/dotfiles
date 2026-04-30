@@ -64,7 +64,7 @@
 
       ghq.root = "~/repos";
       wt = {
-        basedir = ".worktrees";
+        basedir = ".wt";
         nocd = false;
       };
     };
@@ -76,14 +76,9 @@
     ignores = [
       "/.vscode"
       ".*-version" # anyenv local version
-      ".worktrees" # git worktree
       "**/.claude/settings.local.json"
       ".plans/" # Claude Code plans directory
     ];
   };
-
-  programs.zsh.initContent = ''
-    eval "$(git wt --init zsh)"
-  '';
 }
 

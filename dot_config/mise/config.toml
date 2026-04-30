@@ -20,7 +20,7 @@ aws = { version = "latest", symlink_bins = "true" }
 pnpm = "10.28.1"
 rust = "latest"
 "pipx:b2" = "4.6.0"
-"npm:@anthropic-ai/claude-code" = "2.1.119"
+"npm:@anthropic-ai/claude-code" = "latest"
 "github:fwdcloudsec/granted" = "latest"
 direnv = "latest"
 "github:microsoft/apm" = "latest"
