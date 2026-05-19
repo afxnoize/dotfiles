@@ -29,6 +29,7 @@
 
     fzf
     nix-output-monitor
+    pkgs-unstable.nix-sweep
     ripgrep
     fd
     bat

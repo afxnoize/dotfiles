@@ -2,3 +2,8 @@
 name = "home-manager switch (via nom)"
 trigger = "hms"
 snippet = 'out=$(nom build --impure --no-link --print-out-paths {{ .chezmoi.sourceDir }}/nix#homeConfigurations.$USER.activationPackage) && "$out/activate"'
+
+[[snippets]]
+name = "home-manager update (flake.lock)"
+trigger = "hmu"
+snippet = 'nix flake update --flake {{ .chezmoi.sourceDir }}/nix'
