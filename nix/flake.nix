@@ -23,9 +23,14 @@
 
     llm-agents.url = "github:numtide/llm-agents.nix";
     cage.url = "github:Warashi/cage";
+
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, llm-agents, cage, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, llm-agents, cage, nix-index-database, ... }:
     let
       system = builtins.currentSystem;
       pkgs = import nixpkgs {
@@ -48,6 +53,7 @@
           inherit pkgs;
           modules = [
             ./home.nix
+            nix-index-database.homeModules.nix-index
           ];
           extraSpecialArgs = {
             inherit username homeDirectory pkgs-unstable;

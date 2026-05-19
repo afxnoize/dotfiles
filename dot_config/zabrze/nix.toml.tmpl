@@ -1,4 +1,4 @@
 [[snippets]]
-name = "home-manager switch"
+name = "home-manager switch (via nom)"
 trigger = "hms"
-snippet = "home-manager switch --flake {{ .chezmoi.sourceDir }}/nix#$USER --impure"
+snippet = 'out=$(nom build --impure --no-link --print-out-paths {{ .chezmoi.sourceDir }}/nix#homeConfigurations.$USER.activationPackage) && "$out/activate"'

@@ -28,6 +28,7 @@
     neovim
 
     fzf
+    nix-output-monitor
     ripgrep
     fd
     bat
@@ -53,5 +54,8 @@
     enable = true;
     package = pkgs-unstable.pueue;
   };
+
+  programs.nix-index.enable = true;
+  programs.nix-index-database.comma.enable = true;
 
 }
