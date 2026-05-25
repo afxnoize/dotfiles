@@ -12,7 +12,7 @@ moonbit = "latest"
 "npm:tree-sitter-cli" = "latest"
 "npm:@openai/codex" = "latest"
 aws = { version = "latest", symlink_bins = "true" }
-"aqua:k1LoW/mo" = "latest"
+"aqua:k1LoW/mo" = { version = "latest", symlink_bins = "true" }
 "pipx:oci-cli" = "latest"
 pnpm = "10.28.1"
 rust = "latest"
