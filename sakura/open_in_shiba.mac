@@ -1,0 +1,13 @@
+// Open current file in Shiba (Markdown previewer)
+// https://github.com/rhysd/Shiba
+//
+// Usage:
+//   1. Register this file: 設定 → 共通設定 → マクロ → 新しい番号に登録
+//   2. Bind a key: 設定 → 共通設定 → キー割り当て → 機能種別「外部マクロ」
+//
+// $F is expanded to the absolute path of the current file by
+// CSakuraEnvironment::ExpandParameter.
+// Outer quotes wrap the exe path so spaces in "Program Files" do not split.
+// Second arg 0 = no stdout/stdin redirection (fire-and-forget GUI launch).
+
+ExecCommand("\"C:\\Program Files\\Shiba\\shiba.exe\" \"$F\"", 0);
