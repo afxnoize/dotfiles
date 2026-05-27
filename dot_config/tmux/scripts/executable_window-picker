@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Window picker with switch / rename / kill / new bindings.
+# - Enter:  switch to selected window (across sessions)
+# - Ctrl-R: rename selected window via second fzf popup
+# - Ctrl-X: kill selected window
+# - Ctrl-C: create a new session via second fzf popup
+
+set -u
+
+prompt_inline() {
+    local header=$1 default=$2 out ec
+    out=$(printf '\n' | fzf-tmux -p 50%,3 --reverse \
+        --print-query --query "$default" \
+        --bind 'enter:print-query+accept' \
+        --header "$header" \
+        --no-info 2>/dev/null)
+    ec=$?
+    [ $ec -ne 0 ] && return 1
+    printf '%s\n' "$out" | sed -n 1p
+}
+
+create_session() {
+    local new
+    new=$(prompt_inline 'new session name:' '')
+    [ -z "$new" ] && return 0
+    if tmux has-session -t="$new" 2>/dev/null; then
+        tmux switch-client -t "$new"
+    else
+        TMUX= tmux new-session -d -s "$new"
+        tmux switch-client -t "$new"
+    fi
+}
+
+selected=$(tmux list-windows -a -F '#{session_name}:#{window_index}	#{window_name} (#{window_panes} panes)#{?window_active, *,}' | \
+    fzf-tmux -p 70%,50% --reverse \
+        --delimiter '\t' --with-nth 1,2 \
+        --header 'enter: switch / ctrl-r: rename / ctrl-x: kill / ctrl-c: new session' \
+        --expect=ctrl-r,ctrl-x,ctrl-c)
+
+key=$(printf '%s\n' "$selected" | sed -n 1p)
+line=$(printf '%s\n' "$selected" | sed -n 2p)
+target=${line%%$'\t'*}
+
+if [ "$key" = 'ctrl-c' ]; then
+    create_session
+    exit 0
+fi
+
+[ -z "$target" ] && exit 0
+
+case "$key" in
+    ctrl-r)
+        cur=$(tmux display -t "$target" -p '#{window_name}')
+        new=$(prompt_inline "rename '$cur' to:" "$cur")
+        if [ -n "$new" ] && [ "$new" != "$cur" ]; then
+            tmux rename-window -t "$target" "$new"
+        fi
+        ;;
+    ctrl-x)
+        tmux kill-window -t "$target"
+        ;;
+    *)
+        sess=${target%%:*}
+        tmux switch-client -t "$sess"
+        tmux select-window -t "$target"
+        ;;
+esac
