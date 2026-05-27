@@ -2,6 +2,9 @@ local ghq_root=$(ghq root)
 local sorted=$(ghq list | python -c "import os; import sys; print(''.join(sorted(sys.stdin.readlines(), key=lambda path: os.stat(f'$ghq_root/{path.strip()}').st_mtime, reverse=True)))")
 local src=$(echo $sorted | fzf-tmux -p 80% --preview "bat --style=header,grid --line-range :80 $ghq_root/{}/README.*")
 if [ -n "$src" ]; then
+	if [ -n "$TMUX" ] && [ "$(tmux display -p '#{session_windows}')" -eq 1 ]; then
+		tmux rename-session "${src##*/}" 2>/dev/null
+	fi
 	BUFFER="cd $ghq_root/$src"
 	zle accept-line
 fi
