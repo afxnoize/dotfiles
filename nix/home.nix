@@ -18,40 +18,6 @@
     ./tools
   ];
 
-  home.packages = with pkgs; [
-    git
-    gti
-    gh
-    ghq
-    pkgs-unstable.git-wt
-
-    neovim
-
-    fzf
-    nh
-    nix-output-monitor
-    pkgs-unstable.nix-sweep
-    ripgrep
-    fd
-    bat
-    bottom
-    eza
-    pkgs-unstable.mise
-    bitwarden-cli
-    jq
-    sops
-    age
-    zoxide
-    devbox
-    just
-    chezmoi
-    yazi
-
-    rtk
-    ccusage
-    cage
-  ];
-
   services.pueue = {
     enable = true;
     package = pkgs-unstable.pueue;
