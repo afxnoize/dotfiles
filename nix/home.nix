@@ -28,6 +28,7 @@
     neovim
 
     fzf
+    nh
     nix-output-monitor
     pkgs-unstable.nix-sweep
     ripgrep
