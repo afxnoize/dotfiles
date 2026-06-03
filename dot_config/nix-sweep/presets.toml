@@ -1,0 +1,10 @@
+[default]
+keep-min = 7
+remove-older = '30d'
+gc = true
+interactive = true
+
+[reclaim]
+keep-min = 3
+remove-older = '14d'
+gc = true
