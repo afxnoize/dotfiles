@@ -1,5 +1,11 @@
 [[snippets]]
-name = "home-manager switch (via nom if available)"
+name = "home-manager switch (via nh)"
+trigger = "hms"
+snippet = 'nh home switch {{ .chezmoi.sourceDir }}/nix -c $USER -- --impure'
+if = '(( ${+commands[nh]} ))'
+
+[[snippets]]
+name = "home-manager switch (fallback to nom/nix)"
 trigger = "hms"
 snippet = 'builder=$(command -v nom || command -v nix) && out=$("$builder" build --impure --no-link --print-out-paths {{ .chezmoi.sourceDir }}/nix#homeConfigurations.$USER.activationPackage) && "$out/activate"'
 
