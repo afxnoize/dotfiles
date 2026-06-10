@@ -12,12 +12,11 @@
 - 短い相槌・雑談・一言回答ではプレーンテキストでよい（過剰な装飾は読みづらさを生む）
 
 ## Subagent 運用
-コスト・速度・知能のバランスを最適化するため、タスクの性質に応じて model をルーティングする。委譲することで親 context にツール出力のノイズを溜めない狙いもある。
+タスクは適切な subagent に委譲し、親 context にツール出力のノイズを溜めない。
+Agent ツールで直接呼ぶときは task 性質で model を選ぶ:
+- 探索・grep・単純確認 → haiku
+- 実装・リファクタ・調査 → sonnet
+- 設計判断・複雑な分析 → Opus（委譲せず自分で処理）
 
-- 実装・調査・レビューは適切な subagent に委譲する
-- 定義済み subagent（plugin・.claude/agents/）はその model 設定に従う
-- 汎用 subagent（general-purpose・Explore 等）の model ルーティング:
-  - 探索・grep・単純な確認 → haiku（高速・低コスト）
-  - 実装・リファクタリング・調査 → sonnet（バランス重視）
-  - 設計判断・複雑な分析 → 自分(Opus)で直接処理（context 分散を避ける）
+定義済み subagent（plugin・.claude/agents/）は frontmatter の model に従う。
 

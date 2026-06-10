@@ -1,6 +1,5 @@
 {
   "env": {
-    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": true,
     "CLAUDE_CODE_FORK_SUBAGENT": true,
     "CLAUDE_CODE_HIDE_CWD": true
   },
@@ -48,7 +47,6 @@
     ],
     "defaultMode": "default"
   },
-  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -81,7 +79,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude activity-log"
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude activity-log"
           }
         ]
       }
@@ -92,7 +90,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude stop-failure"
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude stop-failure"
           }
         ]
       }
@@ -103,7 +101,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude user-prompt-submit"
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude user-prompt-submit"
           }
         ]
       }
@@ -114,7 +112,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude session-start"
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude session-start"
           }
         ]
       }
@@ -125,7 +123,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $XDG_DATA_HOME/tmux/plugins/tmux-agent-sidebar/hook.sh claude session-end"
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude session-end"
           }
         ]
       }
@@ -134,7 +132,7 @@
       {
         "hooks": [
           {
-            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude cwd-changed",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude cwd-changed",
             "type": "command"
           }
         ],
@@ -145,7 +143,7 @@
       {
         "hooks": [
           {
-            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude permission-denied",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude permission-denied",
             "type": "command"
           }
         ],
@@ -156,7 +154,7 @@
       {
         "hooks": [
           {
-            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude subagent-start",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude subagent-start",
             "type": "command"
           }
         ],
@@ -167,7 +165,7 @@
       {
         "hooks": [
           {
-            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude subagent-stop",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude subagent-stop",
             "type": "command"
           }
         ],
@@ -178,7 +176,7 @@
       {
         "hooks": [
           {
-            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-completed",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-completed",
             "type": "command"
           }
         ],
@@ -189,7 +187,7 @@
       {
         "hooks": [
           {
-            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-created",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-created",
             "type": "command"
           }
         ],
@@ -200,7 +198,7 @@
       {
         "hooks": [
           {
-            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude teammate-idle",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude teammate-idle",
             "type": "command"
           }
         ],
@@ -211,7 +209,7 @@
       {
         "hooks": [
           {
-            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-create",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-create",
             "type": "command"
           }
         ],
@@ -222,7 +220,7 @@
       {
         "hooks": [
           {
-            "command": "bash /home/noize/.local/share/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-remove",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-remove",
             "type": "command"
           }
         ],
@@ -268,6 +266,5 @@
   },
   "language": "japanese",
   "cleanupPeriodDays": 30,
-  "skipDangerousModePermissionPrompt": true,
   "skipAutoPermissionPrompt": false
 }
