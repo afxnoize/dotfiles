@@ -47,6 +47,21 @@ end
 -- vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
 --- }}}
 
+-- kakehashi: inherit nvim lsp configs as bridged servers {{{
+vim.api.nvim_create_autocmd('LspAttach', {
+	callback = function(ev)
+		local client = vim.lsp.get_client_by_id(ev.data.client_id)
+		if client and client.name == 'kakehashi' then
+			require('kakehashi').inherit_nvim_lsp_config(
+				client,
+				vim.tbl_keys(vim.lsp._enabled_configs),
+				'keep'
+			)
+		end
+	end,
+})
+-- }}}
+
 -- AuthCmd: LspAttach {{{
 vim.api.nvim_create_autocmd('LspAttach', {
 	group = vim.api.nvim_create_augroup('mylspconfig', {}),

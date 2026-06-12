@@ -89,6 +89,8 @@ lazy.setup({
 	},
 
 	-- lsp
+	{ 'atusy/kakehashi.nvim' },
+
 	{
 		'mason-org/mason-lspconfig.nvim',
 		priority = 100, -- lsp, null-ls両方の依存先なので早めにload
