@@ -34,6 +34,10 @@ chezmoi + Nix Home-Manager の二段構成 dotfiles リポジトリ。役割分�
 - 未管理ファイルの新規作成時は、リポジトリに追加するかユーザーに確認する
 - 反映は `chezmoi apply` でユーザーが行う（Claude 自身は実行しない）
 
+## Document Rules
+- **テーブル**: 2列まで許容。3列以上になるならリストに変換する
+- **図**: Mermaid を使う
+
 ## Commit Rules
 - Conventional Commits 形式を使う
 - type/scope は英語（feat, fix, docs など）
