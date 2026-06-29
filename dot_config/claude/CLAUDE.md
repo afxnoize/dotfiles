@@ -13,10 +13,14 @@
 
 ## Subagent 運用
 タスクは適切な subagent に委譲し、親 context にツール出力のノイズを溜めない。
+Opus 4.8 は既定では委譲を控えめにするため、並行可能・独立 context のタスクは明示的に委譲する。
+依存のないツール呼び出しは同一メッセージにまとめて並列実行する。
+
 Agent ツールで直接呼ぶときは task 性質で model を選ぶ:
 - 探索・grep・単純確認 → haiku
 - 実装・リファクタ・調査 → sonnet
 - 設計判断・複雑な分析 → Opus（委譲せず自分で処理）
 
+重い設計判断や多段推論を要するタスクは effort を上げて処理し、軽い確認は低めに保つ。
 定義済み subagent（plugin・.claude/agents/）は frontmatter の model に従う。
 
