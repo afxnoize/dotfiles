@@ -21,6 +21,7 @@ rust = "latest"
 "github:fwdcloudsec/granted" = "latest"
 direnv = "latest"
 "github:microsoft/apm" = "latest"
+"npm:@rivolink/leaf" = "latest"
 
 [settings]
 experimental = true
