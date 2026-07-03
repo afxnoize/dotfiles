@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# rtk version: {{ output "rtk" "--version" | trim }}
+set -euo pipefail
+
+CLAUDE_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/claude"
+STAGING=$(mktemp -d)
+trap 'rm -rf "$STAGING"' EXIT
+mkdir -p "$STAGING/claude-out"
+
+# rtk init -g always writes RTK.md / CLAUDE.md / settings.json under $HOME/.claude/,
+# ignoring $XDG_CONFIG_HOME entirely for those artifacts. Its own internal config
+# (rtk/filters.toml) separately reads $XDG_CONFIG_HOME directly. Rather than chase
+# every env var rtk might consult (whack-a-mole), run it inside a bwrap sandbox
+# with the whole $HOME replaced by tmpfs, and bind only $HOME/.claude to a real
+# host staging dir so the generated files can be recovered afterward. Nothing rtk
+# does can touch the real filesystem regardless of which path-resolution method it
+# uses internally.
+if ! command -v bwrap >/dev/null 2>&1; then
+  echo "[rtk-init] Warning: bwrap (bubblewrap) not found; skipping isolated rtk init check. Install bubblewrap to enable this." >&2
+  exit 0
+fi
+
+RTK_BIN_RESOLVED=$(readlink -f "$(command -v rtk)")
+BWRAP_ARGS=(--dev /dev --proc /proc)
+[ -d /nix ] && BWRAP_ARGS+=(--ro-bind /nix /nix)
+[ -d /usr ] && BWRAP_ARGS+=(--ro-bind /usr /usr)
+[ -d /etc ] && BWRAP_ARGS+=(--ro-bind /etc /etc)
+BWRAP_ARGS+=(--tmpfs "$HOME")
+case "$RTK_BIN_RESOLVED" in
+  "$HOME"/*)
+    # rtk itself lives inside $HOME (e.g. ~/.cargo/bin) -- re-expose it read-only
+    # after the tmpfs mount so the sandboxed process can still exec it.
+    BWRAP_ARGS+=(--ro-bind "$(dirname "$RTK_BIN_RESOLVED")" "$(dirname "$RTK_BIN_RESOLVED")")
+    ;;
+esac
+if [ "$CLAUDE_CONFIG" != "$HOME/.config/claude" ]; then
+  # $XDG_CONFIG_HOME points outside $HOME -- isolate it too so rtk's own config
+  # (rtk/filters.toml etc.) can't leak into the real one either.
+  BWRAP_ARGS+=(--tmpfs "$(dirname "$CLAUDE_CONFIG")")
+fi
+BWRAP_ARGS+=(--dir "$HOME/.claude" --bind "$STAGING/claude-out" "$HOME/.claude")
+BWRAP_ARGS+=(--setenv HOME "$HOME" --unshare-all --die-with-parent)
+
+BWRAP_LOG="$STAGING/bwrap.log"
+if ! bwrap "${BWRAP_ARGS[@]}" -- rtk init -g --auto-patch >"$BWRAP_LOG" 2>&1; then
+  if grep -qi 'uid map\|user namespace' "$BWRAP_LOG"; then
+    echo "[rtk-init] Warning: bwrap sandbox unavailable in this environment (unprivileged user namespaces blocked). Skipping isolated rtk init check." >&2
+  else
+    echo "[rtk-init] Warning: bwrap-sandboxed rtk init failed. See below:" >&2
+    cat "$BWRAP_LOG" >&2
+  fi
+  exit 0
+fi
+
+NEW_RTK_MD="$STAGING/claude-out/RTK.md"
+CURRENT_RTK_MD="$CLAUDE_CONFIG/RTK.md"
+
+if [ ! -f "$NEW_RTK_MD" ]; then
+  echo "[rtk-init] Warning: rtk init did not generate RTK.md" >&2
+  exit 0
+fi
+
+if ! diff -q "$NEW_RTK_MD" "$CURRENT_RTK_MD" >/dev/null 2>&1; then
+  cp "$NEW_RTK_MD" "$CURRENT_RTK_MD"
+  echo "[rtk-init] RTK.md updated by rtk $(rtk --version). Review and commit dot_config/claude/RTK.md in your dotfiles repo."
+fi
+
+# settings.json: merge only the rtk PreToolUse(Bash) hook entry -- every other key
+# (permissions, other hooks, plugins, ...) is left untouched.
+NEW_SETTINGS="$STAGING/claude-out/settings.json"
+CURRENT_SETTINGS="$CLAUDE_CONFIG/settings.json"
+
+if [ -f "$NEW_SETTINGS" ] && [ -f "$CURRENT_SETTINGS" ] && command -v jq >/dev/null 2>&1; then
+  EXPECTED_CMD=$(jq -r '.hooks.PreToolUse[]? | select(.matcher=="Bash") | .hooks[]? | select(.command | test("^rtk ")) | .command' "$NEW_SETTINGS" | head -1)
+  CURRENT_CMD=$(jq -r '.hooks.PreToolUse[]? | select(.matcher=="Bash") | .hooks[]? | select(.command | test("^rtk ")) | .command' "$CURRENT_SETTINGS" | head -1)
+
+  if [ -n "$EXPECTED_CMD" ] && [ "$EXPECTED_CMD" != "$CURRENT_CMD" ]; then
+    MERGED="$STAGING/settings.merged.json"
+    if jq --arg cmd "$EXPECTED_CMD" '
+        ( .hooks.PreToolUse //= [] ) |
+        if any(.hooks.PreToolUse[]; .matcher == "Bash" and any(.hooks[]?; .command | test("^rtk ")))
+        then
+          (.hooks.PreToolUse[] | select(.matcher == "Bash") | .hooks[] | select(.command | test("^rtk "))) .command = $cmd
+        elif any(.hooks.PreToolUse[]; .matcher == "Bash")
+        then
+          (.hooks.PreToolUse[] | select(.matcher == "Bash") | .hooks) += [{"type":"command","command":$cmd}]
+        else
+          .hooks.PreToolUse += [{"matcher":"Bash","hooks":[{"type":"command","command":$cmd}]}]
+        end
+      ' "$CURRENT_SETTINGS" > "$MERGED" && jq -e . "$MERGED" >/dev/null 2>&1; then
+      cp "$MERGED" "$CURRENT_SETTINGS"
+      echo "[rtk-init] settings.json: rtk hook command updated ('${CURRENT_CMD:-<none>}' -> '$EXPECTED_CMD'). Review and commit dot_config/claude/settings.json in your dotfiles repo."
+    else
+      echo "[rtk-init] Warning: failed to merge rtk hook command into settings.json; please update manually (expected: '$EXPECTED_CMD')." >&2
+    fi
+  fi
+fi

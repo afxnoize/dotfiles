@@ -58,7 +58,7 @@
           },
           {
             "type": "command",
-            "command": "$CLAUDE_CONFIG_DIR/hooks/rtk-rewrite.sh"
+            "command": "rtk hook claude"
           },
           {
             "type": "command",
