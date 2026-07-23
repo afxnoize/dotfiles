@@ -8,6 +8,7 @@ presets:
       - "$XDG_DATA_HOME/zoxide" # zoxide db
       - "$XDG_DATA_HOME/lesshst"
       - "$XDG_DATA_HOME/pnpm"
+      - "$XDG_DATA_HOME/direnv" # direnv allow hashes
       - "$TMPDIR"
       - "/tmp"
       - "/dev/ptmx" # pseudo-terminal master

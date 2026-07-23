@@ -1,6 +1,9 @@
 { config, pkgs, pkgs-unstable, lib, username, homeDirectory, ... }:
 
 {
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) [ "claude-code" ];
+
   home.username = username;
   home.homeDirectory = homeDirectory;
 

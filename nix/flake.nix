@@ -21,6 +21,7 @@
 
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
 
+    claude-code.url = "github:sadjow/claude-code-nix";
     llm-agents.url = "github:numtide/llm-agents.nix";
     cage.url = "github:Warashi/cage";
 
@@ -30,12 +31,13 @@
     };
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, llm-agents, cage, nix-index-database, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, cage, nix-index-database, ... }:
     let
       system = builtins.currentSystem;
       pkgs = import nixpkgs {
         overlays = [
           neovim-nightly-overlay.overlays.default
+          claude-code.overlays.default
           (final: prev: {
             cage = cage.packages.${system}.default;
             rtk = llm-agents.packages.${system}.rtk;
