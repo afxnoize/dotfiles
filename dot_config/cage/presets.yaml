@@ -13,6 +13,7 @@ presets:
       - "/tmp"
       - "/dev/ptmx" # pseudo-terminal master
       - "/dev/pts" # pseudo-terminal slaves
+      - "$XDG_DATA_HOME/direnv"
 
   git-enabled:
     allow-git: true
