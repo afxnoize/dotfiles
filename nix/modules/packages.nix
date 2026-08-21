@@ -45,6 +45,7 @@ let
   ];
 
   aiTools = with pkgs; [
+    claude-code
     rtk
     ccusage
   ];
