@@ -1,0 +1,107 @@
+# basics {{{
+[[snippets]]
+name = "jj"
+trigger = "jj"
+snippet = "nix run github:martinvonz/jj"
+# }}}
+
+[[snippets]]
+name = "jj status"
+trigger = "st"
+snippet = "status"
+global = true
+context = '^nix run github:martinvonz/jj\s+\S+$'
+
+[[snippets]]
+name = "jj file"
+trigger = "f"
+snippet = "file"
+global = true
+context = '^nix run github:martinvonz/jj\s+\S+$'
+
+[[snippets]]
+name = "jj file untrack"
+trigger-pattern = "^un?t?$"
+snippet = "untrack"
+global = true
+context = '^nix run github:martinvonz/jj\s+file\s+\S+$'
+
+[[snippets]]
+name = "jj describe"
+trigger-pattern = "^de?s$"
+snippet = 'describe -m="{}"'
+cursor = "{}"
+global = true
+context = '^nix run github:martinvonz/jj\s+\S+$'
+
+[[snippets]]
+name = "jj new"
+trigger = "n"
+snippet = "new"
+global = true
+context = '^nix run github:martinvonz/jj\s+\S+$'
+
+[[snippets]]
+name = "jj diff"
+trigger = "df"
+snippet = "diff"
+global = true
+context = '^nix run github:martinvonz/jj\s+\S+$'
+
+[[snippets]]
+name = "jj restore"
+trigger = "re"
+snippet = "restore"
+global = true
+context = '^nix run github:martinvonz/jj\s+\S+$'
+
+[[snippets]]
+name = "jj edit"
+trigger = "e"
+snippet = "edit"
+global = true
+context = '^nix run github:martinvonz/jj\s+\S+$'
+
+[[snippets]]
+name = "jj squash"
+trigger = "sq"
+snippet = "squash"
+global = true
+context = '^nix run github:martinvonz/jj\s+\S+$'
+
+[[snippets]]
+name = "jj split"
+trigger = "sp"
+snippet = "split"
+global = true
+context = '^nix run github:martinvonz/jj\s+\S+$'
+
+# bookmark {{
+[[snippets]]
+name = "jj bookmark"
+trigger = "bk"
+snippet = "bookmark"
+global = true
+context = '^nix run github:martinvonz/jj\s+\S+$'
+
+[[snippets]]
+name = "jj bookmark create"
+trigger = "c"
+snippet = "create"
+global = true
+context = '^nix run github:martinvonz/jj\s+bookmark\s+$'
+
+[[snippets]]
+name = "jj bookmark list"
+trigger = "l"
+snippet = "list"
+global = true
+context = '^nix run github:martinvonz/jj\s+bookmark\s+$'
+
+[[snippets]]
+name = "jj bookmark set"
+trigger = "s"
+snippet = "set"
+global = true
+context = '^nix run github:martinvonz/jj\s+bookmark\s+$'
+# }}
