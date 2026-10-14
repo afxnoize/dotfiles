@@ -1,7 +1,8 @@
 {
+  "cleanupPeriodDays": 30,
   "env": {
-    "CLAUDE_CODE_FORK_SUBAGENT": true,
-    "CLAUDE_CODE_HIDE_CWD": true
+    "CLAUDE_CODE_FORK_SUBAGENT": "true",
+    "CLAUDE_CODE_HIDE_CWD": "true"
   },
   "permissions": {
     "deny": [
@@ -46,8 +47,9 @@
       "Bash(wget * | bash*)",
       "Agent(model:opus)"
     ],
-    "defaultMode": "default"
+    "defaultMode": "auto"
   },
+  "model": "sonnet",
   "hooks": {
     "PreToolUse": [
       {
@@ -131,101 +133,101 @@
     ],
     "CwdChanged": [
       {
+        "matcher": "",
         "hooks": [
           {
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude cwd-changed",
-            "type": "command"
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude cwd-changed"
           }
-        ],
-        "matcher": ""
+        ]
       }
     ],
     "PermissionDenied": [
       {
+        "matcher": "",
         "hooks": [
           {
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude permission-denied",
-            "type": "command"
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude permission-denied"
           }
-        ],
-        "matcher": ""
+        ]
       }
     ],
     "SubagentStart": [
       {
+        "matcher": "",
         "hooks": [
           {
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude subagent-start",
-            "type": "command"
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude subagent-start"
           }
-        ],
-        "matcher": ""
+        ]
       }
     ],
     "SubagentStop": [
       {
+        "matcher": "",
         "hooks": [
           {
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude subagent-stop",
-            "type": "command"
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude subagent-stop"
           }
-        ],
-        "matcher": ""
+        ]
       }
     ],
     "TaskCompleted": [
       {
+        "matcher": "",
         "hooks": [
           {
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-completed",
-            "type": "command"
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-completed"
           }
-        ],
-        "matcher": ""
+        ]
       }
     ],
     "TaskCreated": [
       {
+        "matcher": "",
         "hooks": [
           {
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-created",
-            "type": "command"
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-created"
           }
-        ],
-        "matcher": ""
+        ]
       }
     ],
     "TeammateIdle": [
       {
+        "matcher": "",
         "hooks": [
           {
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude teammate-idle",
-            "type": "command"
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude teammate-idle"
           }
-        ],
-        "matcher": ""
+        ]
       }
     ],
     "WorktreeCreate": [
       {
+        "matcher": "",
         "hooks": [
           {
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-create",
-            "type": "command"
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-create"
           }
-        ],
-        "matcher": ""
+        ]
       }
     ],
     "WorktreeRemove": [
       {
+        "matcher": "",
         "hooks": [
           {
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-remove",
-            "type": "command"
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-remove"
           }
-        ],
-        "matcher": ""
+        ]
       }
     ]
   },
@@ -236,7 +238,7 @@
   },
   "enabledPlugins": {
     "moonbit-practice@moonbit-practice": true,
-    "telegram@claude-plugins-official": false,
+    "telegram@claude-plugins-official": true,
     "voltagent-research@voltagent-subagents": true
   },
   "extraKnownMarketplaces": {
@@ -265,7 +267,13 @@
       }
     }
   },
+  "viewMode": "focus",
   "language": "japanese",
-  "cleanupPeriodDays": 30,
-  "skipAutoPermissionPrompt": false
+  "advisorModel": "opus",
+  "skipAutoPermissionPrompt": false,
+  "modelSettings": {
+    "claude-sonnet-5-5": {
+      "effortLevel": "xhigh"
+    }
+  }
 }
