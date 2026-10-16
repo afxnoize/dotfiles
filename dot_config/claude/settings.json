@@ -226,9 +226,13 @@
     "voltagent-research@voltagent-subagents": false
   },
   "skillOverrides": {
+    "codex-cli": "off",
+    "diff-only": "off",
     "duckdb-wasm": "off",
+    "find-skills": "off",
     "just-pro": "off",
-    "justfile-expert": "off"
+    "justfile-expert": "off",
+    "research": "off"
   },
   "extraKnownMarketplaces": {
     "anthropics-skills": {
