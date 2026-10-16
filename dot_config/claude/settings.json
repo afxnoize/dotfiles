@@ -1,6 +1,7 @@
 {
   "env": {
-    "CLAUDE_CODE_HIDE_CWD": "true"
+    "CLAUDE_CODE_HIDE_CWD": "true",
+    "CLAUDE_CODE_SCROLL_SPEED": "3"
   },
   "permissions": {
     "deny": [
