@@ -220,9 +220,14 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "moonbit-practice@moonbit-practice": true,
+    "moonbit-practice@moonbit-practice": false,
     "telegram@claude-plugins-official": true,
-    "voltagent-research@voltagent-subagents": true
+    "voltagent-research@voltagent-subagents": false
+  },
+  "skillOverrides": {
+    "duckdb-wasm": "off",
+    "just-pro": "off",
+    "justfile-expert": "off"
   },
   "extraKnownMarketplaces": {
     "anthropics-skills": {
