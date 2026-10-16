@@ -25,7 +25,7 @@ chezmoi + Nix Home-Manager の二段構成 dotfiles リポジトリ。役割分�
 - `dot_config/zsh/` - Zsh設定（zinit, completions）
 - `dot_config/wezterm/` - Wezterm ターミナル設定
 - `dot_config/zabrze/` - スニペット展開（git, chezmoi, AI用ショートカット）
-- `dot_config/claude/` - Claude Code カスタムコマンド・スキル・hooks
+- `dot_config/claude/` - Claude Code カスタムコマンド・スキル・subagent・hooks
 - `.chezmoiscripts/` - chezmoi apply時のライフサイクルスクリプト
 - `dosbin/` - Windows用バッチファイル
 

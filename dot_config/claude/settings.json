@@ -1,7 +1,5 @@
 {
-  "cleanupPeriodDays": 30,
   "env": {
-    "CLAUDE_CODE_FORK_SUBAGENT": "true",
     "CLAUDE_CODE_HIDE_CWD": "true"
   },
   "permissions": {
@@ -45,7 +43,11 @@
       "Bash(curl * | bash*)",
       "Bash(wget * | sh*)",
       "Bash(wget * | bash*)",
-      "Agent(model:opus)"
+      "Agent(model:*opus*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)"
     ],
     "defaultMode": "auto"
   },
@@ -57,7 +59,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_CONFIG_DIR/hooks/validate-bash.sh"
+            "command": "$CLAUDE_CONFIG_DIR/hooks/validate-bash.sh",
+            "onFailure": "block"
           },
           {
             "type": "command",
@@ -66,12 +69,14 @@
           {
             "type": "command",
             "command": "bun $CLAUDE_CONFIG_DIR/hooks/validate-cloud.ts aws",
-            "if": "Bash(aws *)"
+            "if": "Bash(aws *)",
+            "onFailure": "block"
           },
           {
             "type": "command",
             "command": "bun $CLAUDE_CONFIG_DIR/hooks/validate-cloud.ts b2",
-            "if": "Bash(b2 *)"
+            "if": "Bash(b2 *)",
+            "onFailure": "block"
           }
         ]
       }
@@ -186,17 +191,6 @@
         ]
       }
     ],
-    "TaskCreated": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-created"
-          }
-        ]
-      }
-    ],
     "TeammateIdle": [
       {
         "matcher": "",
@@ -204,17 +198,6 @@
           {
             "type": "command",
             "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude teammate-idle"
-          }
-        ]
-      }
-    ],
-    "WorktreeCreate": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-create"
           }
         ]
       }
@@ -270,7 +253,6 @@
   "viewMode": "focus",
   "language": "japanese",
   "advisorModel": "opus",
-  "skipAutoPermissionPrompt": false,
   "modelSettings": {
     "claude-sonnet-5-5": {
       "effortLevel": "xhigh"

@@ -106,7 +106,7 @@ home-manager switch --flake .#$USER --impure
 | `dot_config/zsh/` | Zsh 設定（zinit, completions） |
 | `dot_config/wezterm/` | WezTerm ターミナル設定 |
 | `dot_config/zabrze/` | スニペット展開（git, chezmoi, AI 用） |
-| `dot_config/claude/` | Claude Code 設定・スキル・hooks |
+| `dot_config/claude/` | Claude Code 設定・スキル・subagent・hooks |
 | `.chezmoiscripts/` | chezmoi ライフサイクルスクリプト |
 
 ## 注意事項
