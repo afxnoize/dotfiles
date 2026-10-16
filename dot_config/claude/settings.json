@@ -93,6 +93,28 @@
         ]
       }
     ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude notification"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude stop"
+          }
+        ]
+      }
+    ],
     "StopFailure": [
       {
         "matcher": "",
@@ -181,6 +203,17 @@
         ]
       }
     ],
+    "TaskCreated": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude task-created"
+          }
+        ]
+      }
+    ],
     "TaskCompleted": [
       {
         "matcher": "",
@@ -199,17 +232,6 @@
           {
             "type": "command",
             "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude teammate-idle"
-          }
-        ]
-      }
-    ],
-    "WorktreeRemove": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude worktree-remove"
           }
         ]
       }
