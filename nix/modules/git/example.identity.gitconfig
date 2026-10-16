@@ -1,0 +1,10 @@
+# vim: ft=gitconfig
+# One account's identity. Save as ~/.config/git/identities/<name>.config and
+# include it from local.config. The account must be logged in with `gh auth login`.
+[user]
+	name = Your Name
+	email = you@example.com
+[github]
+	user = your-github-login
+[credential "https://github.com"]
+	username = your-github-login

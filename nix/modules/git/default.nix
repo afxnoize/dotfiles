@@ -1,3 +1,15 @@
+{ pkgs, ... }:
+
+let
+  # Serves the token of the requested account, independent of `gh auth switch`.
+  # Referenced by store path so git does not depend on PATH.
+  ghUserCredential = pkgs.writeShellApplication {
+    name = "git-credential-gh-user";
+    runtimeInputs = [ pkgs.gh pkgs.git ];
+    text = builtins.readFile ./git-credential-gh-user.sh;
+  };
+  ghUserHelper = "${ghUserCredential}/bin/git-credential-gh-user";
+in
 {
   programs.git = {
     enable = true;
@@ -34,7 +46,11 @@
 
       credential = {
         useHttpPath = true;
-        "https://github.com".username = "afxnoize";
+        "https://github.com" = {
+          username = "afxnoize";
+          helper = ghUserHelper;
+        };
+        "https://gist.github.com".helper = ghUserHelper;
       };
       github.user = "afxnoize";
       core = {

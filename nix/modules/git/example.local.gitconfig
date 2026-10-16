@@ -1,6 +1,21 @@
-[user]
-	email = 22848261+afxnoize@users.noreply.github.com
-[includeIf "gitdir:~/repos/github.com/afxnoize/"]
-	path = ~/repos/github.com/afxnoize/gitconfig
-[includeIf "gitdir:~/repos/github.com/xxx/"]
-	path = ~/repos/github.com/xxx/gitconfig
+# vim: ft=gitconfig
+# Per-machine git config. Save as ~/.config/git/local.config; it is included
+# from the Nix-generated ~/.config/git/config and is not managed by chezmoi/Nix.
+#
+# The credential helper (git-credential-gh-user) and the default identity live
+# in nix/modules/git/default.nix. This file maps owners to other identities and
+# decides which owners are reached over HTTPS.
+
+# One includeIf per owner and URL form. hasconfig:remote.*.url matches the URL
+# as written in the repository config, before insteadOf rewrites it.
+[includeIf "hasconfig:remote.*.url:git@github.com:example-org/**"]
+	path = identities/work.config
+[includeIf "hasconfig:remote.*.url:https://github.com/example-org/**"]
+	path = identities/work.config
+
+# Rewrite scp-style remotes of those owners to HTTPS. An SSH key is bound to one
+# account, so the helper (which picks the account per remote) only takes effect
+# over HTTPS. Scope it to the owners above instead of all of github.com: owners
+# that stay on an SSH key keep working on machines without a `gh auth login`.
+[url "https://github.com/example-org/"]
+	insteadOf = git@github.com:example-org/
