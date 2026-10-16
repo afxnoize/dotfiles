@@ -1,5 +1,7 @@
 # shebang recipe の書き方
 
+いつ読む: 複数行 shell の recipe を書くとき。
+
 複数行 shell として評価される shebang recipe の定型。
 
 ## 冒頭 2 行は定型

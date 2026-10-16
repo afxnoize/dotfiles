@@ -1,6 +1,8 @@
 # 標準 group 名
 
-`[group('...')]` 属性で使う group 名は下記のコアセットに揃える。派生を増やさない。
+いつ読む: `[group('...')]` を付けるとき、group の追加を考えるとき。mod との役割分担は [`SKILL.md`](../SKILL.md) を先に読む。
+
+`[group('...')]` 属性で使う group 名は下記のコアセットに揃える。派生を増やさない。mod の中でも同じコアセットを使う。
 
 ## コア group
 
@@ -40,7 +42,7 @@
 - `coverage` / `coverage-check` は `test`（独立 group は作らない）
 - `clean` は `setup`（環境の構築と破棄は対称）
 - `audit` は `quality` ではなく `security`（静的解析とランタイム / 依存脆弱性は別問題）
-- `deploy` は存在する時点で mod 昇格候補（state と副作用が重い）。group 運用は軽量プロジェクト用と割り切る
+- `deploy` は存在する時点で mod 昇格候補（state と副作用が重い）。group 運用は軽量プロジェクト用と割り切る。mod に昇格したらルートの `deploy` group は消す
 
 ## 拡張方針
 

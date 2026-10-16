@@ -1,5 +1,7 @@
 # secrets の扱い
 
+いつ読む: sops など secret を recipe から扱うとき。
+
 `.env` は `set dotenv-load` で自動読み込みだが、sops 暗号化 yaml は明示復号が要る。nix ベース（agenix / sops-nix）への移行余地があるため、ここは薄めに留める。
 
 ## 変数バインド (backtick + sops extract)

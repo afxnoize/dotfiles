@@ -1,5 +1,7 @@
 # Module (mod) 使用ガイド
 
+いつ読む: justfile を分割するとき、mod を追加・入れ子にするとき、mod 内から他の recipe を呼ぶとき。mod と group の役割分担は [`SKILL.md`](../SKILL.md) を先に読む。前提は just 1.43.0 以上。
+
 monorepo やパッケージ分割、ドメイン分離で `mod` を使う際のパターン。
 
 ## `mod` と `import` の使い分け
@@ -19,6 +21,7 @@ monorepo やパッケージ分割、ドメイン分離で `mod` を使う際の�
 - ドリルダウン UX を提供したい、ドメイン名を CLI で明示したい → `mod`
 - 単にファイルが長くなったので分けたいだけ、呼び出し側は今まで通り → `import`
 - 「見栄えのため」だけなら `import` で十分。`mod` の存在意義は CLI UX と名前空間にある
+- 全 justfile に共通の設定を配りたい → `import "_common.just"`（[`settings.md`](settings.md)）
 
 ## 基本構文
 
@@ -30,8 +33,8 @@ mod <name>                       # ./<name>/justfile または ./<name>.just を
 
 ## 分割の 2 形態
 
-- **ディレクトリ分割 (`packages/api/justfile`)** — パッケージが独立したコード・依存・build 成果物を持つとき。monorepo の真のサブパッケージ向け
-- **ファイル単位 (`db.just`)** — 同一 working dir で動く recipe 群をドメインで名前空間分けしたいとき。IaC / 運用スクリプトで多い
+- **ディレクトリ分割 (`packages/api/justfile`)** — パッケージが独立したコード・依存・build 成果物を持つとき。monorepo の真のサブパッケージ向け。recipe は mod のディレクトリを cwd として走る
+- **ファイル単位 (`db.just`)** — 同一 working dir で動く recipe 群をドメインで名前空間分けしたいとき。IaC / 運用スクリプトで多い。recipe は**ルートと同じ cwd** で走る
 
 ```
 repo/
@@ -48,13 +51,14 @@ mod dms "dms.just"               # 明示パスも OK
 mod bastion
 ```
 
-呼び出し感は `just db connect` / `just dms run-task` と同じで、UX はディレクトリ分割と変わらない。
+呼び出し感は `just db connect` / `just dms run-task` と同じで、UX は形態によらず変わらない。形態で変わるのは cwd と、次節以降の落とし穴。
 
 ## monorepo router 構成
 
 ```
 repo/
-├── justfile              # ルーター。モジュールを import するだけ
+├── justfile              # ルーター。mod を宣言し、umbrella recipe を持つ
+├── _common.just          # 全 justfile 共通の set と _default
 └── packages/
     ├── api/
     │   └── justfile
@@ -67,24 +71,51 @@ repo/
 **ルート justfile**:
 
 ```just
-_default:
-    @just --list
+set dotenv-load := true
+
+import "_common.just"
 
 # Go API (GraphQL)
 mod api "packages/api"
-
 # Next.js frontend
 mod web "packages/web"
-
 # DevOps / infra
-mod ops "ops"
+mod ops
 
-# umbrella recipes — モジュールに委譲
-check: (api::check) (web::check)
+# api::check + web::check
+check: api::check web::check
     @echo "All checks passed"
 
-setup: (api::setup) (web::setup)
+# api::setup + web::setup
+setup: api::setup web::setup
     @echo "Toolchains ready"
+```
+
+**各 mod の justfile** も `_common.just` を import する。パスは import するファイルからの相対で、`packages/api/justfile` からは 2 階層上になる。
+
+```just
+# packages/api/justfile
+import "../../_common.just"
+
+# fmt + lint + test
+check: fmt lint test
+    @echo "All checks passed"
+
+# go fmt ./...
+fmt:
+    go fmt ./...
+
+# ... 以下 recipe
+```
+
+`_common.just` の `[default]` が効くので、`just api` で api モジュールの recipe 一覧が出る。
+
+呼び出し:
+
+```bash
+just api check
+just web build
+just ops deploy
 ```
 
 ### 引数伝播つき umbrella recipe
@@ -100,35 +131,54 @@ deploy tag=GIT_HASH sfn_env="itg": (docker::build tag) docker::login (docker::pu
 - 引数あり呼び出しは `(module::recipe arg1 arg2)`（必ずカッコで囲む）
 - 行が長くなるなら、意味単位で改行する書き方でよい
 
-**各モジュール justfile** も必ず先頭に `_default` を持つ:
+## 入れ子の mod
+
+mod の中に `mod` を宣言できる（`just db migrate up`）。深さは 2 階層までにする（判断は [`SKILL.md`](../SKILL.md)）。
+
+入れ子にする mod は**ディレクトリ型**にする。ファイル型 mod（`db.just`）の中の `mod migrate` は、`db/migrate.just` ではなく `db.just` と同じディレクトリの `migrate.just` を探す。別の mod が同名のサブ mod を持つと衝突するため。
+
+```
+repo/
+├── justfile              # mod db
+├── _common.just
+└── db/
+    ├── justfile          # mod migrate
+    └── migrate.just
+```
 
 ```just
-# packages/api/justfile
-_default:
-    @just --list
+# db/justfile
+import "../_common.just"
 
-check: fmt lint test
-    @echo "All checks passed"
+# psql "$DATABASE_URL"
+connect:
+    psql "$DATABASE_URL"
 
-fmt:
-    go fmt ./...
-
-# ... 以下 recipe
+# Schema migrations
+mod migrate
 ```
 
-これで `just api` で api モジュールの recipe 一覧が出る（無いと missing recipe エラーになる）。
+サブ mod にも `_common.just` を import する。`just db migrate` でサブ mod の一覧が出る。
 
-呼び出し:
+## mod 内から同じ mod の recipe を呼ぶ
 
-```bash
-just api check
-just web build
-just ops deploy
+recipe の依存として書く。依存名は常に自分の mod の recipe を指す。
+
+```just
+# migrate + seed
+setup: migrate seed
+    @echo "Database ready"
 ```
 
-## Working Directory
+本文からサブプロセスの `just x` で呼ぶと、**ファイル型 mod では**ルートの `x` が走る。サブプロセスの `just` は cwd から justfile を探し、ファイル型 mod の cwd はルートと同じだから。サブプロセスで呼ぶ必要があるとき（並列実行など）は、mod 自身のファイルを指定する。
 
-モジュール内 recipe は、そのモジュール直下をカレントディレクトリとして実行される。package-local command を書くとき想定どおりに動く。
+```just
+# in db.just
+reset:
+    "{{ just_executable() }}" --justfile "{{ module_file() }}" migrate
+```
+
+ディレクトリ型 mod は cwd が mod のディレクトリなので `just x` でも動くが、型を変えたときに壊れるので、統一して上記の書き方にしておく。
 
 ## 一覧表示
 
@@ -140,16 +190,9 @@ just --list-submodules    # 全モジュール込みで再帰表示
 
 flag はモジュール名の前。`just --list api`（正）／ `just api --list`（誤）。
 
-## 呼び出し
-
-```bash
-just api check            # CLI から
-(api::check)              # 他 recipe の依存として
-```
-
 ## 並列実行
 
-`just` は依存の並列実行を直接サポートしない。shebang + shell backgrounding で書く。
+`just` は依存の並列実行を直接サポートしない。shebang + shell backgrounding で書く。ルートの recipe から `just api check` と呼ぶ分には、ルートの cwd から mod 名で解決されるので問題ない。
 
 ```just
 # Run all package checks in parallel
@@ -169,25 +212,6 @@ check:
 
 `-euo` ではなく `-uo`。`-e` を付けると最初の `wait` 失敗で残りの wait をスキップしてしまう。
 
-## module doc comment
-
-`mod` の直前のコメントは `just --list` に表示される。必ず付ける。
-
-```just
-# Go API (GraphQL + Watermill)
-mod api "packages/api"
-
-# PostgreSQL migration & seeding
-mod db "packages/db"
-```
-
-出力例:
-
-```
-api ...      # Go API (GraphQL + Watermill)
-db  ...      # PostgreSQL migration & seeding
-```
-
 ## オプショナル module
 
 ```just
@@ -195,3 +219,7 @@ mod? optional "packages/optional"
 ```
 
 環境によって存在しないパッケージがあるときに使う。
+
+## module の doc comment
+
+`mod` の直前のコメントが `just --list` に表示される。書き方は [`doc-comment.md`](doc-comment.md)。
