@@ -39,6 +39,13 @@ trigger = "ccc"
 snippet = "cage claude"
 
 [[snippets]]
+name = "claude channels (telegram)"
+trigger = "ch"
+snippet = "--channels plugin:telegram@claude-plugins-official"
+global = true
+context = '^(?:cage\s+)?claude(?:\s+-\S+)*\s+\S+$'
+
+[[snippets]]
 name = "skills add"
 trigger = "skills"
 snippet = "bunx skills add"
