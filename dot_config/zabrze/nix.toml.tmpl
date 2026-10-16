@@ -12,7 +12,8 @@ snippet = 'builder=$(command -v nom || command -v nix) && out=$("$builder" build
 [[snippets]]
 name = "home-manager update (flake.lock)"
 trigger = "hmu"
-snippet = 'nix flake update --flake {{ .chezmoi.sourceDir }}/nix'
+snippet = 'nix flake update {} --flake {{ .chezmoi.sourceDir }}/nix'
+cursor = "{}"
 
 [[snippets]]
 name = "nix-sweep cleanout (user + home profiles, default preset)"
