@@ -1,0 +1,10 @@
+[Unit]
+Description=Update claude-code every 3-4 days (Mon/Thu, late night JST)
+
+[Timer]
+# 7 days are not divisible by 3, so "every 3 days" drifts; fixed weekdays keep it stable.
+OnCalendar=Mon,Thu *-*-* 03:00:00 Asia/Tokyo
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -27,6 +27,8 @@ serena/
 {{ if ne .chezmoi.os "linux" }}
 .config/zsh/**
 .config/zabrze/**
+.config/systemd/**
+.local/bin/claude-update
 {{ end }}
 
 {{ if ne .chezmoi.os "windows" }}
