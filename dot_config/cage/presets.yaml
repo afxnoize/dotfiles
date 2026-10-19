@@ -21,6 +21,10 @@ presets:
     allow-git: true
 
   ai-coding:
+    # $CLAUDE_CONFIG_DIR must stay writable: Claude atomically rewrites root-level files there (temp + rename).
+    # The Telegram allowlist is pinned per session by TELEGRAM_ACCESS_MODE=static (zshenv).
+    # Residual risk: settings.json/hooks edited inside cage apply on the next launch
+    # until a root-owned managed-settings file is used.
     allow:
       - "$CLAUDE_CONFIG_DIR"
       - "$CODEX_HOME"
@@ -31,7 +35,7 @@ presets:
     allow:
       - "$CARGO_HOME"
       - "$DENO_DIR"
-      - "$GOPATH"
+      - "$GOPATH/pkg"
       - "$HOME/.docker"
 
   cloud-storage:
