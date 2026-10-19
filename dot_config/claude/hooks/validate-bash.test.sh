@@ -4,41 +4,45 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-VB="$SCRIPT_DIR/validate-bash.sh"
+# In the chezmoi source tree the wrapper is named executable_validate-bash.sh.
+VB="${VB:-$SCRIPT_DIR/validate-bash.sh}"
+[ -f "$VB" ] || VB="$SCRIPT_DIR/executable_validate-bash.sh"
 PASS=0 FAIL=0
 
+# Throwaway repos so that `git push origin HEAD` can be resolved from cwd.
+WORK=$(mktemp -d)
+trap 'rm -rf "$WORK"' EXIT
+git init -q -b main "$WORK/on-main"
+git init -q -b feat/x "$WORK/on-feature"
+
+# _run <command> [cwd]
+# The JSON is built with jq so that quotes, backslashes and newlines in the
+# command survive; a malformed payload would otherwise look like "pass".
 _run() {
-  local result
-  result=$(echo "{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"$1\"}}" | bash "$VB" 2>/dev/null) || true
+  local payload result
+  payload=$(jq -n --arg cmd "$1" --arg cwd "${2:-$WORK}" \
+    '{tool_name: "Bash", cwd: $cwd, tool_input: {command: $cmd}}')
+  result=$(printf '%s' "$payload" | bash "$VB" 2>/dev/null) || true
   if [ -z "$result" ]; then echo "pass"
   else echo "$result" | jq -r '.hookSpecificOutput.permissionDecision // "pass"'; fi
 }
 
-assert_deny() {
-  local name="$1" cmd="$2"
+_assert() {
+  local expected="$1" name="$2" cmd="$3" cwd="${4:-}"
   local actual
-  actual=$(_run "$cmd")
-  if [ "$actual" = "deny" ]; then
+  actual=$(_run "$cmd" "$cwd")
+  if [ "$actual" = "$expected" ]; then
     echo "  ✅ $name"
     PASS=$((PASS + 1))
   else
-    echo "  ❌ $name → $actual (expected: deny)"
+    echo "  ❌ $name → $actual (expected: $expected)"
     FAIL=$((FAIL + 1))
   fi
 }
 
-assert_pass() {
-  local name="$1" cmd="$2"
-  local actual
-  actual=$(_run "$cmd")
-  if [ "$actual" = "pass" ]; then
-    echo "  ✅ $name"
-    PASS=$((PASS + 1))
-  else
-    echo "  ❌ $name → $actual (expected: pass)"
-    FAIL=$((FAIL + 1))
-  fi
-}
+assert_deny() { _assert deny "$@"; }
+assert_pass() { _assert pass "$@"; }
+assert_ask()  { _assert ask "$@"; }
 
 echo "━━━ validate-bash.sh ━━━"
 
@@ -138,6 +142,84 @@ assert_deny "gh issue delete を拒否する"   "gh issue delete 1"
 assert_deny "gh repo delete を拒否する"    "gh repo delete owner/repo"
 assert_deny "gh repo archive を拒否する"   "gh repo archive owner/repo"
 assert_deny "gh release delete を拒否する" "gh release delete v1.0"
+
+echo ""
+echo "# グローバルオプション・ラッパー・サブシェル越しでも検査する"
+assert_deny "git -C . push を拒否する"                 "git -C . push origin main"
+assert_deny "git -c k=v push を拒否する"               "git -c k=v push origin main"
+assert_deny "git --no-pager push を拒否する"           "git --no-pager push origin main"
+assert_deny "git --git-dir=.git push を拒否する"       "git --git-dir=.git push origin main"
+assert_deny "-c alias での push を拒否する"            "git -c alias.p=push p origin main"
+assert_deny "サブシェル内の push を拒否する"           "(git push origin main)"
+assert_deny "コマンド置換内の push を拒否する"         'echo $(git push origin main)'
+assert_deny "二重引用符内のコマンド置換を拒否する"     'echo "$(git push origin main)"'
+assert_deny "バッククォート内の push を拒否する"       'echo `git push origin main`'
+assert_deny "env 経由の push を拒否する"               "env git push origin main"
+assert_deny "sudo 経由の push を拒否する"              "sudo git push origin main"
+assert_deny "環境変数代入付きの push を拒否する"       "FOO=1 git push origin main"
+assert_deny "rtk 経由の push を拒否する"               "rtk proxy git push origin main"
+assert_deny "bash -c 内の push を拒否する"             "bash -c 'git push origin main'"
+assert_deny "bash -lc 内の push を拒否する"            "bash -lc \"git push origin main\""
+assert_deny "eval 内の push を拒否する"                'eval "git push origin main"'
+assert_deny "絶対パスの git push を拒否する"           "/usr/bin/git push origin main"
+assert_deny "if 内の push を拒否する"                  "if true; then git push origin main; fi"
+assert_deny "波括弧グループ内の push を拒否する"       "{ git push origin main; }"
+assert_deny "2 行目の push を拒否する"                 $'cd /tmp\ngit push origin main'
+assert_deny "行継続をまたぐ push を拒否する"           $'git push \\\n origin main'
+assert_deny "git -C 経由の reset --hard を拒否する"    "git -C . reset --hard HEAD~5"
+assert_deny "git -C 経由の branch -D を拒否する"       "git -C /tmp branch -D feature"
+assert_deny "git -C 経由の add -A を拒否する"          "git -C . add -A"
+assert_deny "clean -df を拒否する"                     "git clean -df"
+assert_deny "branch -d --force を拒否する"             "git branch -d --force feature"
+assert_deny "checkout HEAD -- file を拒否する"         "git checkout HEAD -- src/main.rs"
+assert_deny "gh -R 付きの pr merge を拒否する"         "gh -R owner/repo pr merge 1"
+assert_deny "gh pr -R 付きの merge を拒否する"         "gh pr -R owner/repo merge 1"
+assert_deny "env 経由の gh repo delete を拒否する"     "env GH_TOKEN=x gh repo delete owner/repo"
+
+echo ""
+echo "# 保護ブランチ判定の抜け道を塞ぐ"
+assert_deny "+main (強制 refspec) を拒否する"          "git push origin +main"
+assert_deny "引用符付きの main を拒否する"             "git push origin \"main\""
+assert_deny "単引用符付きの main を拒否する"           "git push origin 'main'"
+assert_deny "HEAD:main を拒否する"                     "git push origin HEAD:main"
+assert_deny "refs/heads/main を拒否する"               "git push origin refs/heads/main"
+assert_deny "feature:refs/heads/main を拒否する"       "git push origin feature:refs/heads/main"
+assert_deny "main の削除 (:main) を拒否する"           "git push origin :main"
+assert_deny "--delete main を拒否する"                 "git push origin --delete main"
+assert_deny "--all を拒否する"                         "git push --all origin"
+assert_deny "--mirror を拒否する"                      "git push --mirror origin"
+assert_deny "main 上での push origin HEAD を拒否する"  "git push origin HEAD" "$WORK/on-main"
+assert_deny "-C で main を指す push origin HEAD を拒否する" "git -C $WORK/on-main push origin HEAD" "$WORK/on-feature"
+assert_pass "feature 上での push origin HEAD を許可する" "git push origin HEAD" "$WORK/on-feature"
+assert_pass "+feature は許可する"                      "git push origin +feature-x"
+assert_deny "ANSI-C 引用で隠した main を拒否する"      "git push origin \$'\\x6dain'"
+assert_deny "ANSI-C 引用で隠した push を拒否する"      "git \$'\\160ush' origin main"
+assert_ask  "波括弧展開で main になりうる push は確認する" "git push origin {main,x}"
+assert_ask  "glob refspec は確認する"                  "git push origin 'refs/heads/*:refs/heads/*'"
+assert_ask  "サブコマンドが変数のときは確認する"       'git ${SUB} origin main'
+assert_ask  "ブランチ名が変数のときは確認する"         'git push origin "$BRANCH"'
+assert_ask  "ブランチ名がコマンド置換のときは確認する" 'git push origin $(git branch --show-current)'
+
+echo ""
+echo "# 複数の push は全部検査する"
+assert_deny "先行する main push を拒否する"            "git push origin main && git push origin feature/x"
+assert_deny "echo で隠した main push を拒否する"       "git push origin main; echo git push a b"
+assert_deny "後続の main push を拒否する"              "git push origin feature/x && git push origin main"
+
+echo ""
+echo "# コマンドではない文字列には反応しない"
+assert_pass "echo 内の push 文字列は許可する"          'echo "git push origin main"'
+assert_pass "コメント内の push は許可する"             "git status # git push origin main"
+assert_pass "grep の引数にある push は許可する"        "git log --grep='git push origin main'"
+assert_pass "引用符内の git reset --hard は許可する"   "git commit -m 'docs: git reset --hard is blocked'"
+assert_pass "ヒアドキュメント本文の push は許可する"   $'git commit -m "$(cat <<\'EOF\'\nfix: tidy (wip\n\ngit push origin main\nEOF\n)"'
+assert_pass "gh pr view は許可する"                    "gh pr view 1"
+assert_pass "gh pr create は許可する"                  "gh pr create --title x --body y"
+assert_pass "git status は許可する"                    "git status"
+assert_pass "git checkout -b は許可する"               "git checkout -b feature/x"
+assert_pass "git add 個別ファイルは許可する"           "git add README.md src/main.rs"
+assert_pass "git branch -d は許可する"                 "git branch -d merged-branch"
+assert_pass "git clean -n は許可する"                  "git clean -n"
 
 # --- summary ---
 echo ""
