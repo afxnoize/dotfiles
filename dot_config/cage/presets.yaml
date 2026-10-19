@@ -7,7 +7,9 @@ presets:
       # nix/profiles holds the symlinks behind ~/.nix-profile (PATH), mise/trusted-configs
       # decides which .mise.toml may run, nvim/view is sourced by the loadview autocmd and
       # nvim/lazy/pkg-cache.lua is loaded by lazy.nvim. Grant only the data-only parts.
-      # Side effect: nvim started inside cage reports a lazy.nvim error (pkg-cache.lua is read-only).
+      # Side effects inside cage (e.g. Ctrl-G prompt editing): nvim saves no views (autocmds.lua uses
+      # silent! mkview), and lazy.nvim cannot rewrite pkg-cache.lua, so it reports an error only when
+      # that cache is stale; the next nvim outside cage regenerates it.
       - "$XDG_STATE_HOME/zsh" # shell history
       - "$XDG_STATE_HOME/claude" # claude locks
       - "$XDG_STATE_HOME/mise/tracked-configs"
@@ -18,14 +20,12 @@ presets:
       - "$XDG_STATE_HOME/nvim/backup"
       - "$XDG_DATA_HOME/rtk" # rtk gain
       - "$XDG_DATA_HOME/zoxide" # zoxide db
-      - "$XDG_DATA_HOME/lesshst"
       - "$XDG_DATA_HOME/pnpm"
       - "$XDG_DATA_HOME/direnv" # direnv allow hashes
       - "$TMPDIR"
       - "/tmp"
       - "/dev/ptmx" # pseudo-terminal master
       - "/dev/pts" # pseudo-terminal slaves
-      - "$XDG_DATA_HOME/direnv"
       - "$HOME/.aws/login/cache"
       - "$HOME/.aws/cli/cache"
 
