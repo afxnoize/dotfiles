@@ -43,3 +43,11 @@ auto-presets:
    - symlink が関係する場合は `eval-symlinks: true` を使う
    - 既存プリセットへの追記を優先し、新規作成は用途が異なる場合のみ
    - 最小権限の原則に従う
+
+## 許可を足してはいけない場所
+
+cage の外で動くプロセスがコードとして読み込む場所を許可すると、cage 内の agent が書いたコードをサンドボックス外で実行させられる。Landlock は許可したディレクトリの一部だけを除外できないため、そういうファイルを含む親ディレクトリは許可せず、必要な子だけを個別に許可する。
+
+- `$XDG_STATE_HOME` 全体: `nix/profiles`（PATH にある `~/.nix-profile` の実体）、`mise/trusted-configs`（信頼済みの `.mise.toml`）、`nvim/view` と `nvim/lazy`（nvim が source / loadfile する）を含む。`zsh`、`claude`、`pnpm` のように、データだけを置く子を追記する
+- PATH 上のディレクトリ（`$GOPATH/bin`、`~/.local/bin`）と、zsh の hook や `.zcompdump`（`$XDG_DATA_HOME/zsh` に置いている）
+- 次の操作は意図的に失敗する。許可を足さず、cage の外で実行するようユーザーに伝える: `nix profile`、`home-manager switch`、`nh home switch`、`go install`、新しい worktree での `mise run` / `mise exec`（cage の外で一度 `mise trust` が要る）
