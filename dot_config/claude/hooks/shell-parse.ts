@@ -13,20 +13,30 @@
 export type Argv = string[];
 
 const MAX_DEPTH = 8;
+const MAX_LEX_DEPTH = 40;
 const MAX_ARGVS = 2000;
+
+/**
+ * argv[0] of the synthetic entry invocations() emits for code it cannot read
+ * (a script built at runtime, one fed through stdin, nesting that is too deep).
+ * argv[1] says why. Guards should ask the user instead of passing it.
+ */
+export const UNVERIFIABLE = "<unverifiable>";
 
 // Commands that run their arguments as another command. Every suffix of such a
 // command is also treated as a command start, so option values that belong to
 // the wrapper (`sudo -u bob git push`) do not need per-wrapper parsing.
+// noglob / nocorrect / repeat are zsh precommand modifiers; the Bash tool runs zsh.
 const WRAPPERS = new Set([
   "sudo", "doas", "env", "command", "builtin", "exec", "time", "nohup", "nice",
   "ionice", "timeout", "stdbuf", "setsid", "xargs", "watch", "chrt", "taskset",
-  "flock", "unbuffer", "rtk", "cage", "direnv", "mise",
+  "flock", "unbuffer", "rtk", "cage", "direnv", "mise", "noglob", "nocorrect",
+  "repeat",
 ]);
 const SHELLS = new Set(["sh", "bash", "zsh", "dash", "ksh", "fish"]);
 const KEYWORDS = new Set([
   "!", "{", "}", "if", "then", "else", "elif", "fi", "do", "done", "while", "until",
-  "coproc", "function",
+  "coproc",
 ]);
 const ENV_ASSIGN = /^[A-Za-z_][A-Za-z0-9_]*(\[[^\]]*\])?\+?=/;
 
@@ -158,9 +168,25 @@ function readHeredocs(src: string, start: number, pending: Heredoc[], out: Argv[
   return i;
 }
 
+let lexDepth = 0;
+
 // Lexes src from `start`, pushing each simple command's words to `out`.
 // Returns the index after the closing `)` when closeOnParen, else src.length.
+// Nested substitutions recurse, so the depth is capped.
 function lexScript(src: string, start: number, out: Argv[], closeOnParen: boolean): number {
+  if (lexDepth >= MAX_LEX_DEPTH) {
+    out.push([UNVERIFIABLE, "command nesting is too deep to check"]);
+    return src.length;
+  }
+  lexDepth++;
+  try {
+    return lexScriptBody(src, start, out, closeOnParen);
+  } finally {
+    lexDepth--;
+  }
+}
+
+function lexScriptBody(src: string, start: number, out: Argv[], closeOnParen: boolean): number {
   let i = start;
   let argv: string[] = [];
   let word = "";
@@ -235,6 +261,23 @@ function lexScript(src: string, start: number, out: Argv[], closeOnParen: boolea
       word += src.slice(i, end);
       inWord = true;
       i = end;
+      continue;
+    }
+    if (c === "(" && n === "(" && !inWord) {
+      // ((...)) arithmetic command: its `<<` is a shift, not a heredoc. Only
+      // substitutions inside it can run commands.
+      let depth = 0;
+      let j = i;
+      while (j < src.length) {
+        if (src[j] === "(") depth++;
+        else if (src[j] === ")" && --depth === 0) {
+          j++;
+          break;
+        }
+        j++;
+      }
+      lexExpansions(src.slice(i, j), out);
+      i = j;
       continue;
     }
     if (c === "(") {
@@ -312,27 +355,58 @@ function lexScript(src: string, start: number, out: Argv[], closeOnParen: boolea
 
 function stripPrefix(argv: Argv): Argv {
   let k = 0;
-  while (k < argv.length && (KEYWORDS.has(argv[k]) || ENV_ASSIGN.test(argv[k]))) k++;
+  while (k < argv.length) {
+    if (argv[k] === "function") {
+      k += 2; // `function NAME`; the body follows as `{ ...`
+    } else if (KEYWORDS.has(argv[k]) || ENV_ASSIGN.test(argv[k])) {
+      k++;
+    } else {
+      break;
+    }
+  }
   return argv.slice(k);
 }
 
-function shellScript(argv: Argv): string | null {
-  for (let i = 1; i < argv.length; i++) {
+type ShellInvocation =
+  | { kind: "script"; script: string } // sh -c SCRIPT
+  | { kind: "stdin" } // reads the script from stdin (pipe, heredoc, here-string)
+  | { kind: "file" }; // sh FILE
+
+function shellInvocation(argv: Argv): ShellInvocation {
+  let i = 1;
+  for (; i < argv.length; i++) {
     const t = argv[i];
-    if (/^-[A-Za-z]*c[A-Za-z]*$/.test(t)) return argv[i + 1] ?? null;
+    if (/^-[A-Za-z]*c[A-Za-z]*$/.test(t)) {
+      return argv[i + 1] === undefined ? { kind: "stdin" } : { kind: "script", script: argv[i + 1] };
+    }
+    if (t === "--version" || t === "--help") return { kind: "file" };
     if (t === "-o" || t === "-O" || t === "+o" || t === "+O") {
       i++;
       continue;
     }
-    if (!t.startsWith("-") && !t.startsWith("+")) return null;
+    if (t === "--") {
+      i++;
+      break;
+    }
+    if (!t.startsWith("-") && !t.startsWith("+")) break;
   }
-  return null;
+  return i < argv.length ? { kind: "file" } : { kind: "stdin" };
+}
+
+function unverifiable(reason: string, out: Argv[]): void {
+  if (out.length < MAX_ARGVS) out.push([UNVERIFIABLE, reason]);
 }
 
 function expand(argv: Argv, depth: number, out: Argv[], seen: Set<string>): void {
-  if (depth > MAX_DEPTH || out.length >= MAX_ARGVS) return;
-  const a = stripPrefix(argv);
+  if (out.length >= MAX_ARGVS) return;
+  if (depth > MAX_DEPTH) {
+    unverifiable("command nesting is too deep to check", out);
+    return;
+  }
+  let a = stripPrefix(argv);
   if (a.length === 0) return;
+  // zsh expands `=git` to the path of git
+  if (a[0].length > 1 && a[0].startsWith("=")) a = [a[0].slice(1), ...a.slice(1)];
   const key = a.join("\0");
   if (seen.has(key)) return;
   seen.add(key);
@@ -341,15 +415,29 @@ function expand(argv: Argv, depth: number, out: Argv[], seen: Set<string>): void
   if (WRAPPERS.has(name)) {
     for (let i = 1; i < a.length; i++) expand(a.slice(i), depth + 1, out, seen);
   } else if (SHELLS.has(name)) {
-    const script = shellScript(a);
-    if (script !== null) collect(script, depth + 1, out, seen);
+    const sh = shellInvocation(a);
+    if (sh.kind === "script") {
+      if (isDynamic(sh.script)) unverifiable(`${name} -c runs a script built at runtime`, out);
+      collect(sh.script, depth + 1, out, seen);
+    } else if (sh.kind === "stdin") {
+      unverifiable(`${name} reads its script from stdin`, out);
+    }
   } else if (name === "eval") {
-    collect(a.slice(1).join(" "), depth + 1, out, seen);
+    const script = a.slice(1).join(" ");
+    if (isDynamic(script)) unverifiable("eval runs a script built at runtime", out);
+    collect(script, depth + 1, out, seen);
+  } else if (name === "source" || name === ".") {
+    if (a.slice(1).some((t) => t.startsWith("<(") || isDynamic(t))) {
+      unverifiable(`${name} loads a script that is generated at runtime`, out);
+    }
   }
 }
 
 function collect(src: string, depth: number, out: Argv[], seen: Set<string>): void {
-  if (depth > MAX_DEPTH) return;
+  if (depth > MAX_DEPTH) {
+    unverifiable("command nesting is too deep to check", out);
+    return;
+  }
   const cmds: Argv[] = [];
   lexScript(src, 0, cmds, false);
   for (const c of cmds) expand(c, depth, out, seen);
@@ -359,7 +447,9 @@ function collect(src: string, depth: number, out: Argv[], seen: Set<string>): vo
  * Every command invocation (argv) in a shell command string: all simple
  * commands, those inside `$(...)`, backticks, subshells and `sh -c` / `eval`
  * strings, and the command behind env assignments and wrappers like sudo.
- * Never throws; unparseable input degrades to fewer results.
+ * Code that cannot be read statically (a script built at runtime, one piped
+ * into a shell, too-deep nesting) shows up as [UNVERIFIABLE, reason].
+ * Never throws for ordinary input; unparseable input degrades to fewer results.
  */
 export function invocations(src: string): Argv[] {
   const out: Argv[] = [];

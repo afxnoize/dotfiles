@@ -6,7 +6,7 @@
 // are all seen.
 
 import { resolve } from "node:path";
-import { basename, invocations, isDynamic } from "./shell-parse";
+import { basename, invocations, isDynamic, UNVERIFIABLE } from "./shell-parse";
 
 export interface Decision {
   decision: "deny" | "ask";
@@ -189,6 +189,10 @@ function checkGh(argv: string[]): Decision | null {
 export function evaluate(cmd: string, ctx: Context): Decision | null {
   let pending: Decision | null = null;
   for (const argv of invocations(cmd)) {
+    if (argv[0] === UNVERIFIABLE) {
+      pending ??= ask(`${argv[1]}, so it cannot be checked. Proceed?`);
+      continue;
+    }
     const name = basename(argv[0]);
     const result = name === "git" ? checkGit(argv, ctx) : name === "gh" ? checkGh(argv) : null;
     if (!result) continue;

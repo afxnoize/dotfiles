@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { basename, invocations, isDynamic } from "./shell-parse";
+import { basename, invocations, isDynamic, UNVERIFIABLE } from "./shell-parse";
 
 // argv lists of the commands whose name is `name`
 const argvs = (cmd: string, name: string) =>
@@ -144,6 +144,51 @@ describe("invocations: 入れ子とラッパー", () => {
     expect(argvs(`${wrappers} git push`, "git").length).toBeGreaterThan(0);
     const nested = "bash -c '".repeat(12) + "git push" + "'".repeat(12);
     expect(() => invocations(nested)).not.toThrow();
+  });
+});
+
+describe("invocations: zsh 構文と検査できない実行", () => {
+  test("=cmd と noglob / nocorrect / repeat の後ろのコマンドを返す", () => {
+    for (const cmd of ["=git push", "noglob git push", "nocorrect git push", "repeat 2 git push"]) {
+      expect(argvs(cmd, "git"), cmd).toContainEqual(["git", "push"]);
+    }
+  });
+
+  test("function 定義の本体を見る", () => {
+    expect(argvs("function f { git push; }; f", "git")).toEqual([["git", "push"]]);
+    expect(argvs("f() { git push; }; f", "git")).toEqual([["git", "push"]]);
+  });
+
+  test("算術コマンドの << をヒアドキュメントと誤認しない", () => {
+    expect(argvs("(( x = 1 << 2 ))\ngit push origin main", "git")).toEqual([
+      ["git", "push", "origin", "main"],
+    ]);
+    expect(argvs("(( x = $(git push) ))", "git")).toEqual([["git", "push"]]);
+  });
+
+  test.each([
+    ['X=1; eval "$X"', "eval"],
+    ['bash -c "$X"', "bash"],
+    ["echo x | sh", "sh"],
+    ["sh <<'EOF'\ngit push\nEOF", "sh"],
+    ["source <(echo x)", "source"],
+  ])("%s は検査できない実行として UNVERIFIABLE を返す", (cmd) => {
+    expect(invocations(cmd).some((a) => a[0] === UNVERIFIABLE)).toBe(true);
+  });
+
+  test("リテラルの eval / bash -c / スクリプトファイルは UNVERIFIABLE にしない", () => {
+    for (const cmd of ['eval "git push"', "bash -c 'git push'", "bash ./run.sh", "source ./env.sh"]) {
+      expect(invocations(cmd).some((a) => a[0] === UNVERIFIABLE), cmd).toBe(false);
+    }
+  });
+
+  test("深すぎる入れ子は例外ではなく UNVERIFIABLE になる", () => {
+    const deep = "$(".repeat(5000) + "git push" + ")".repeat(5000);
+    let result: string[][] = [];
+    expect(() => (result = invocations(`echo ${deep}`))).not.toThrow();
+    expect(result.some((a) => a[0] === UNVERIFIABLE)).toBe(true);
+    const evals = 'eval "'.repeat(12) + "git push" + '"'.repeat(12);
+    expect(invocations(evals).some((a) => a[0] === UNVERIFIABLE)).toBe(true);
   });
 });
 

@@ -201,6 +201,28 @@ assert_ask  "ブランチ名が変数のときは確認する"         'git push
 assert_ask  "ブランチ名がコマンド置換のときは確認する" 'git push origin $(git branch --show-current)'
 
 echo ""
+echo "# zsh 固有の構文と、実行時に組み立てられるコマンド"
+assert_deny "=git (EQUALS 展開) 経由の push を拒否する"   "=git push origin main"
+assert_deny "noglob 経由の push を拒否する"              "noglob git push origin main"
+assert_deny "nocorrect 経由の push を拒否する"           "nocorrect git push origin main"
+assert_deny "repeat 経由の push を拒否する"              "repeat 1 git push origin main"
+assert_deny "function 定義内の push を拒否する"          "function f { git push origin main; }; f"
+assert_deny "f() 定義内の push を拒否する"               "f() { git push origin main; }; f"
+assert_deny "算術コマンドの後ろの push を拒否する"       $'(( x = 1 << 2 ))\ngit push origin main'
+assert_deny "for ((;;)) 内の push を拒否する"            "for ((i=0;i<1;i++)); do git push origin main; done"
+assert_deny "算術コマンド内のコマンド置換を拒否する"     '(( x = $(git push origin main) ))'
+assert_ask  "eval の引数が変数のときは確認する"          $'X=\'git push origin main\'; eval "$X"'
+assert_ask  "eval \$(...) は確認する"                    'eval "$(zoxide init zsh)"'
+assert_ask  "bash -c の引数が変数のときは確認する"       $'X=\'git push origin main\'; bash -c "$X"'
+assert_ask  "標準入力から読む sh は確認する"             "echo 'git push origin main' | sh"
+assert_ask  "ヒアドキュメントを読む sh は確認する"       $'sh <<\'EOF\'\ngit push origin main\nEOF'
+assert_ask  "source <(...) は確認する"                   "source <(echo git push origin main)"
+assert_ask  ". <(...) は確認する"                        ". <(echo true)"
+assert_pass "スクリプトファイルを実行する bash は許可する" "bash dot_config/claude/hooks/validate-bash.test.sh"
+assert_pass "算術コマンドだけなら許可する"               "(( x = 1 << 2 )); echo \$x"
+assert_pass "source ファイルは許可する"                  "source ./env.sh"
+
+echo ""
 echo "# 複数の push は全部検査する"
 assert_deny "先行する main push を拒否する"            "git push origin main && git push origin feature/x"
 assert_deny "echo で隠した main push を拒否する"       "git push origin main; echo git push a b"

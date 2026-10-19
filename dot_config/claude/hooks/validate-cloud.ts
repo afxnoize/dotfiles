@@ -3,7 +3,7 @@
 // Usage: validate-cloud.ts <service>
 // Reads patterns from patterns/<service>.ts
 
-import { basename, invocations, isDynamic } from "./shell-parse";
+import { basename, invocations, isDynamic, UNVERIFIABLE } from "./shell-parse";
 
 export interface Pattern {
   pattern: RegExp;
@@ -28,9 +28,16 @@ const AWS_GLOBAL_FLAGS = new Set([
 ]);
 const B2_GLOBAL_VALUE_OPTS = new Set(["--log-config"]);
 
-/** Argv of every `service` invocation in cmd, including nested and wrapped ones. */
+/**
+ * Argv of every `service` invocation in cmd, including nested and wrapped ones.
+ * Code that cannot be read statically counts too when the command mentions the
+ * service at all (it may be building that command at runtime).
+ */
 export function serviceInvocations(cmd: string, service: string): string[][] {
-  return invocations(cmd).filter((argv) => basename(argv[0]) === service);
+  const all = invocations(cmd);
+  const mine = all.filter((argv) => basename(argv[0]) === service);
+  if (cmd.includes(service)) mine.push(...all.filter((argv) => argv[0] === UNVERIFIABLE));
+  return mine;
 }
 
 /** [service, ...rest] with global options removed, so patterns see `aws <svc> <op> ...`. */
@@ -87,7 +94,13 @@ export function matchCommand(
 ): MatchResult | null {
   let ask: MatchResult | null = null;
   for (const argv of serviceInvocations(cmd, service)) {
-    const result = matchTokens(canonicalize(argv, service), service, patterns);
+    const result: MatchResult | null =
+      argv[0] === UNVERIFIABLE
+        ? {
+            decision: "ask",
+            reason: `${argv[1]}, so it cannot be checked for ${service} commands. Proceed?`,
+          }
+        : matchTokens(canonicalize(argv, service), service, patterns);
     if (!result) continue;
     if (result.decision === "deny") return result;
     ask ??= result;
@@ -116,20 +129,26 @@ if (import.meta.main) {
   const service = process.argv[2];
   if (!service) process.exit(0);
 
-  const input = await Bun.stdin.json();
-  const cmd = input.tool_input?.command ?? "";
-  if (!cmd) process.exit(0);
+  // This hook runs on every Bash call with onFailure=block, so a crash here
+  // would block unrelated commands. Ask instead of failing.
+  try {
+    const input = await Bun.stdin.json();
+    const cmd = input.tool_input?.command ?? "";
+    if (!cmd) process.exit(0);
 
-  if (!hasServiceCommand(cmd, service)) process.exit(0);
+    if (!hasServiceCommand(cmd, service)) process.exit(0);
 
-  const patternsPath = new URL(`patterns/${service}.ts`, import.meta.url)
-    .pathname;
-  if (!(await Bun.file(patternsPath).exists())) process.exit(0);
+    const patternsPath = new URL(`patterns/${service}.ts`, import.meta.url)
+      .pathname;
+    if (!(await Bun.file(patternsPath).exists())) process.exit(0);
 
-  const { default: patterns } = await import(patternsPath);
-  const result = matchCommand(cmd, patterns, service);
-  if (result) {
-    respond(result.decision, result.reason);
+    const { default: patterns } = await import(patternsPath);
+    const result = matchCommand(cmd, patterns, service);
+    if (result) {
+      respond(result.decision, result.reason);
+    }
+  } catch (err) {
+    respond("ask", `validate-cloud failed to check this command (${String(err)}). Proceed?`);
   }
 
   process.exit(0);

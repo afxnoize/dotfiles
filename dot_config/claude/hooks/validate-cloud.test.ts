@@ -282,6 +282,15 @@ describe("matchCommand", () => {
       expect(b2("sudo b2 rm --recursive b2://b")).toMatchObject({ decision: "deny" });
     });
 
+    test("ask: 実行時に組み立てられるコマンドが aws を含むときは確認する", () => {
+      expect(aws(`X='aws s3 rb s3://b'; eval "$X"`)).toMatchObject({ decision: "ask" });
+      expect(aws("echo 'aws s3 rb s3://b' | sh")).toMatchObject({ decision: "ask" });
+    });
+
+    test("aws を含まない動的な実行は対象外", () => {
+      expect(aws('eval "$X"')).toBeNull();
+    });
+
     test("コマンドではない文字列では反応しない", () => {
       expect(aws("echo aws s3 rb s3://b")).toBeNull();
       expect(aws('git commit -m "aws s3 rb s3://b"')).toBeNull();
