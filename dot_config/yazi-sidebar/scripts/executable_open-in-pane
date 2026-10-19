@@ -1,13 +1,41 @@
 #!/usr/bin/env bash
 # Open files in the adjacent tmux pane (sidebar mode) or directly (standalone)
 
+# Wrap $1 in POSIX single quotes, escaping embedded single quotes.
+# printf %q is avoided because the receiving shell may be zsh/fish.
+quote() {
+    local s=${1//\'/\'\\\'\'}
+    printf "'%s'" "$s"
+}
+
 if [ "$YAZI_SIDEBAR" = "1" ] && [ -n "$TMUX" ]; then
     args=""
     for f in "$@"; do
-        args="$args '$(realpath "$f")'"
+        if ! path=$(realpath -- "$f"); then
+            tmux display-message "open-in-pane: cannot resolve path"
+            exit 1
+        fi
+        # Newline/tab/ESC etc. would be interpreted by the receiving pane.
+        # $f is checked as well because $(...) drops a trailing newline from $path.
+        if [[ $f == *[[:cntrl:]]* || $path == *[[:cntrl:]]* ]]; then
+            tmux display-message "open-in-pane: refusing path with control characters"
+            exit 1
+        fi
+        args="$args $(quote "$path")"
     done
+    # Typing into a non-shell pane (editor, REPL, ...) would inject keystrokes there
+    cmd=$(tmux display-message -p -t '{right}' '#{pane_current_command}') || exit 1
+    case "$cmd" in
+        zsh | bash | fish | sh | dash | ksh) ;;
+        *)
+            tmux display-message "open-in-pane: right pane is not a shell"
+            exit 1
+            ;;
+    esac
     tmux send-keys -t '{right}' C-u
-    tmux send-keys -t '{right}' "${EDITOR:-nvim} --$args" Enter
+    # -l: send literally so tmux never interprets key names in the text
+    tmux send-keys -t '{right}' -l -- "${EDITOR:-nvim} --$args"
+    tmux send-keys -t '{right}' Enter
 else
-    exec ${EDITOR:-nvim} "$@"
+    exec ${EDITOR:-nvim} -- "$@"
 fi
