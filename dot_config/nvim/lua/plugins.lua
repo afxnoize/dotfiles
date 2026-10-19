@@ -566,6 +566,11 @@ lazy.setup({
 		{
 			'catppuccin/nvim',
 			name = 'catppuccin',
+			opts = {
+				-- The compiled flavours are Lua that gets loadfile()d on every start.
+				-- Keep them out of stdpath('cache'), which cage grants to sandboxed agents.
+				compile_path = vim.fn.stdpath('data') .. '/catppuccin',
+			},
 		},
 	},
 }, {

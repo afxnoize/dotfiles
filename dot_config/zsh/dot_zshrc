@@ -2,6 +2,9 @@
 [[ -n $ZDATADIR ]] && mkdir -p "$ZDATADIR"
 [[ -n $ZSTATEDIR ]] && mkdir -p "$ZSTATEDIR"
 [[ -n $ZCACHEDIR ]] && mkdir -p "$ZCACHEDIR"
+# zinit falls back to ~/.cache/zinit unless ZSH_CACHE_DIR already exists and is writable.
+# Inside cage the dir cannot be created; that shell uses the fallback.
+[[ -n $ZSH_CACHE_DIR ]] && mkdir -p "$ZSH_CACHE_DIR" 2>/dev/null
 
 # Prevent logging out with `Ctrl-D`
 setopt IGNORE_EOF

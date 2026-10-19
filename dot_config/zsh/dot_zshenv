@@ -35,6 +35,9 @@ export ZDATADIR="$XDG_DATA_HOME/zsh"
 # Hooks and zcompdump moved to ZDATADIR: cage grants the cache dir to sandboxed
 # agents, and the unsandboxed shell sources those files as code.
 export ZCACHEDIR="$XDG_CACHE_HOME/zsh"
+# zinit puts $ZSH_CACHE_DIR/completions on fpath, so the completion functions it
+# finds there run as code in every shell. Default is under the cage-writable cache dir.
+export ZSH_CACHE_DIR="$ZDATADIR/cache"
 
 export ZRCDIR="$ZHOMEDIR/rc"
 # End of Zsh Base Directory }}}

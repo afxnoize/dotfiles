@@ -3,7 +3,19 @@ presets:
     allow:
       - "." # current
       - "$XDG_CACHE_HOME" # ~/.cache
-      - "$XDG_STATE_HOME" # ~/.local/state (zsh history, nvim state)
+      # Not the whole of $XDG_STATE_HOME: unsandboxed processes load code from it.
+      # nix/profiles holds the symlinks behind ~/.nix-profile (PATH), mise/trusted-configs
+      # decides which .mise.toml may run, nvim/view is sourced by the loadview autocmd and
+      # nvim/lazy/pkg-cache.lua is loaded by lazy.nvim. Grant only the data-only parts.
+      # Side effect: nvim started inside cage reports a lazy.nvim error (pkg-cache.lua is read-only).
+      - "$XDG_STATE_HOME/zsh" # shell history
+      - "$XDG_STATE_HOME/claude" # claude locks
+      - "$XDG_STATE_HOME/mise/tracked-configs"
+      - "$XDG_STATE_HOME/pnpm"
+      - "$XDG_STATE_HOME/nvim/shada"
+      - "$XDG_STATE_HOME/nvim/logs"
+      - "$XDG_STATE_HOME/nvim/undo"
+      - "$XDG_STATE_HOME/nvim/backup"
       - "$XDG_DATA_HOME/rtk" # rtk gain
       - "$XDG_DATA_HOME/zoxide" # zoxide db
       - "$XDG_DATA_HOME/lesshst"
