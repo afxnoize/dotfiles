@@ -53,6 +53,22 @@ export function isDynamic(token: string): boolean {
   return /[$`]|\{[^}]*(,|\.\.)[^}]*\}/.test(token);
 }
 
+// `$`, a backtick or `{` that stays literal in the word being built (inside '...',
+// after a backslash, in $'...') is swapped for a private-use placeholder, so that
+// isDynamic() only reacts to expansions the shell really performs: the script of
+// `sh -c 'echo $HOME'` is fully known. restore() undoes the swap before a script is
+// lexed again and before invocations() returns.
+const LITERAL: Record<string, string> = { $: "", "`": "", "{": "" };
+const UNLITERAL: Record<string, string> = { "": "$", "": "`", "": "{" };
+
+function lit(s: string): string {
+  return s.replace(/[$`{]/g, (c) => LITERAL[c]);
+}
+
+function restore(s: string): string {
+  return s.replace(/[-]/g, (c) => UNLITERAL[c]);
+}
+
 // Decodes the escapes of a $'...' string so `$'\x6dain'` is seen as `main`.
 function decodeAnsiC(body: string): string {
   const simple: Record<string, string> = {
@@ -109,7 +125,7 @@ function lexDouble(
     const c = src[i];
     if (c === "\\" && i + 1 < src.length) {
       const n = src[i + 1];
-      if (n !== "\n") append('$`"\\'.includes(n) ? n : "\\" + n);
+      if (n !== "\n") append('$`"\\'.includes(n) ? lit(n) : "\\" + n);
       i += 2;
       continue;
     }
@@ -218,7 +234,7 @@ function lexScriptBody(src: string, start: number, out: Argv[], closeOnParen: bo
       if (n === "\n") {
         i += 2;
       } else if (n !== undefined) {
-        word += n;
+        word += lit(n);
         inWord = true;
         i += 2;
       } else {
@@ -229,7 +245,7 @@ function lexScriptBody(src: string, start: number, out: Argv[], closeOnParen: bo
     if (c === "'") {
       const j = src.indexOf("'", i + 1);
       const end = j < 0 ? src.length : j;
-      word += src.slice(i + 1, end);
+      word += lit(src.slice(i + 1, end));
       inWord = true;
       i = end + 1;
       continue;
@@ -237,7 +253,7 @@ function lexScriptBody(src: string, start: number, out: Argv[], closeOnParen: bo
     if (c === "$" && n === "'") {
       let j = i + 2;
       while (j < src.length && src[j] !== "'") j += src[j] === "\\" ? 2 : 1;
-      word += decodeAnsiC(src.slice(i + 2, j));
+      word += lit(decodeAnsiC(src.slice(i + 2, j)));
       inWord = true;
       i = j + 1;
       continue;
@@ -397,7 +413,32 @@ function unverifiable(reason: string, out: Argv[]): void {
   if (out.length < MAX_ARGVS) out.push([UNVERIFIABLE, reason]);
 }
 
-function expand(argv: Argv, depth: number, out: Argv[], seen: Set<string>): void {
+// A shell lives in a bin dir; a path like `dot_config/zsh` or `/home/u/.config/zsh`
+// is just a directory argument.
+function looksLikeShellPath(p: string): boolean {
+  return !p.includes("/") || /\/s?bin\/[^/]+$/.test(p);
+}
+
+const FIND_EXEC = new Set(["-exec", "-execdir", "-ok", "-okdir"]);
+
+/**
+ * Adds the invocation `argv` starts, and those it runs in turn (the wrapped
+ * command, the script of `sh -c` / `eval`).
+ *
+ * suffix: argv is the tail of a wrapper's arguments, which may be option values or
+ * plain paths rather than a command.
+ * nested: argv comes from a script that `sh -c` / `eval` was given. Its text is
+ * known, but a command name built at runtime in it (`sh -c '"$@"' _ git push`) is
+ * as unreadable as a script built at runtime.
+ */
+function expand(
+  argv: Argv,
+  depth: number,
+  out: Argv[],
+  seen: Set<string>,
+  nested: boolean,
+  suffix: boolean
+): void {
   if (out.length >= MAX_ARGVS) return;
   if (depth > MAX_DEPTH) {
     unverifiable("command nesting is too deep to check", out);
@@ -407,25 +448,34 @@ function expand(argv: Argv, depth: number, out: Argv[], seen: Set<string>): void
   if (a.length === 0) return;
   // zsh expands `=git` to the path of git
   if (a[0].length > 1 && a[0].startsWith("=")) a = [a[0].slice(1), ...a.slice(1)];
-  const key = a.join("\0");
+  const key = (nested ? "n" : "t") + "\0" + a.join("\0");
   if (seen.has(key)) return;
   seen.add(key);
   out.push(a);
+  if (nested && isDynamic(a[0])) {
+    unverifiable("a nested shell script runs a command built at runtime", out);
+  }
   const name = basename(a[0]);
   if (WRAPPERS.has(name)) {
-    for (let i = 1; i < a.length; i++) expand(a.slice(i), depth + 1, out, seen);
-  } else if (SHELLS.has(name)) {
+    for (let i = 1; i < a.length; i++) expand(a.slice(i), depth + 1, out, seen, nested, true);
+  } else if (name === "find") {
+    for (let i = 1; i < a.length; i++) {
+      if (!FIND_EXEC.has(a[i])) continue;
+      const stop = a.findIndex((t, k) => k > i && (t === ";" || t === "+"));
+      expand(a.slice(i + 1, stop < 0 ? undefined : stop), depth + 1, out, seen, nested, true);
+    }
+  } else if (SHELLS.has(name) && !(suffix && !looksLikeShellPath(a[0]))) {
     const sh = shellInvocation(a);
     if (sh.kind === "script") {
       if (isDynamic(sh.script)) unverifiable(`${name} -c runs a script built at runtime`, out);
-      collect(sh.script, depth + 1, out, seen);
+      collect(restore(sh.script), depth + 1, out, seen, true);
     } else if (sh.kind === "stdin") {
       unverifiable(`${name} reads its script from stdin`, out);
     }
   } else if (name === "eval") {
     const script = a.slice(1).join(" ");
     if (isDynamic(script)) unverifiable("eval runs a script built at runtime", out);
-    collect(script, depth + 1, out, seen);
+    collect(restore(script), depth + 1, out, seen, true);
   } else if (name === "source" || name === ".") {
     if (a.slice(1).some((t) => t.startsWith("<(") || isDynamic(t))) {
       unverifiable(`${name} loads a script that is generated at runtime`, out);
@@ -433,14 +483,20 @@ function expand(argv: Argv, depth: number, out: Argv[], seen: Set<string>): void
   }
 }
 
-function collect(src: string, depth: number, out: Argv[], seen: Set<string>): void {
+function collect(
+  src: string,
+  depth: number,
+  out: Argv[],
+  seen: Set<string>,
+  nested: boolean
+): void {
   if (depth > MAX_DEPTH) {
     unverifiable("command nesting is too deep to check", out);
     return;
   }
   const cmds: Argv[] = [];
   lexScript(src, 0, cmds, false);
-  for (const c of cmds) expand(c, depth, out, seen);
+  for (const c of cmds) expand(c, depth, out, seen, nested, false);
 }
 
 /**
@@ -453,6 +509,6 @@ function collect(src: string, depth: number, out: Argv[], seen: Set<string>): vo
  */
 export function invocations(src: string): Argv[] {
   const out: Argv[] = [];
-  collect(src, 0, out, new Set());
-  return out;
+  collect(src, 0, out, new Set(), false);
+  return out.map((a) => a.map(restore));
 }

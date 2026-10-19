@@ -182,6 +182,90 @@ describe("invocations: zsh 構文と検査できない実行", () => {
     }
   });
 
+  test("単引用符・バックスラッシュ・$'...' の中の $ はリテラルなので UNVERIFIABLE にしない", () => {
+    for (const cmd of [
+      "bash -c 'echo $HOME'",
+      "sh -c 'for f in a b; do echo \"$f\"; done'",
+      "zsh -c 'S=$PWD; echo $S'",
+      "eval 'echo $X'",
+      "sh -c 'echo {a,b}'",
+      "sh -c \"echo \\$HOME\"",
+      "sh -c $'echo $HOME'",
+      "xargs -I{} sh -c 'echo \"$1\"' _ {}",
+    ]) {
+      expect(invocations(cmd).some((a) => a[0] === UNVERIFIABLE), cmd).toBe(false);
+    }
+  });
+
+  test("リテラルの $ は返す argv では元の $ に戻る", () => {
+    expect(argvs("echo 'a$b' \\$c $'$d'", "echo")).toEqual([["echo", "a$b", "$c", "$d"]]);
+    expect(argvs("sh -c 'echo $HOME'", "echo")).toEqual([["echo", "$HOME"]]);
+    expect(argvs("echo '{a,b}'", "echo")).toEqual([["echo", "{a,b}"]]);
+  });
+
+  test("二重引用符や引用なしの $ は外側のシェルが展開するので UNVERIFIABLE のまま", () => {
+    for (const cmd of ['B=main; bash -c "git push origin $B"', "bash -c git\\ push\\ $B", "eval echo $X"]) {
+      expect(invocations(cmd).some((a) => a[0] === UNVERIFIABLE), cmd).toBe(true);
+    }
+  });
+
+  test("入れ子のスクリプトで実行時に決まるコマンド名は UNVERIFIABLE になる", () => {
+    for (const cmd of [
+      `sh -c '"$@"' _ git push origin main`,
+      "sh -c '$0 push origin main' git",
+      `sh -c 'exec "$@"' _ git push origin main`,
+      `sh -c 'sudo "$@"' _ git push origin main`,
+      `bash -c 'cmd=$1; shift; "$cmd" "$@"' _ git push origin main`,
+      "sh -c 'x=git; $x push origin main'",
+      "sh -c '$(echo git) push origin main'",
+      `bash -c 'eval "$1"' _ 'git push origin main'`,
+      `sh -c 'bash -c "$1"' _ 'git push origin main'`,
+      "sh -c '{git,x} push'",
+      `eval '"$@"'`,
+    ]) {
+      expect(invocations(cmd).some((a) => a[0] === UNVERIFIABLE), cmd).toBe(true);
+    }
+  });
+
+  test("トップレベルで同じ argv を先に見ていても、入れ子の側は見逃さない", () => {
+    const r = invocations(`"$@"; sh -c '"$@"' _ git push origin main`);
+    expect(r.some((a) => a[0] === UNVERIFIABLE)).toBe(true);
+  });
+
+  test("find -exec / -execdir の後ろもコマンドとして返す", () => {
+    expect(argvs("find . -name x -exec git push origin main \\;", "git")).toEqual([
+      ["git", "push", "origin", "main"],
+    ]);
+    expect(argvs("find . -execdir git push origin main +", "git")).toEqual([
+      ["git", "push", "origin", "main"],
+    ]);
+    expect(argvs("find . -exec sh -c 'git push origin main' _ {} \\;", "git")).toEqual([
+      ["git", "push", "origin", "main"],
+    ]);
+    // -name zsh is an argument of find, not a shell
+    expect(invocations("find . -type d -name zsh").some((a) => a[0] === UNVERIFIABLE)).toBe(false);
+  });
+
+  test("ラッパーの引数にあるシェル名で終わるパスは、標準入力を読むシェルとは見なさない", () => {
+    for (const cmd of [
+      "rtk proxy grep -rn foo dot_config/zsh",
+      "rtk grep -rn foo ~/.config/zsh",
+      "rtk ls /home/u/.config/zsh",
+      "env ls ./tools/bash",
+    ]) {
+      expect(invocations(cmd).some((a) => a[0] === UNVERIFIABLE), cmd).toBe(false);
+    }
+    for (const cmd of [
+      "echo x | sudo sh",
+      "echo x | sudo /bin/sh",
+      "echo x | sudo -u root /usr/bin/bash",
+      "echo x | sudo /nix/store/abc-bash-5.2/bin/bash",
+      "echo x | rtk proxy bash",
+    ]) {
+      expect(invocations(cmd).some((a) => a[0] === UNVERIFIABLE), cmd).toBe(true);
+    }
+  });
+
   test("深すぎる入れ子は例外ではなく UNVERIFIABLE になる", () => {
     const deep = "$(".repeat(5000) + "git push" + ")".repeat(5000);
     let result: string[][] = [];
