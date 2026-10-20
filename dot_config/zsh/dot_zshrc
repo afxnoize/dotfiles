@@ -2,20 +2,36 @@
 [[ -n $ZDATADIR ]] && mkdir -p "$ZDATADIR"
 [[ -n $ZSTATEDIR ]] && mkdir -p "$ZSTATEDIR"
 [[ -n $ZCACHEDIR ]] && mkdir -p "$ZCACHEDIR"
+# zinit falls back to ~/.cache/zinit unless ZSH_CACHE_DIR already exists and is writable.
+# Inside cage the dir cannot be created; that shell uses the fallback.
+[[ -n $ZSH_CACHE_DIR ]] && mkdir -p "$ZSH_CACHE_DIR" 2>/dev/null
 
 # Prevent logging out with `Ctrl-D`
 setopt IGNORE_EOF
 
 # Completion {{{
 # Activate shell completion (cache compaudit for 24h)
+# The dump is sourced as code on every start, so it lives in ZDATADIR, not in
+# ZCACHEDIR (cage grants the cache dir to sandboxed agents).
 autoload -Uz compinit
-local -a _comp_outdated=( $ZCACHEDIR/.zcompdump(N.mh+24) )
-if (( $#_comp_outdated )) || [[ ! -f "$ZCACHEDIR/.zcompdump" ]]; then
-	compinit -d "$ZCACHEDIR/.zcompdump"
+local _zcompdump="$ZDATADIR/.zcompdump" _zprobe="$ZDATADIR/.write-probe.$$"
+# Probe with a real write: [[ -w ]] ignores Landlock and reports cage-denied dirs as writable
+if { : >| "$_zprobe" && rm -f "$_zprobe" } 2>/dev/null; then
+	local -a _comp_outdated=( $_zcompdump(N.mh+24) )
+	if (( $#_comp_outdated )) || [[ ! -f "$_zcompdump" ]]; then
+		compinit -d "$_zcompdump"
+	else
+		compinit -C -d "$_zcompdump"
+	fi
+	unset _comp_outdated
+elif [[ -f "$_zcompdump" ]]; then
+	# Read-only ZDATADIR (e.g. inside cage): load the existing dump, never regenerate
+	compinit -C -d "$_zcompdump"
 else
-	compinit -C -d "$ZCACHEDIR/.zcompdump"
+	# No dump to load and nowhere to write one: skip the dump entirely (-D)
+	compinit -D
 fi
-unset _comp_outdated
+unset _zcompdump _zprobe
 # for bash_completion
 autoload -U +X bashcompinit && bashcompinit
 

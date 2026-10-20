@@ -32,7 +32,12 @@ export ZDOTDIR="${ZDOTDIR:-$HOME/.config/zsh}"
 export ZHOMEDIR="${ZDOTDIR:-$HOME/.config/zsh}"
 export ZSTATEDIR="$XDG_STATE_HOME/zsh"
 export ZDATADIR="$XDG_DATA_HOME/zsh"
+# Hooks and zcompdump moved to ZDATADIR: cage grants the cache dir to sandboxed
+# agents, and the unsandboxed shell sources those files as code.
 export ZCACHEDIR="$XDG_CACHE_HOME/zsh"
+# zinit puts $ZSH_CACHE_DIR/completions on fpath, so the completion functions it
+# finds there run as code in every shell. Default is under the cage-writable cache dir.
+export ZSH_CACHE_DIR="$ZDATADIR/cache"
 
 export ZRCDIR="$ZHOMEDIR/rc"
 # End of Zsh Base Directory }}}
@@ -41,6 +46,10 @@ export ZRCDIR="$ZHOMEDIR/rc"
 export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$XDG_CONFIG_HOME/claude}"
 export CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=0
 export CODEX_HOME="${CODEX_HOME:-$XDG_CONFIG_HOME/codex}"
+# Pin the Telegram plugin allowlist to access.json as read at plugin boot, so an
+# edit made from a sandboxed agent cannot grant live access. Pairing via the
+# access skill is unavailable in this mode; chezmoi manages access.json.
+export TELEGRAM_ACCESS_MODE=static
 # End of AI Agents }}}
 
 # Programing Langs {{{

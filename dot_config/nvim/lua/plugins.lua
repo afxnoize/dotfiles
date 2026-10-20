@@ -566,6 +566,9 @@ lazy.setup({
 		{
 			'catppuccin/nvim',
 			name = 'catppuccin',
+			opts = function()
+				return { compile_path = require('rc/catppuccin').compile_path() }
+			end,
 		},
 	},
 }, {

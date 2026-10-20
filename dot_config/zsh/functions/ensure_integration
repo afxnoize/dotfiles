@@ -1,5 +1,7 @@
 local cmd=$1 version_cmd=$2 gen_cmd=$3
-local hook_dir="$ZCACHEDIR/hooks"
+# Hooks are sourced as code by every shell, so they live in ZDATADIR, not in
+# ZCACHEDIR (cage grants the cache dir to sandboxed agents).
+local hook_dir="$ZDATADIR/hooks"
 local ver_dir="$hook_dir/.versions"
 local hook_file="$hook_dir/${cmd}.zsh"
 local ver_file="$ver_dir/${cmd}"
@@ -10,9 +12,15 @@ local current_ver
 current_ver=$(eval "$version_cmd" 2>/dev/null) || return
 
 if [[ ! -r "$hook_file" ]] || [[ ! -r "$ver_file" ]] || [[ "$(< "$ver_file")" != "$current_ver" ]]; then
-	mkdir -p "$hook_dir" "$ver_dir"
-	eval "$gen_cmd" > "$hook_file" 2>/dev/null && echo "$current_ver" > "$ver_file"
-	zcompile -R -- "$hook_file" 2>/dev/null
+	# Try to write and fall back quietly on failure. Do not pre-check with
+	# [[ -w ]]: it ignores Landlock and reports cage-denied dirs as writable.
+	if { mkdir -p "$hook_dir" "$ver_dir" && eval "$gen_cmd" >| "$hook_file" && echo "$current_ver" >| "$ver_file" } 2>/dev/null; then
+		zcompile -R -- "$hook_file" 2>/dev/null
+	elif [[ ! -r "$hook_file" ]]; then
+		# Nowhere to write (e.g. inside cage) and no hook yet: use the output in memory only
+		source <(eval "$gen_cmd" 2>/dev/null)
+		return
+	fi
 fi
 
 source "$hook_file"

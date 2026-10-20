@@ -40,7 +40,8 @@ local shut_up_auto_fold_at_writing = create_augroup('ShutUpAutoFoldAtWriting', {
 create_autocmd('BufWinLeave', {
 	group = shut_up_auto_fold_at_writing,
 	pattern = '*',
-	command = [[if expand('%') != '' && &buftype != 'nofile' | mkview | endif]],
+	-- silent!: inside cage the view dir is read-only (it is sourced as code by loadview)
+	command = [[if expand('%') != '' && &buftype != 'nofile' | silent! mkview | endif]],
 })
 create_autocmd('BufWinEnter', {
 	group = shut_up_auto_fold_at_writing,
