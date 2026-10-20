@@ -242,7 +242,7 @@ context = '^git\s+\S+$'
 [[snippets]]
 name = "git current branch name"
 trigger = "B"
-snippet = "$(git symbolic-ref --short HEAD)"
+snippet = '${(q)$(git symbolic-ref --short HEAD)}'
 evaluate = true
 global = true
 context = '^git\s+'
@@ -260,7 +260,7 @@ context = '^git\s+'
 [[snippets]]
 name = "git tag patch bump"
 trigger = "T+"
-snippet = '$(semver -i patch "$(git describe --abbrev=0 --tags @ 2>/dev/null)")'
+snippet = '${(q)$(semver -i patch "$(git describe --abbrev=0 --tags @ 2>/dev/null)")}'
 evaluate = true
 global = true
 context = '^git\s+'
@@ -268,7 +268,7 @@ context = '^git\s+'
 [[snippets]]
 name = "git tag minor bump"
 trigger = "T++"
-snippet = '$(semver -i minor "$(git describe --abbrev=0 --tags @ 2>/dev/null)")'
+snippet = '${(q)$(semver -i minor "$(git describe --abbrev=0 --tags @ 2>/dev/null)")}'
 evaluate = true
 global = true
 context = '^git\s+'
@@ -276,7 +276,7 @@ context = '^git\s+'
 [[snippets]]
 name = "git tag major bump"
 trigger = "T!"
-snippet = '$(semver -i major "$(git describe --abbrev=0 --tags @ 2>/dev/null)")'
+snippet = '${(q)$(semver -i major "$(git describe --abbrev=0 --tags @ 2>/dev/null)")}'
 evaluate = true
 global = true
 context = '^git\s+'

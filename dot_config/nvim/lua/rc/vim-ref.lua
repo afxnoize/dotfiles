@@ -1,7 +1,7 @@
 vim.cmd([[
 let g:ref_source_webdict_sites = {
 \   'wikipedia': {
-\     'url': 'http://ja.wikipedia.org/wiki/%s'
+\     'url': 'https://ja.wikipedia.org/wiki/%s'
 \   },
 \   'weblio': {
 \     'url': 'https://ejje.weblio.jp/content/%s'

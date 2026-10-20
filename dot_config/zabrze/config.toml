@@ -131,7 +131,7 @@ global = true
 [[snippets]]
 name = "mo --target <repository>"
 trigger = 'r'
-snippet = '$(basename $(git rev-parse --show-toplevel))'
+snippet = '${(q)$(basename "$(git rev-parse --show-toplevel)")}'
 evaluate = true
 global = true
 context = '^mo\s+--target\s+'
