@@ -1,0 +1,64 @@
+#!/bin/bash
+# Update the claude-code flake input, then switch home-manager (hmu claude-code + hms).
+# Run by claude-update.service (systemd user timer), i.e. outside the cage sandbox.
+#
+# This builds the pushed main branch of the remote, from a fresh shallow clone
+# in a private temp dir. It never reads or runs git in the local working copy.
+# Consequences:
+#   - Local unpushed work is not applied (and a manual hms that was never pushed
+#     is reverted by the next run).
+#   - The working-copy flake.lock is not updated. To persist a lock bump, run
+#     `hmu claude-code` locally and commit it.
+set -euo pipefail
+
+# Hard-coded on purpose: a sandboxed (cage) agent can write the working copy's
+# .git (allow-git), so the remote URL and any git config read from there are
+# attacker-controlled (e.g. core.fsmonitor runs a command).
+readonly remote="https://github.com/afxnoize/dotfiles.git"
+readonly branch="main"
+
+log() { printf 'claude-update: %s\n' "$*"; }
+
+# Not /tmp: the cage base preset allows writes to /tmp and $TMPDIR, and the
+# sandboxed agent runs as the same uid, so it could edit the clone between the
+# clone and the switch. $XDG_RUNTIME_DIR (/run/user/UID) is not writable from the
+# cage. Exporting TMPDIR keeps the temp files of git, nix and nh there as well.
+work=$(mktemp -d -p "${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is not set}")
+trap 'rm -rf "$work"' EXIT
+export TMPDIR="$work"
+
+# cwd is $work so that no repository config is in effect for the clone.
+cd "$work"
+GIT_TERMINAL_PROMPT=0 git clone --quiet --depth 1 --branch "$branch" "$remote" "$work/src" || {
+  log "clone failed"
+  exit 1
+}
+flake="$work/src/nix"
+
+rev() { jq -r '.nodes["claude-code"].locked.rev' "$flake/flake.lock"; }
+before=$(rev)
+
+out=$(nix flake update claude-code --flake "$flake" 2>&1) || {
+  printf '%s\n' "$out"
+  log "flake update failed"
+  exit 1
+}
+[[ -z "$out" ]] || printf '%s\n' "$out"
+
+# Without a GitHub token, an exhausted API rate limit makes nix fall back to the
+# cached lock with only a warning, which would look like a successful no-op.
+if grep -q 'using cached version' <<<"$out"; then
+  log "flake update fell back to the cached lock (GitHub API rate limit?)"
+  exit 1
+fi
+
+after=$(rev)
+if [[ "$before" == "$after" ]]; then
+  log "claude-code is already at ${after:0:7}"
+else
+  log "claude-code ${before:0:7} -> ${after:0:7}"
+fi
+
+# Always switch, even when the lock did not change, so a switch that failed
+# on a previous run is retried instead of being skipped forever.
+nh home switch --no-nom "$flake" -c "$USER" -- --impure

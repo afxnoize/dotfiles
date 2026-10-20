@@ -28,8 +28,10 @@
 - **カスタムバイナリ**: `tools/kakehashi/` のようにプラットフォーム別に分岐
 
 ### claude-code の自動更新
-- systemd user timer `claude-update`（月・木 03:00 JST）が `claude-code` 入力だけ `flake.lock` を更新し、`nh home switch` まで実行する。実体は `dot_local/bin/executable_claude-update.tmpl`、unit は `dot_config/systemd/user/`
-- `nix/` に `flake.lock` 以外の未コミット変更があるとスキップする（switch は working tree 全体を適用するため、編集途中の状態を無人で反映しない）。`nix/` を編集したら commit するか手動で `hms` する
+- systemd user timer `claude-update`（月・木 03:00 JST）が `claude-code` 入力だけ `flake.lock` を更新し、`nh home switch` まで実行する。実体は `dot_local/bin/executable_claude-update`、unit は `dot_config/systemd/user/`
+- ビルド元はローカルの working copy ではなく、リモート（`https://github.com/afxnoize/dotfiles.git` の `main`）を毎回 shallow clone した一時ディレクトリ。cage 内の agent は working copy と `.git` を書き換えられるため、working copy を読む・git を実行すると、悪意ある nix module や `core.fsmonitor` を無人・サンドボックス外で実行させられてしまう。リモートの URL もスクリプトに固定している
+- 一時ディレクトリは `/tmp` ではなく `$XDG_RUNTIME_DIR` 配下に作る（cage の `base` preset は `/tmp` を書込許可しており、同一 uid の agent が clone を改ざんできるため）。終了時に削除される
+- push していない変更は反映されず、手動 `hms` で入れた未 push の変更は次回の timer で main の内容に戻る。working copy の `flake.lock` も更新されないので、lock の更新を残したいときはローカルで `hmu claude-code` して commit・push する（放置すると手動 `hms` が古い rev に戻る）
 - GitHub API の rate limit で更新できない日は exit 1 で終わる（nix は警告だけで cached lock に戻るため、スクリプト側で検出している）。結果は `journalctl --user -u claude-update` で確認する
 - 反映されるのは次回起動から。実行中の claude は旧バイナリのまま動き続ける
 - timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now claude-update.timer`（`.chezmoiignore` の `.chezmoiscripts/*` で chezmoi scripts が無効なため、apply では有効化されない）
