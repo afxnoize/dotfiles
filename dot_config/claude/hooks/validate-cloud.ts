@@ -7,8 +7,9 @@ import { basename, invocations, isDynamic, UNVERIFIABLE } from "./shell-parse";
 
 export interface Pattern {
   /**
-   * Tested against the canonical line `aws <service> <operation> <args...>` (global
-   * options removed, tokens joined by single spaces). matchTokens() pins it to the
+   * Tested against the canonical line `<cli> <service> <operation> <args...>` for aws
+   * (`aws iam delete-user ...`) or `<cli> <command> <args...>` for b2 (`b2 rm ...`),
+   * with global options removed and tokens joined by single spaces. matchTokens() pins it to the
    * start of the line, so write it without `^`. Conventions in the tables:
    *   \s+      spacing between words
    *   delete-  a trailing `-` matches every operation with that prefix (delete-user, ...)
