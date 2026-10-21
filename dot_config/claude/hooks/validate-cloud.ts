@@ -6,6 +6,16 @@
 import { basename, invocations, isDynamic, UNVERIFIABLE } from "./shell-parse";
 
 export interface Pattern {
+  /**
+   * Tested against the canonical line `aws <service> <operation> <args...>` (global
+   * options removed, tokens joined by single spaces). matchTokens() pins it to the
+   * start of the line, so write it without `^`. Conventions in the tables:
+   *   \s+      spacing between words
+   *   delete-  a trailing `-` matches every operation with that prefix (delete-user, ...)
+   *   .*       anything in between: `attach-.*-policy` covers attach-user-policy and
+   *            attach-role-policy, `rm\s+.*--recursive` the flag anywhere after rm
+   *   (a|b)    alternatives
+   */
   pattern: RegExp;
   decision: string;
   reason: string;
@@ -71,8 +81,14 @@ function matchTokens(
   service: string,
   patterns: Pattern[]
 ): MatchResult | null {
+  // Each run of newlines inside a token becomes one space. `.` in the patterns does
+  // not match a newline, so a newline in an argument could otherwise hide the rest of
+  // the line from `attach-.*-policy` and the like.
   const line = tokens.map((t) => t.replace(/[\r\n]+/g, " ")).join(" ");
   for (const { pattern, decision, reason } of patterns) {
+    // Only the source is reused (the tables use no flags). The tables are written
+    // unanchored; `^` pins each to the start of the line, so an argument that merely
+    // contains `aws iam delete-` does not trigger it.
     if (new RegExp(`^${pattern.source}`).test(line)) return { decision, reason };
   }
   // The service or operation comes from a variable or substitution, so no

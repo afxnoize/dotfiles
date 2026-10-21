@@ -38,6 +38,8 @@ const KEYWORDS = new Set([
   "!", "{", "}", "if", "then", "else", "elif", "fi", "do", "done", "while", "until",
   "coproc",
 ]);
+// A leading `NAME=value` word: NAME, optionally indexed (`a[1]=`) or appending
+// (`PATH+=`). Only the part up to `=` is matched; the value is not looked at.
 const ENV_ASSIGN = /^[A-Za-z_][A-Za-z0-9_]*(\[[^\]]*\])?\+?=/;
 
 export function basename(path: string): string {
@@ -48,6 +50,9 @@ export function basename(path: string): string {
 /**
  * True when a token still holds something the shell would expand into other
  * text: `$...`, a backtick, or a brace list/range (`{a,b}`, `{1..3}`).
+ *
+ * Pattern: any `$` or backtick, or a `{...}` that contains `,` or `..`. A plain `{}`
+ * (as in `find -exec ... {}`) or `{a}` is not expanded by the shell, so it stays static.
  */
 export function isDynamic(token: string): boolean {
   return /[$`]|\{[^}]*(,|\.\.)[^}]*\}/.test(token);
@@ -61,10 +66,13 @@ export function isDynamic(token: string): boolean {
 const LITERAL: Record<string, string> = { $: "", "`": "", "{": "" };
 const UNLITERAL: Record<string, string> = { "": "$", "": "`", "": "{" };
 
+// Swaps each of `$`, backtick and `{` for its placeholder.
 function lit(s: string): string {
   return s.replace(/[$`{]/g, (c) => LITERAL[c]);
 }
 
+// Swaps the placeholders back. The character class below is the three private-use
+// characters U+E000..U+E002 (they are invisible in most editors).
 function restore(s: string): string {
   return s.replace(/[-]/g, (c) => UNLITERAL[c]);
 }
@@ -75,6 +83,12 @@ function decodeAnsiC(body: string): string {
     n: "\n", t: "\t", r: "\r", a: "\x07", b: "\b", e: "\x1b", E: "\x1b",
     f: "\f", v: "\v", "\\": "\\", "'": "'", '"': '"', "?": "?",
   };
+  // One match is one escape: `\` followed by one of, in this order (so `\x41` is hex,
+  // not the letter x): `\xHH` (1-2 hex digits), `\uHHHH` (1-4), `\UHHHHHHHH` (1-8),
+  // `\NNN` octal (1-3 digits), or any other single character (`s` flag, so a newline
+  // too), which is looked up in `simple`. The groups arrive as hex, u4, u8, oct, ch;
+  // `g` replaces every escape. Unknown escapes and code points above U+10FFFF are
+  // left as written.
   return body.replace(
     /\\(?:x([0-9A-Fa-f]{1,2})|u([0-9A-Fa-f]{1,4})|U([0-9A-Fa-f]{1,8})|([0-7]{1,3})|(.))/gs,
     (m, hex, u4, u8, oct, ch) => {
@@ -175,6 +189,7 @@ function readHeredocs(src: string, start: number, pending: Heredoc[], out: Argv[
       const end = nl < 0 ? src.length : nl;
       const line = src.slice(i, end);
       i = nl < 0 ? src.length : nl + 1;
+      // `<<-` ignores leading tabs (tabs only) when looking for the closing delimiter.
       if ((h.strip ? line.replace(/^\t+/, "") : line) === h.delim) break;
       body += line + "\n";
     }
@@ -310,7 +325,8 @@ function lexScriptBody(src: string, start: number, out: Argv[], closeOnParen: bo
       continue;
     }
     if (c === "<" || c === ">" || (c === "&" && n === ">")) {
-      // A bare number before the operator is a file descriptor, not an argument.
+      // A bare number before the operator is a file descriptor, not an argument
+      // (`2>/dev/null`: the word `2` is all digits).
       if (inWord && /^\d+$/.test(word)) {
         word = "";
         inWord = false;
@@ -329,6 +345,9 @@ function lexScriptBody(src: string, start: number, out: Argv[], closeOnParen: bo
         const strip = src[j] === "-";
         if (strip) j++;
         while (src[j] === " " || src[j] === "\t") j++;
+        // The delimiter word runs up to whitespace or a shell operator (`;&|()<>`).
+        // A quoted delimiter (`<<'EOF'`, `<<"EOF"`, `<<\EOF`) means the body is not
+        // expanded; the quotes and backslashes are dropped to get the closing text.
         let raw = "";
         while (j < src.length && !/[\s;&|()<>]/.test(src[j])) raw += src[j++];
         const expand = !/['"\\]/.test(raw);
@@ -392,6 +411,9 @@ function shellInvocation(argv: Argv): ShellInvocation {
   let i = 1;
   for (; i < argv.length; i++) {
     const t = argv[i];
+    // `-c`, alone or clustered with other short flags (`-lc`, `-ec`): the next word is
+    // the script. Same shape as shortCluster() in validate-bash.ts; `--long` options
+    // never match.
     if (/^-[A-Za-z]*c[A-Za-z]*$/.test(t)) {
       return argv[i + 1] === undefined ? { kind: "stdin" } : { kind: "script", script: argv[i + 1] };
     }
@@ -414,7 +436,8 @@ function unverifiable(reason: string, out: Argv[]): void {
 }
 
 // A shell lives in a bin dir; a path like `dot_config/zsh` or `/home/u/.config/zsh`
-// is just a directory argument.
+// is just a directory argument. A bare name (`zsh`) counts, and so does a path that
+// ends in `/bin/NAME` or `/sbin/NAME` (`/usr/bin/zsh`); NAME may not contain another `/`.
 function looksLikeShellPath(p: string): boolean {
   return !p.includes("/") || /\/s?bin\/[^/]+$/.test(p);
 }

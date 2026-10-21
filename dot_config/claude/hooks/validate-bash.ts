@@ -19,6 +19,10 @@ export interface Context {
   currentBranch: (dir: string) => string | null;
 }
 
+// Branch names that are protected as a whole: main, master, development, develop,
+// dev, and release or anything under release/ (release/1.0). Anchored at both ends,
+// so `maintenance` and `dev-x` are not protected. main/master as a later path
+// segment (hotfix/main) is handled by isProtectedBranch().
 const PROTECTED_EXACT = /^(main|master|development|develop|dev|release(\/.*)?)$/;
 const PROTECTED_MSG = "Push to protected branch is blocked. Ask the user to push manually.";
 const BARE_PUSH_MSG =
@@ -46,6 +50,10 @@ const GH_DENY: Array<[string, string, string]> = [
 const deny = (reason: string): Decision => ({ decision: "deny", reason });
 const ask = (reason: string): Decision => ({ decision: "ask", reason });
 
+// True when `token` is a cluster of short options that contains `letter`:
+// "-f", "-fd" and "-df" match for "f"; "--force" and "-C=f" do not. The pattern is
+// `-`, any letters, `letter`, any letters, end of token. Case-sensitive (-D is not
+// -d). Callers pass a fixed letter, so it is safe to put into the pattern.
 function shortCluster(token: string, letter: string): boolean {
   return new RegExp(`^-[A-Za-z]*${letter}[A-Za-z]*$`).test(token);
 }
@@ -74,7 +82,9 @@ function parseGit(argv: string[]): GitCall {
       dirs.push(argv[i + 1] ?? "");
       i += 2;
     } else if (t === "-c") {
-      // `-c alias.p=push` makes `git p` run push
+      // `-c alias.p=push` makes `git p` run push.
+      // Pattern `alias.NAME=VALUE`: group 1 is NAME (up to the first `=`), group 2 is
+      // VALUE, which is split on whitespace to become the alias's argv.
       const m = /^alias\.([^=]+)=(.*)$/.exec(argv[i + 1] ?? "");
       if (m) aliases.set(m[1], m[2].split(/\s+/).filter(Boolean));
       i += 2;
@@ -115,10 +125,14 @@ function checkPush(call: GitCall, ctx: Context): Decision | null {
 
   const dir = call.dirs.reduce((acc, d) => resolve(acc, d), ctx.cwd);
   for (const spec of positional.slice(1)) {
-    // A variable, substitution, brace list or glob can expand to a protected branch.
+    // A variable, substitution, brace list (isDynamic) or glob character (`*`, `?`,
+    // `[`) can expand to a protected branch.
     if (isDynamic(spec) || /[*?[]/.test(spec)) {
       return ask("The push target is built from a variable, substitution or pattern, so it cannot be checked. Proceed?");
     }
+    // Refspec is [+]SRC[:DST]. A leading `+` forces the push (`+main`), and only DST
+    // (after the last `:`) names the branch that gets updated. `refs/heads/main` is
+    // the same branch as `main`.
     const ref = spec.replace(/^\+/, "");
     let dst = ref.slice(ref.lastIndexOf(":") + 1).replace(/^refs\/heads\//, "");
     if (dst === "HEAD" || dst === "@") {
