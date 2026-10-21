@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-// Validate Bash commands via PreToolUse hook (run through validate-bash.sh).
+// Validate Bash commands via PreToolUse hook.
 // Blocks dangerous git/gh operations. Rules inspect the argv of each command
 // found by shell-parse.ts instead of regexing the raw string, so global options
 // (`git -C . push`), wrappers (`sudo git push`), subshells and chained commands

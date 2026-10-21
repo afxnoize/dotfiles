@@ -1,12 +1,15 @@
 #!/bin/bash
-# validate-bash.sh のユニットテスト
-# Usage: bash test-validate-bash.sh
+# validate-bash.ts のユニットテスト
+# Usage: bash validate-bash.test.sh
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-# In the chezmoi source tree the wrapper is named executable_validate-bash.sh.
-VB="${VB:-$SCRIPT_DIR/validate-bash.sh}"
-[ -f "$VB" ] || VB="$SCRIPT_DIR/executable_validate-bash.sh"
+# VB can point at another implementation to compare against (a .sh file runs with bash).
+VB="${VB:-$SCRIPT_DIR/validate-bash.ts}"
+case "$VB" in
+  *.sh) RUN=(bash "$VB") ;;
+  *) RUN=(bun "$VB") ;;
+esac
 PASS=0 FAIL=0
 
 # Throwaway repos so that `git push origin HEAD` can be resolved from cwd.
@@ -22,7 +25,7 @@ _run() {
   local payload result
   payload=$(jq -n --arg cmd "$1" --arg cwd "${2:-$WORK}" \
     '{tool_name: "Bash", cwd: $cwd, tool_input: {command: $cmd}}')
-  result=$(printf '%s' "$payload" | bash "$VB" 2>/dev/null) || true
+  result=$(printf '%s' "$payload" | "${RUN[@]}" 2>/dev/null) || true
   if [ -z "$result" ]; then echo "pass"
   else echo "$result" | jq -r '.hookSpecificOutput.permissionDecision // "pass"'; fi
 }
@@ -44,7 +47,7 @@ assert_deny() { _assert deny "$@"; }
 assert_pass() { _assert pass "$@"; }
 assert_ask()  { _assert ask "$@"; }
 
-echo "━━━ validate-bash.sh ━━━"
+echo "━━━ validate-bash.ts ━━━"
 
 echo ""
 echo "# 保護ブランチへの push をブロックする"

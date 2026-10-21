@@ -60,7 +60,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_CONFIG_DIR/hooks/validate-bash.sh",
+            "command": "bun $CLAUDE_CONFIG_DIR/hooks/validate-bash.ts",
             "onFailure": "block"
           },
           {
