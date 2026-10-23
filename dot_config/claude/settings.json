@@ -44,7 +44,6 @@
       "Bash(curl * | bash*)",
       "Bash(wget * | sh*)",
       "Bash(wget * | bash*)",
-      "Agent(model:*opus*)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(~/.ssh/**)",
