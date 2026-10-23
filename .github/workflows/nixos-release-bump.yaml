@@ -1,0 +1,59 @@
+name: Bump NixOS stable release
+
+on:
+  schedule:
+    - cron: "0 20 1 * *" # 1st of every month 20:00 UTC (= 2nd 05:00 JST)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
+
+      - name: Move nixpkgs and home-manager to the newest adoptable release
+        id: bump
+        run: bash .github/scripts/nixos-release-bump.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      # Evaluation only: renamed or removed options and packages fail here. Building is left to the reviewer.
+      - name: Evaluate the home-manager configuration
+        id: eval
+        if: steps.bump.outputs.bumped == 'true'
+        continue-on-error: true
+        run: nix eval --impure --raw "path:./nix#homeConfigurations.${USER}.activationPackage.drvPath"
+        env:
+          USER: runner # flake.nix names the configuration after $USER
+
+      - uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8.1.0
+        if: steps.bump.outputs.bumped == 'true'
+        with:
+          commit-message: |
+            chore(nix): nixpkgs と home-manager を ${{ steps.bump.outputs.release }} に更新
+
+            NixOS stable の新しいリリース ${{ steps.bump.outputs.release }} を検出したため、
+            nix/flake.nix の nixpkgs と home-manager のブランチを ${{ steps.bump.outputs.release }} に揃えて、
+            flake.lock を再生成した。
+
+            週次の flake.lock 更新はブランチ内の追従しかできず、リリースをまたげない。
+            stable が EOL のまま取り残されると、cacert などのセキュリティ更新が届かなくなる。
+          branch: chore/nixos-release-bump
+          title: "chore(nix): nixpkgs と home-manager を ${{ steps.bump.outputs.release }} に更新"
+          draft: ${{ steps.eval.outcome == 'failure' }}
+          body: |
+            NixOS stable ${{ steps.bump.outputs.release }} を検出したため、nixpkgs と home-manager を追従させる。
+
+            - 評価チェック (`nix eval`): ${{ steps.eval.outcome == 'success' && '成功' || '失敗（draft。Actions のログを参照）' }}
+            - ビルドは行っていない。適用前に `nix build --impure 'path:./nix#homeConfigurations.'$USER'.activationPackage'` で確認する
+            - `home.stateVersion` は変更していない。上げるかどうかは別に判断する
+            - リリース名 `YY.MM` の翌月 1 日以降のものだけを採用している（beta を拾わないため）
+          add-paths: |
+            nix/flake.nix
+            nix/flake.lock
