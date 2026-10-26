@@ -1,5 +1,29 @@
 {
   "nodes": {
+    "bun-linux-aarch64": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-dGlb+IkaurfBKyitp8ZFRFZY3pk+PGVeNNl4HHdIn5Q=",
+        "type": "file",
+        "url": "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-aarch64.zip"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-aarch64.zip"
+      }
+    },
+    "bun-linux-x64": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-y6I7lmoEz7UEnzxZdsnqU8oSrYEcnbXuvEZR5njPSPw=",
+        "type": "file",
+        "url": "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64-baseline.zip"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64-baseline.zip"
+      }
+    },
     "bun2nix": {
       "inputs": {
         "flake-parts": [
@@ -407,6 +431,8 @@
     },
     "root": {
       "inputs": {
+        "bun-linux-aarch64": "bun-linux-aarch64",
+        "bun-linux-x64": "bun-linux-x64",
         "cage": "cage",
         "claude-code": "claude-code",
         "home-manager": "home-manager",

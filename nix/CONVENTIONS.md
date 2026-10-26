@@ -26,6 +26,7 @@
 - **nixpkgs-unstable**: 最新版が必要なパッケージ（mise, git-wt 等）
 - **外部 flake**: llm-agents, cage 等（`inputs` で定義）
 - **カスタムバイナリ**: `tools/kakehashi/` のようにプラットフォーム別に分岐
+- **bun**: nixpkgs の版は upstream より遅れ、同梱の brotli に脆弱性（bun 1.4.4 で修正）が残る。そのため `bun-linux-x64` / `bun-linux-aarch64` を `flake = false` のファイル入力（upstream の latest release の zip）として持ち、`flake.nix` の overlay で `pkgs.bun` の `src` だけを差し替える。`tools/bunx` と PATH 上の `bun` は同じ `pkgs.bun` なのでまとめて追従する。更新は `nix flake update bun-linux-x64 bun-linux-aarch64`。nixpkgs が bun 1.4.4 以降を出したら、入力と overlay を削除して nixpkgs に戻す。linux 以外の system は nixpkgs の bun のまま
 
 ### claude-code の自動更新
 - systemd user timer `claude-update`（月・木 03:00 JST）が `claude-code` 入力だけ `flake.lock` を更新し、`nh home switch` まで実行する。実体は `dot_local/bin/executable_claude-update`、unit は `dot_config/systemd/user/`
