@@ -42,13 +42,9 @@
     };
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, cage, nix-index-database, bun-linux-x64, bun-linux-aarch64, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, cage, nix-index-database, ... }@inputs:
     let
       system = builtins.currentSystem;
-      bunSrc = {
-        x86_64-linux = bun-linux-x64;
-        aarch64-linux = bun-linux-aarch64;
-      }.${system} or null;
       pkgs = import nixpkgs {
         overlays = [
           neovim-nightly-overlay.overlays.default
@@ -58,15 +54,7 @@
             rtk = llm-agents.packages.${system}.rtk;
             ccusage = llm-agents.packages.${system}.ccusage;
           })
-          # nixpkgs bun lags upstream and bundles a vulnerable brotli (fixed in bun 1.4.4).
-          # Drop this overlay and the bun-linux-* inputs once nixpkgs ships bun >= 1.4.4.
-          # Other systems keep the nixpkgs bun.
-          (final: prev: nixpkgs.lib.optionalAttrs (bunSrc != null) {
-            bun = prev.bun.overrideAttrs (_: {
-              version = "latest";
-              src = final.runCommand "bun-${system}.zip" { } "cp ${bunSrc} $out";
-            });
-          })
+          (import ./overlays/bun.nix { inherit inputs system; })
         ];
         inherit system;
       };
