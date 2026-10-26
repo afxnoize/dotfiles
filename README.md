@@ -28,6 +28,14 @@ curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 ```
 
+> メモ: trusted user でないと、flake の `nixConfig` で指定した substituter は無視される。rtk・ccusage・neovim がソースビルドになり、初回は 30 分以上かかる。
+> 回避は、root で `/etc/nix/nix.custom.conf` に次を追記して `nix-daemon` を再起動する。`trusted-users` に自分を足すのは root 相当になるので避ける。
+>
+> ```
+> extra-substituters = https://cache.numtide.com https://nix-community.cachix.org
+> extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+> ```
+
 ### 3. Home-Manager の初回適用
 
 全ツール（git, neovim, fzf, ripgrep, sops, age, mise, claude-code 等）が一括でインストールされる。
