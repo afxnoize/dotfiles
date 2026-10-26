@@ -25,13 +25,24 @@
     llm-agents.url = "github:numtide/llm-agents.nix";
     cage.url = "github:Warashi/cage";
 
+    # Latest upstream bun release, locked by narHash.
+    # Refresh with `nix flake update bun-linux-x64 bun-linux-aarch64`.
+    bun-linux-x64 = {
+      url = "file+https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64-baseline.zip";
+      flake = false;
+    };
+    bun-linux-aarch64 = {
+      url = "file+https://github.com/oven-sh/bun/releases/latest/download/bun-linux-aarch64.zip";
+      flake = false;
+    };
+
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, cage, nix-index-database, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, cage, nix-index-database, ... }@inputs:
     let
       system = builtins.currentSystem;
       pkgs = import nixpkgs {
@@ -43,6 +54,7 @@
             rtk = llm-agents.packages.${system}.rtk;
             ccusage = llm-agents.packages.${system}.ccusage;
           })
+          (import ./overlays/bun.nix { inherit inputs system; })
         ];
         inherit system;
       };
