@@ -57,6 +57,7 @@ in
         editor = "nvim";
         whitespace = "cr-at-eol";
         autocrlf = "input";
+        quotePath = false;
       };
 
       gpg.program = "gpg";
