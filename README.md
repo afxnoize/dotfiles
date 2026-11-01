@@ -104,6 +104,38 @@ cd ~/repos/github.com/afxnoize/dotfiles/nix
 home-manager switch --flake .#$USER --impure
 ```
 
+## Telegram チャンネルの差し替え（supercharged）
+
+公式 plugin の `server.ts` を [claude-telegram-supercharged](https://github.com/k1p1l0/claude-telegram-supercharged) v0.5.0 に差し替える。`telegram-supercharged` コマンド（`~/.local/bin`、Linux のみ）で入れて、いつでも戻せる。
+
+```sh
+telegram-supercharged status    # 今どちらが有効か
+telegram-supercharged install   # 固定した版に差し替える（冪等）
+telegram-supercharged restore   # 公式に戻す
+```
+
+- 入れるのは `server.ts` だけ。upstream の `install.sh` は使わない
+  - `server.ts` 以外（skills、Mini App、launchd 用の supervisor、進捗フック）は、チャンネルを動かすのに要らない。upstream の `access` / `configure` skill は `~/.claude` 決め打ちで、`CLAUDE_CONFIG_DIR` を解決する公式のものより古いので、上書きしない
+  - 進捗のライブ表示（Agentic Mode）は、supervisor が進捗フックを `--settings` で渡す前提のため、この差し替えだけでは動かない。使うなら、フックの導入を別に決める
+  - 版は commit SHA で固定してある。HEAD は `server.ts` が `decisionTap` / `needsList` / `routerHook` を import するが、upstream の `install.sh` がこれらをコピーしないため、起動時に落ちる
+  - 版を上げるときは、新しい版で `grep 'from "\./' server.ts` を確認し、`server.ts` の差分を読んでから、スクリプト内の `rev` を更新する
+- 差し替え先は `installed_plugins.json` の user scope の `installPath`。最新バージョンのディレクトリを機械的に選ぶと、読み込まれない版を直して無反応になる
+- 公式 plugin が更新されると新しいバージョンのディレクトリができ、差し替えが外れる。`install` を再実行すれば直る
+- `install` は反映までに、Telegram を使う claude セッションの再起動が要る
+- 作業用の clone は `$XDG_RUNTIME_DIR` に作る。cage から書ける `/tmp` では、検証とコピーの間に書き換えられうるため
+- 公式と supercharged の `server.ts` は排他用のファイルが別（公式は `bot.pid`、supercharged は `data/telegram.lock`）で、互いを見ない。混ぜて動かすと 2 本が polling して 409 になり、DM はどちらかに落ちる
+  - supercharged どうしなら、先に起動した 1 本だけが DM を受け取り、残りは送信のみの MCP モードになる
+  - すでに動いている公式の `bun server.ts` は、再起動するまで古いコードのまま
+  - project scope で入れた 0.0.4 は対象外。そのプロジェクトでは公式のまま動く
+- `installed_plugins.json` の `installPath` やキャッシュ内の `server.ts*` は cage から書ける。スクリプトは、cache の外を指す・symlink になっている場合は書かずに止まる
+- 受信メッセージは `~/.claude/channels/telegram/data/messages.db` に全件残る。`TELEGRAPH_ENABLED=true` にしない限り、長文を telegra.ph（公開）に投げることはない
+
+導入後の確認:
+
+- `telegram-supercharged status` が `supercharged 6dc3593` を示す
+- 他の Telegram セッション（公式のままの `bun server.ts`）を止めてから、1 セッションだけ `claude --channels plugin:telegram@claude-plugins-official` で起動し直し、DM を送る。読んだ時点で 👀、返信後に 👍 が付く（長い作業では間に 🔥）。これは `server.ts` の instructions でモデルに頼んでいる動きで、保証ではない
+- `telegram-supercharged restore` で戻したあとも、同じように動く
+
 ## ディレクトリ構成
 
 | パス | 説明 |

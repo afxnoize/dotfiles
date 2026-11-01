@@ -29,6 +29,7 @@ serena/
 .config/zabrze/**
 .config/systemd/**
 .local/bin/claude-update
+.local/bin/telegram-supercharged
 {{ end }}
 
 {{ if ne .chezmoi.os "windows" }}

@@ -1,0 +1,149 @@
+#!/bin/bash
+# Swap the official Telegram channel server for claude-telegram-supercharged
+# (pinned release), and swap it back.
+#
+#   telegram-supercharged install   copy the pinned server.ts over the official one
+#   telegram-supercharged restore   put the official server.ts back
+#   telegram-supercharged status    show which server.ts is active
+#
+# Only server.ts is replaced. Upstream's install.sh also overwrites the official
+# skills (access/configure), copies the launchd/expect daemon scripts and a
+# statusline hook; none of that is needed to run the channel server, and the
+# official skills are newer than the ones upstream ships.
+set -euo pipefail
+
+# Hard-coded on purpose: a sandboxed (cage) agent can write $CLAUDE_CONFIG_DIR,
+# so neither the remote nor the revision may come from anything it can edit.
+readonly remote="https://github.com/k1p1l0/claude-telegram-supercharged.git"
+# v0.5.0. Do not follow HEAD: since v0.5.0, server.ts imports ./decisionTap,
+# ./needsList and ./routerHook, which upstream's install.sh never copies, so the
+# server would crash at start. Before bumping, check `grep 'from "\./' server.ts`
+# at the new revision and read the diff of server.ts.
+readonly rev="6dc359394f6d5a599a041ed129f7962c44f7e26e"
+readonly plugin_key="telegram@claude-plugins-official"
+
+log() { printf 'telegram-supercharged: %s\n' "$*"; }
+die() {
+  log "$*" >&2
+  exit 1
+}
+
+config_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+cache_root="$config_dir/plugins/cache/claude-plugins-official/telegram"
+
+# Claude Code runs the plugin from the installPath recorded for the user scope.
+# Picking the newest directory instead would patch a version that is not loaded
+# (both 0.0.4 and 0.0.7 can sit in the cache).
+resolve_target() {
+  local manifest="$config_dir/plugins/installed_plugins.json" target
+  [[ -f "$manifest" ]] || die "$manifest not found; install the official plugin first (/plugin install $plugin_key)"
+  target=$(jq -r --arg k "$plugin_key" \
+    '[.plugins[$k][]? | select(.scope == "user")][0].installPath // empty' "$manifest")
+  [[ -n "$target" ]] || die "no user-scope install of $plugin_key in $manifest"
+  # The manifest and the cache are writable from the cage; never follow either
+  # outside the cache (a '..' in the manifest, or a symlink planted in the cache).
+  local real_target real_root
+  real_target=$(realpath -e -- "$target") || die "installPath does not exist: $target"
+  real_root=$(realpath -e -- "$cache_root") || die "$cache_root does not exist"
+  case "$real_target" in
+    "$real_root"/*) ;;
+    *) die "installPath resolves outside $real_root: $real_target" ;;
+  esac
+  # server.ts and its siblings are rewritten by this script, outside the cage.
+  # A symlink at any of those names would send the write to a file the cage
+  # cannot touch itself.
+  local f
+  for f in server.ts server.ts.official .supercharged-rev; do
+    [[ ! -L "$real_target/$f" ]] || die "$real_target/$f is a symlink; refusing to write through it"
+  done
+  [[ -f "$real_target/server.ts" ]] || die "$real_target/server.ts not found"
+  printf '%s\n' "$real_target"
+}
+
+# Write the contents of $1 to $2 through an exclusively created temp file in the
+# same directory, then rename it over $2. mktemp (O_EXCL) cannot be redirected
+# by a planted symlink, rename replaces a symlink at $2 instead of following it,
+# and a session that starts during the copy never reads a half-written file.
+replace_file() {
+  local src="$1" dst="$2" tmp
+  tmp=$(mktemp -p "${dst%/*}" ".${dst##*/}.XXXXXX")
+  cp -- "$src" "$tmp"
+  chmod 644 -- "$tmp"
+  mv -fT -- "$tmp" "$dst"
+}
+
+cmd_install() {
+  local target
+  target=$(resolve_target)
+
+  # Not /tmp: the cage base preset allows writes to /tmp and $TMPDIR, and the
+  # sandboxed agent runs as the same uid, so it could edit the checkout between
+  # the verification and the copy. $XDG_RUNTIME_DIR is not writable from the cage.
+  # Global, not local: the EXIT trap runs after this function has returned.
+  work=$(mktemp -d -p "${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is not set}")
+  trap 'rm -rf -- "$work"' EXIT
+
+  # cwd is a fresh repository so that no other repository config is in effect.
+  git init --quiet "$work/src"
+  cd "$work/src"
+  GIT_TERMINAL_PROMPT=0 git fetch --quiet --depth 1 "$remote" "$rev" || die "fetch failed"
+  git -c advice.detachedHead=false checkout --quiet FETCH_HEAD
+  [[ "$(git rev-parse HEAD)" == "$rev" ]] || die "fetched revision does not match the pin"
+
+  if [[ ! -f "$target/server.ts.official" ]]; then
+    # Refuse to record an already-swapped file as the official copy.
+    if cmp -s "$work/src/server.ts" "$target/server.ts"; then
+      die "server.ts already equals the pinned one but server.ts.official is missing; reinstall the official plugin to get a clean copy"
+    fi
+    replace_file "$target/server.ts" "$target/server.ts.official"
+    log "saved the official server.ts as server.ts.official"
+  fi
+
+  replace_file "$work/src/server.ts" "$target/server.ts"
+  printf '%s\n' "$rev" >"$work/rev"
+  replace_file "$work/rev" "$target/.supercharged-rev"
+
+  log "installed ${rev:0:7} into $target"
+  log "sha256 $(sha256sum "$target/server.ts" | cut -d' ' -f1)"
+  log "restart the claude sessions that use the telegram channel to load it"
+}
+
+cmd_restore() {
+  local target
+  target=$(resolve_target)
+  if [[ ! -f "$target/server.ts.official" ]]; then
+    log "no server.ts.official in $target; nothing to restore"
+    return 0
+  fi
+  replace_file "$target/server.ts.official" "$target/server.ts"
+  rm -f -- "$target/.supercharged-rev"
+  log "restored the official server.ts in $target"
+  log "restart the claude sessions that use the telegram channel to load it"
+}
+
+cmd_status() {
+  local target installed
+  target=$(resolve_target)
+  log "plugin dir: $target"
+  log "pinned:     ${rev:0:7}"
+  if [[ ! -f "$target/server.ts.official" ]]; then
+    log "active:     official (no backup yet, never swapped in this directory)"
+  elif cmp -s "$target/server.ts" "$target/server.ts.official"; then
+    log "active:     official"
+  elif [[ -f "$target/.supercharged-rev" ]]; then
+    installed=$(<"$target/.supercharged-rev")
+    log "active:     supercharged ${installed:0:7}$([[ "$installed" == "$rev" ]] || printf ' (differs from the pin; run install)')"
+  else
+    log "active:     unknown server.ts (differs from the official copy, no revision marker)"
+  fi
+}
+
+case "${1:-}" in
+  install) cmd_install ;;
+  restore) cmd_restore ;;
+  status) cmd_status ;;
+  *)
+    printf 'usage: %s {install|restore|status}\n' "${0##*/}" >&2
+    exit 2
+    ;;
+esac
