@@ -11,7 +11,6 @@
 
 - `zo`, `zO`: opening the fold
 - `,tt`: terminal toggle (floaterm)
-- `,r`: source myvimrc
 - `,?`: open this cheatsheet
 
 ## plugins
