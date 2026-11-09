@@ -1,13 +1,6 @@
-local create_augroup = vim.api.nvim_create_augroup
-local create_autocmd = vim.api.nvim_create_autocmd
-
 -- BB abbreviate {{{
--- NOTE: NOT WORKING
-create_autocmd('filetype', {
-	group = create_augroup('GitBBAbbr', {}),
-	pattern = 'gitcommit',
-	command = 'inoreabbrev <buffer> BB BREAKING CHANGE:'
-})
+-- Registering a FileType autocmd here misses the FileType event that is running this file.
+vim.cmd('inoreabbrev <buffer> BB BREAKING CHANGE:')
 -- }}}
 
 -- Complete types {{{

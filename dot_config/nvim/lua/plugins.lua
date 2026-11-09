@@ -201,6 +201,7 @@ lazy.setup({
 	-- autotag
 	{
 		'windwp/nvim-ts-autotag',
+		event = { 'BufReadPre', 'BufNewFile' },
 		config = function()
 			require('nvim-ts-autotag').setup {
 				opts = {
@@ -217,20 +218,7 @@ lazy.setup({
 		end,
 	},
 
-	{
-		'windwp/nvim-autopairs',
-		config = function()
-			require('nvim-autopairs').setup {
-				disable_filetype = { 'telescopeprompt', 'vim', 'fern' },
-			}
-		end,
-	},
-	-- auto closer
-	{
-		'cohama/lexima.vim',
-		enabled = false,
-	},
-	-- small implement lexima
+	-- auto closer (small implement lexima)
 	{
 		'mattn/vim-lexiv',
 		lazy = false,
@@ -296,10 +284,10 @@ lazy.setup({
 	{
 		'monaqa/dial.nvim',
 		keys = {
-			{ '<C-a>', nil, { 'n', 'v' } },
-			{ '<C-x>', nil, { 'n', 'v' } },
-			{ 'g<C-a>', nil, { 'n', 'v' } },
-			{ 'g<C-x>', nil, { 'n', 'v' } },
+			{ '<C-a>', mode = { 'n', 'v' } },
+			{ '<C-x>', mode = { 'n', 'v' } },
+			{ 'g<C-a>', mode = { 'n', 'v' } },
+			{ 'g<C-x>', mode = { 'n', 'v' } },
 		},
 		config = function()
 			require('rc/dial').config()
@@ -387,6 +375,7 @@ lazy.setup({
 
 	{
 		'lewis6991/gitsigns.nvim',
+		event = { 'BufReadPre', 'BufNewFile' },
 		config = function()
 			require('rc/gitsigns')
 		end,
@@ -410,7 +399,7 @@ lazy.setup({
 	-- 一部切り抜いて編集
 	{
 		'thinca/vim-partedit',
-		cmd = 'Parsedit',
+		cmd = 'Partedit',
 	},
 
 	{
