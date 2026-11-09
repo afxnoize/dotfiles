@@ -6,8 +6,9 @@ vim.keymap.set({ 'n', 'x' }, '/', [[<Cmd>call searchx#start({ 'dir': 1 })<CR>]])
 -- Move to next/prev match.
 vim.keymap.set({ 'n', 'x' }, 'N', '<Cmd>call searchx#prev_dir()<CR>')
 vim.keymap.set({ 'n', 'x' }, 'n', '<Cmd>call searchx#next_dir()<CR>')
-vim.keymap.set({ 'n', 'x', 'c' }, '<C-k>', '<Cmd>call searchx#prev()<CR>')
-vim.keymap.set({ 'n', 'x', 'c' }, '<C-j>', '<Cmd>call searchx#next()<CR>')
+-- Not mapped in cmdline mode: skkeleton toggles with <C-j> there (skkeleton.rc.lua)
+vim.keymap.set({ 'n', 'x' }, '<C-k>', '<Cmd>call searchx#prev()<CR>')
+vim.keymap.set({ 'n', 'x' }, '<C-j>', '<Cmd>call searchx#next()<CR>')
 
 -- Clear highlights
 vim.keymap.set('n', '<C-l>', '<Cmd>call searchx#clear()<CR>')
