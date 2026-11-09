@@ -35,7 +35,6 @@ opt.laststatus = 2
 opt.scrolloff = 10
 opt.backupskip = { '/tmp/*', '/private/tmp/*' }
 opt.inccommand = 'split'
-opt.ignorecase = true     -- Case insensitive searching UNLESS /C or capital in search
 opt.breakindent = true
 opt.wrap = false          -- No Wrap lines
 opt.backspace = { 'start', 'eol', 'indent' }
@@ -56,10 +55,6 @@ opt.foldmethod = 'marker'
 -- 特殊文字をわかりやすくする
 opt.list = true
 opt.listchars = [[tab:▸-,trail:-,extends:»,precedes:«]]
--- ↑の付随: Grey rbg(95, 95, 135)にする
-vim.api.nvim_set_hl(0, 'NonText', { ctermfg = 59 })
-vim.api.nvim_set_hl(0, 'SpecialKey', { ctermfg = 59 })
--- hi.create: https://www.reddit.com/r/neovim/comments/me35u9/comment/gsgfcya/?utm_source=reddit&utm_medium=web2x&context=3
 -- }}}
 
 -- Search {{{
@@ -73,19 +68,8 @@ opt.wrapscan = true
 opt.wildmode = 'list:longest'
 --- }}}
 
--- Undercurl
-local cmd = vim.cmd
-cmd([[let &t_Cs = "\e[4:3m"]])
-cmd([[let &t_Ce = "\e[4:0m"]])
-
--- Suppress autoindent pasting clipboard
+-- Suppress autoindent pasting clipboard (paste is turned off again by the InsertLeave autocmd in autocmds.lua)
 vim.keymap.set('n', '<F10>', [[<C-u>exe "normal" (getline(".")==""?"I":"o")<CR>i<C-o>:set paste<CR>]], {})
-vim.api.nvim_create_autocmd('InsertLeave', {
-	pattern = '*',
-	callback = function()
-		vim.opt.paste = false
-	end,
-})
 
 -- Add asterisks in block comments
 opt.formatoptions:append({ 'r' })

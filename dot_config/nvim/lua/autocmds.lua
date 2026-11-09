@@ -7,6 +7,21 @@ create_autocmd('filetype', { -- {{{
 	command = 'setlocal formatoptions-=ro',
 }) -- }}}
 
+-- 2-space indent filetypes {{{
+create_autocmd('FileType', {
+	group = create_augroup('TwoSpaceIndent', {}),
+	pattern = {
+		'css', 'html', 'javascript', 'javascriptreact', 'json', 'nix',
+		'sass', 'scss', 'typescript', 'typescriptreact', 'vue', 'xhtml',
+	},
+	callback = function()
+		vim.opt_local.expandtab = true
+		vim.opt_local.tabstop = 2
+		vim.opt_local.softtabstop = 0
+		vim.opt_local.shiftwidth = 2
+	end,
+}) -- }}}
+
 -- Turn off paste mode when leaving insert{{{
 create_autocmd('InsertLeave', {
 	pattern = '*',

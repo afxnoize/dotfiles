@@ -1,5 +1,5 @@
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
 	vim.fn.system {
 		'git',
 		'clone',
@@ -168,10 +168,7 @@ lazy.setup({
 	{
 		'folke/trouble.nvim',
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
-		cmd = {
-			'Trouble',
-			'TroubleToggle',
-		},
+		cmd = 'Trouble',
 		config = true,
 	},
 
@@ -270,7 +267,6 @@ lazy.setup({
 	},
 
 	-- comment
-	-- 'tyru/caw.vim',
 	{
 		'tpope/vim-commentary',
 		-- after/plugin/commentary.rc.lua
