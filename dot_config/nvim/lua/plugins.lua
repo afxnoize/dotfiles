@@ -94,7 +94,8 @@ lazy.setup({
 	{
 		'mason-org/mason-lspconfig.nvim',
 		priority = 100, -- lsp, null-ls両方の依存先なので早めにload
-		opts = {},
+		-- setup() is called once, in after/plugin/lsp.rc.lua. An `opts` here would run setup a second
+		-- time first, enabling every installed server before automatic_enable.exclude applies.
 		dependencies = {
 			{ 'mason-org/mason.nvim', opts = {} },
 			'neovim/nvim-lspconfig',
@@ -157,7 +158,6 @@ lazy.setup({
 			require('mason-null-ls').setup {
 				ensure_installed = { 'prettier', 'stylua' },
 				automatic_installation = false,
-				automatic_setup = true,
 				handlers = {},
 			}
 			require('null-ls').setup {

@@ -38,15 +38,6 @@ local function lua_help()
 	return false
 end
 
--- Mappings. {{{
--- See `:help vim.diagnostic.*` for documentation on any of the below functions
--- local opts = { noremap = true, silent = true }
--- vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
--- vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
--- vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
--- vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
---- }}}
-
 -- kakehashi: inherit nvim lsp configs as bridged servers {{{
 vim.api.nvim_create_autocmd('LspAttach', {
 	callback = function(ev)
@@ -62,13 +53,23 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 -- }}}
 
+-- Servers that must not format, because null-ls already formats the same filetypes.
+-- With several formatting clients attached, `]F` runs every one of them in turn.
+local formatting_disabled = { vtsls = true, lua_ls = true }
+
 -- AuthCmd: LspAttach {{{
 vim.api.nvim_create_autocmd('LspAttach', {
 	group = vim.api.nvim_create_augroup('mylspconfig', {}),
 	callback = function(args)
+		local client = vim.lsp.get_client_by_id(args.data.client_id)
+		if client and formatting_disabled[client.name] then
+			client.server_capabilities.documentFormattingProvider = false
+			client.server_capabilities.documentRangeFormattingProvider = false
+		end
+
 		-- Mappings.
 		-- See `:help vim.lsp.*` for documentation on any of the below functions
-		local bufnr = args.bufnr
+		local bufnr = args.buf
 		local bufopts = { noremap = true, silent = true, buffer = bufnr }
 		vim.keymap.set('n', '][', function() vim.diagnostic.jump({ count = -1 }) end, bufopts)
 		vim.keymap.set('n', ']]', function() vim.diagnostic.jump({ count = 1 }) end, bufopts)
@@ -76,8 +77,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 		-- Definitions
 		vim.keymap.set('n', ']d', vim.lsp.buf.definition, bufopts)
-		vim.keymap.set('n', ']D', vim.lsp.buf.definition, bufopts)
-		vim.keymap.set('n', ']<C-d>', vim.lsp.buf.definition, bufopts)
 
 		-- Implementations
 		vim.keymap.set('n', ']i', vim.lsp.buf.implementation, bufopts)
@@ -90,27 +89,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
 				vim.lsp.buf.hover()
 			end
 		end, bufopts)
-		vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
 		vim.keymap.set('n', ']r', vim.lsp.buf.rename, bufopts)
-		vim.keymap.set('n', ']c', vim.lsp.buf.code_action, bufopts)
-		-- vim.keymap.set('n', '<space>f', vim.lsp.buf.formatting, bufopts)
+		vim.keymap.set('n', ']a', vim.lsp.buf.code_action, bufopts)
 		vim.keymap.set('n', ']F', function()
 			vim.lsp.buf.format { async = true }
 		end, bufopts)
-
-		-- Auto-format ("lint") on save.
-		-- Usually not needed if server supports "textDocument/willSaveWaitUntil".
-		-- ocal client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-		-- if not client:supports_method('textDocument/willSaveWaitUntil')
-		--     and client:supports_method('textDocument/formatting') then
-		--   vim.api.nvim_create_autocmd('BufWritePre', {
-		--     group = vim.api.nvim_create_augroup('my.lsp', {clear=false}),
-		--     buffer = args.buf,
-		--     callback = function()
-		--       vim.lsp.buf.format({ bufnr = args.buf, id = client.id, timeout_ms = 1000 })
-		--     end,
-		--   })
-		-- end
 	end,
 })
 -- }}}
@@ -118,19 +101,18 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- Capacibilites {{{
 -- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers...
 local ok, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
-if not ok then
+if ok then
+	local capabilities = vim.lsp.protocol.make_client_capabilities()
+	vim.lsp.config('*', { capabilities = cmp_nvim_lsp.default_capabilities(capabilities) })
+else
 	print('cmp-nvim-lsp is not installed')
-	return
 end
-
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
 -- }}}
 
 -- mason lspconfig {{{
 local ok, mason_lspconfig = pcall(require, 'mason-lspconfig')
 if not ok then
-	print('mson-lspconfig is not installed')
+	print('mason-lspconfig is not installed')
 	return
 end
 
@@ -139,6 +121,13 @@ mason_lspconfig.setup {
 		'lua_ls',
 		'vtsls',
 	},
-	automatic_installation = true,
+	-- Every installed server is enabled by default. Skip the ones that duplicate another client:
+	-- ts_ls (vtsls is the TypeScript server) and stylua (null-ls runs stylua via mason-null-ls).
+	automatic_enable = {
+		exclude = { 'ts_ls', 'stylua' },
+	},
 }
 -- }}}
+
+-- kakehashi has no mason package, so it is enabled explicitly (see lsp/kakehashi.lua)
+vim.lsp.enable('kakehashi')
