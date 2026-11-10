@@ -17,6 +17,7 @@ for _, ft in ipairs({
 	'css', 'html', 'javascript', 'javascriptreact', 'json', 'nix',
 	'sass', 'scss', 'typescript', 'typescriptreact', 'vue', 'xhtml',
 	'jsonc', 'php', 'eruby', 'htmldjango', 'liquid', 'stylus', 'htmlangular',
+	'aspvbs', 'jsp', 'tt2html', 'haml',
 }) do
 	two_space_filetypes[ft] = true
 end
