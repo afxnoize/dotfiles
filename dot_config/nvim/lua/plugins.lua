@@ -157,7 +157,11 @@ lazy.setup({
 			require('mason-null-ls').setup {
 				ensure_installed = { 'prettier', 'stylua' },
 				automatic_installation = false,
-				handlers = {},
+				handlers = {
+					-- An empty handlers table registers every installed mason package as a null-ls source.
+					-- biome overlaps with prettier (both format and diagnose the same filetypes), so skip it
+					biome = function() end,
+				},
 			}
 			require('null-ls').setup {
 				capabilities = vim.lsp.protocol.make_client_capabilities(),

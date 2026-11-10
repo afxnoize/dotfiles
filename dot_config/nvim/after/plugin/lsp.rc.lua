@@ -122,9 +122,10 @@ mason_lspconfig.setup {
 		'vtsls',
 	},
 	-- Every installed server is enabled by default. Skip the ones that duplicate another client:
-	-- ts_ls (vtsls is the TypeScript server) and stylua (null-ls runs stylua via mason-null-ls).
+	-- ts_ls (vtsls is the TypeScript server), stylua (null-ls runs stylua via mason-null-ls) and
+	-- biome (prettier is the formatter; see the biome handler in plugins.lua).
 	automatic_enable = {
-		exclude = { 'ts_ls', 'stylua' },
+		exclude = { 'ts_ls', 'stylua', 'biome' },
 	},
 }
 -- }}}
