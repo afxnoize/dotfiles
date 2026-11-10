@@ -1,5 +1,4 @@
 -- BB abbreviate {{{
--- Registering a FileType autocmd here misses the FileType event that is running this file.
 vim.cmd('inoreabbrev <buffer> BB BREAKING CHANGE:')
 -- }}}
 
