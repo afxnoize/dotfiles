@@ -13,6 +13,9 @@ ts.setup({
 -- Async, and parsers that are already installed are skipped.
 -- Probe with a real write, as in rc/catppuccin.lua: inside cage the data dir is read-only, and
 -- installing there would print EACCES errors on every start (fs_access() ignores Landlock).
+-- The directory does not exist on a fresh machine, and the probe would fail without it. mkdir is
+-- allowed to fail for the same read-only reason, and then the probe below skips the install.
+pcall(vim.fn.mkdir, install_dir, 'p')
 local probe = install_dir .. '/.write-probe'
 local f = io.open(probe, 'w')
 if f then
