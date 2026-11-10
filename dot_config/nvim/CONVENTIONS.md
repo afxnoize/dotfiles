@@ -23,7 +23,7 @@
 - `<Leader>t` — floaterm ターミナル
 - `<Leader>g` — git操作
 - `<Leader>f` — telescope
-- `]` — LSP操作（]d, ]i, ]f, ]r, ]a, ]F）。`]c` は gitsigns の hunk 移動と diff 標準に空けてある
+- `]` — LSP操作（]d, ]i, ]f, ]r, ]a, ]F）。`]c` は diff 標準の変更箇所移動に空けてある
 - `m` — motion系
 
 ### プラグイン設定のパターン

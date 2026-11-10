@@ -368,14 +368,6 @@ lazy.setup({
 		cmd = { 'DiffviewOpen', 'DiffviewFileHistory', 'DiffviewClose' },
 	},
 
-	{
-		'lewis6991/gitsigns.nvim',
-		event = { 'BufReadPre', 'BufNewFile' },
-		config = function()
-			require('rc/gitsigns')
-		end,
-	},
-
 	-- buffers
 	{
 		'jeetsukumaran/vim-buffergator',
