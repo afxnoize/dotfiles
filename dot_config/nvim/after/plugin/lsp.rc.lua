@@ -1,3 +1,21 @@
+-- kakehashi: inherit nvim lsp configs as bridged servers {{{
+-- It has no mason package, so it is enabled explicitly (see lsp/kakehashi.lua). This block sits
+-- above the mason checks below, which return early, so kakehashi does not depend on mason loading.
+vim.api.nvim_create_autocmd('LspAttach', {
+	callback = function(ev)
+		local client = vim.lsp.get_client_by_id(ev.data.client_id)
+		if client and client.name == 'kakehashi' then
+			require('kakehashi').inherit_nvim_lsp_config(
+				client,
+				vim.tbl_keys(vim.lsp._enabled_configs),
+				'keep'
+			)
+		end
+	end,
+})
+vim.lsp.enable('kakehashi')
+-- }}}
+
 local ok, _ = pcall(require, 'mason')
 if not ok then
 	print('mason is not installed')
@@ -37,21 +55,6 @@ local function lua_help()
 	end
 	return false
 end
-
--- kakehashi: inherit nvim lsp configs as bridged servers {{{
-vim.api.nvim_create_autocmd('LspAttach', {
-	callback = function(ev)
-		local client = vim.lsp.get_client_by_id(ev.data.client_id)
-		if client and client.name == 'kakehashi' then
-			require('kakehashi').inherit_nvim_lsp_config(
-				client,
-				vim.tbl_keys(vim.lsp._enabled_configs),
-				'keep'
-			)
-		end
-	end,
-})
--- }}}
 
 -- Servers that must not format, because null-ls already formats the same filetypes.
 -- With several formatting clients attached, `]F` runs every one of them in turn.
@@ -129,6 +132,3 @@ mason_lspconfig.setup {
 	},
 }
 -- }}}
-
--- kakehashi has no mason package, so it is enabled explicitly (see lsp/kakehashi.lua)
-vim.lsp.enable('kakehashi')
