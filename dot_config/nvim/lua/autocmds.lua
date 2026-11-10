@@ -8,17 +8,32 @@ create_autocmd('filetype', { -- {{{
 }) -- }}}
 
 -- 2-space indent filetypes {{{
+-- Compound filetypes (typescript.tsx, html.handlebars, ...) are split and matched per part,
+-- like ftplugin does. A bare pattern list would miss them.
+-- jsonc, php etc. are listed because $VIMRUNTIME's ftplugin used to chain-load the json/html
+-- ftplugin of this config, so they were 2-space before the ftplugin files were merged here.
+local two_space_filetypes = {}
+for _, ft in ipairs({
+	'css', 'html', 'javascript', 'javascriptreact', 'json', 'nix',
+	'sass', 'scss', 'typescript', 'typescriptreact', 'vue', 'xhtml',
+	'jsonc', 'php', 'eruby', 'htmldjango', 'liquid', 'stylus', 'htmlangular',
+}) do
+	two_space_filetypes[ft] = true
+end
+
 create_autocmd('FileType', {
 	group = create_augroup('TwoSpaceIndent', {}),
-	pattern = {
-		'css', 'html', 'javascript', 'javascriptreact', 'json', 'nix',
-		'sass', 'scss', 'typescript', 'typescriptreact', 'vue', 'xhtml',
-	},
-	callback = function()
-		vim.opt_local.expandtab = true
-		vim.opt_local.tabstop = 2
-		vim.opt_local.softtabstop = 0
-		vim.opt_local.shiftwidth = 2
+	pattern = '*',
+	callback = function(args)
+		for _, ft in ipairs(vim.split(args.match, '.', { plain = true })) do
+			if two_space_filetypes[ft] then
+				vim.opt_local.expandtab = true
+				vim.opt_local.tabstop = 2
+				vim.opt_local.softtabstop = 0
+				vim.opt_local.shiftwidth = 2
+				return
+			end
+		end
 	end,
 }) -- }}}
 
