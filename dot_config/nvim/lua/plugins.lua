@@ -1,5 +1,5 @@
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
 	vim.fn.system {
 		'git',
 		'clone',
@@ -94,7 +94,8 @@ lazy.setup({
 	{
 		'mason-org/mason-lspconfig.nvim',
 		priority = 100, -- lsp, null-ls両方の依存先なので早めにload
-		opts = {},
+		-- setup() is called once, in after/plugin/lsp.rc.lua. An `opts` here would run setup a second
+		-- time first, enabling every installed server before automatic_enable.exclude applies.
 		dependencies = {
 			{ 'mason-org/mason.nvim', opts = {} },
 			'neovim/nvim-lspconfig',
@@ -105,7 +106,6 @@ lazy.setup({
 	{
 		'hrsh7th/nvim-cmp',
 		lazy = false,
-		event = 'InsertEnter',
 		dependencies = {
 			'hrsh7th/cmp-nvim-lsp',
 			'hrsh7th/cmp-buffer',
@@ -157,8 +157,11 @@ lazy.setup({
 			require('mason-null-ls').setup {
 				ensure_installed = { 'prettier', 'stylua' },
 				automatic_installation = false,
-				automatic_setup = true,
-				handlers = {},
+				handlers = {
+					-- An empty handlers table registers every installed mason package as a null-ls source.
+					-- biome overlaps with prettier (both format and diagnose the same filetypes), so skip it
+					biome = function() end,
+				},
 			}
 			require('null-ls').setup {
 				capabilities = vim.lsp.protocol.make_client_capabilities(),
@@ -169,10 +172,7 @@ lazy.setup({
 	{
 		'folke/trouble.nvim',
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
-		cmd = {
-			'Trouble',
-			'TroubleToggle',
-		},
+		cmd = 'Trouble',
 		config = true,
 	},
 
@@ -201,6 +201,7 @@ lazy.setup({
 	-- autotag
 	{
 		'windwp/nvim-ts-autotag',
+		event = { 'BufReadPre', 'BufNewFile' },
 		config = function()
 			require('nvim-ts-autotag').setup {
 				opts = {
@@ -217,20 +218,7 @@ lazy.setup({
 		end,
 	},
 
-	{
-		'windwp/nvim-autopairs',
-		config = function()
-			require('nvim-autopairs').setup {
-				disable_filetype = { 'telescopeprompt', 'vim', 'fern' },
-			}
-		end,
-	},
-	-- auto closer
-	{
-		'cohama/lexima.vim',
-		enabled = false,
-	},
-	-- small implement lexima
+	-- auto closer (small implement lexima)
 	{
 		'mattn/vim-lexiv',
 		lazy = false,
@@ -283,7 +271,6 @@ lazy.setup({
 	},
 
 	-- comment
-	-- 'tyru/caw.vim',
 	{
 		'tpope/vim-commentary',
 		-- after/plugin/commentary.rc.lua
@@ -296,10 +283,10 @@ lazy.setup({
 	{
 		'monaqa/dial.nvim',
 		keys = {
-			{ '<C-a>', nil, { 'n', 'v' } },
-			{ '<C-x>', nil, { 'n', 'v' } },
-			{ 'g<C-a>', nil, { 'n', 'v' } },
-			{ 'g<C-x>', nil, { 'n', 'v' } },
+			{ '<C-a>', mode = { 'n', 'v' } },
+			{ '<C-x>', mode = { 'n', 'v' } },
+			{ 'g<C-a>', mode = { 'n', 'v' } },
+			{ 'g<C-x>', mode = { 'n', 'v' } },
 		},
 		config = function()
 			require('rc/dial').config()
@@ -385,13 +372,6 @@ lazy.setup({
 		cmd = { 'DiffviewOpen', 'DiffviewFileHistory', 'DiffviewClose' },
 	},
 
-	{
-		'lewis6991/gitsigns.nvim',
-		config = function()
-			require('rc/gitsigns')
-		end,
-	},
-
 	-- buffers
 	{
 		'jeetsukumaran/vim-buffergator',
@@ -410,7 +390,7 @@ lazy.setup({
 	-- 一部切り抜いて編集
 	{
 		'thinca/vim-partedit',
-		cmd = 'Parsedit',
+		cmd = 'Partedit',
 	},
 
 	{

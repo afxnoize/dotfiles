@@ -1,7 +1,6 @@
 vim.cmd('autocmd!')
 
 vim.scriptencoding = 'utf-8'
-vim.opt.encoding = 'utf-8'
 vim.opt.fileencoding = 'utf-8'
 
 local disable_plugins = { -- {{{
@@ -38,9 +37,6 @@ local disable_plugins = { -- {{{
 	'loaded_tutor_mode_plugin',
 	'did_install_default_menus',
 	'did_install_syntax_menu',
-	'skip_loading_mswin',
-	'did_indent_on',
-	'did_load_ftplugin',
 	'loaded_rrhelper',
 } -- }}}
 

@@ -17,6 +17,9 @@ let
 
   editorTools = with pkgs; [
     neovim
+    # nvim-treesitter (main branch) compiles parsers with it. It requires 0.26.1 or later,
+    # installed via a package manager rather than npm, so mise must not provide it
+    tree-sitter
   ];
 
   shellTools = with pkgs; [

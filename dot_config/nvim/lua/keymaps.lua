@@ -66,9 +66,6 @@ keymap.set('n', '<Leader>q', function()
 end, { silent = true })
 -- }}}
 
--- reload myvimrc
-keymap.set('n', '<Leader>r', [[<Cmd>source $MYVIMRC<CR>]], { noremap = false })
-
 -- [tab] {{{
 keymap.set('', '[tab]', '<Nop>')
 keymap.set('n', '<Leader><Tab>', '[tab]', { remap = true })

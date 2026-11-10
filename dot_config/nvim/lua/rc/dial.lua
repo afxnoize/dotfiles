@@ -1,8 +1,6 @@
 local M = {}
 
-function M init() end
-
-function M config()
+function M.config()
 	local dialmap = require('dial.map')
 
 	vim.keymap.set('n', '<C-a>', function()
@@ -31,7 +29,6 @@ function M config()
 	end)
 
 	local augend = require('dial.augend')
-	end
 	require('dial.config').augends:register_group({
 		-- default augends used when no group name is specified
 		default = {
@@ -49,3 +46,5 @@ function M config()
 		}
 	})
 end
+
+return M
