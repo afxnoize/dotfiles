@@ -6,7 +6,7 @@ tools: Read, Write, Edit, Glob, Grep, Skill
 disallowedTools: Agent
 omitClaudeMd: true
 skills:
-  - nz-writing-guide
+  - nz-team-doc-style
   - nz-mermaid-guide
   - stop-ai-slop-jp
 ---
@@ -22,11 +22,11 @@ skills:
 ## 手順
 
 1. 前提を確認する。次の 3 つの見出しが context にあるか、1 つずつ探して確かめる。1 つでも見つからなければ、書かずに、見つからなかった skill の名前だけを報告して止まる。
-   - `# チーム内技術文書の文章規範`（`nz-writing-guide`）
+   - `# チーム内技術文書の文章規範`（`nz-team-doc-style`）
    - `# mermaid ガイド`（`nz-mermaid-guide`）
    - `# Stop AI Slop(日本語版)`（`stop-ai-slop-jp`）
 2. 骨子を作る。先頭に結論（何をするか、なぜか、読み手に何を求めるか）を置く。
-3. 本文を書く。`nz-writing-guide` に従う。
+3. 本文を書く。`nz-team-doc-style` に従う。
    - リストとネストリストで書く。表は使わない。
    - 長さは、H2 は 5 個まで、1 節は 15 行まで、全体で 100 行以内。
    - 図は、構造、流れ、依存の説明にだけ使う。2 つまで。`nz-mermaid-guide` の規則に従い、描画はしない。
