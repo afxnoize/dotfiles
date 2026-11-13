@@ -2,7 +2,8 @@
 configuration.*.dsc.yaml
 README.md
 
-# AutoHotkey scripts need AutoHotkey from configuration.personal.dsc.yaml
-{{ if not .personal }}
+# AutoHotkey scripts need AutoHotkey from configuration.personal.dsc.yaml.
+# Skip them unless personal is set (also when the config predates the prompt).
+{{ if not (and (hasKey . "personal") .personal) }}
 AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/*.ahk
 {{ end }}
