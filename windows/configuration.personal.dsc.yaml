@@ -33,8 +33,8 @@ properties:
           @{ Result = (Test-Path (Join-Path $dir 'nircmd.exe')).ToString() }
         TestScript: |
           $dir = Join-Path $env:LOCALAPPDATA 'Programs\NirCmd'
-          $userPath = [Environment]::GetEnvironmentVariable('Path', 'User') -split ';'
-          (Test-Path (Join-Path $dir 'nircmd.exe')) -and ($userPath -contains $dir)
+          $userPath = [Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | ForEach-Object { $_.Trim().TrimEnd('\') }
+          (Test-Path (Join-Path $dir 'nircmd.exe')) -and ($userPath -icontains $dir)
         SetScript: |
           $dir = Join-Path $env:LOCALAPPDATA 'Programs\NirCmd'
           $url = 'https://www.nirsoft.net/utils/nircmd-x64.zip'
@@ -50,7 +50,19 @@ properties:
           New-Item -ItemType Directory -Path $dir -Force | Out-Null
           Expand-Archive -Path $zip -DestinationPath $dir -Force
           Remove-Item $zip
-          $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
-          if (($userPath -split ';') -notcontains $dir) {
-            [Environment]::SetEnvironmentVariable('Path', ($userPath.TrimEnd(';') + ';' + $dir), 'User')
+          # Edit the raw registry value: [Environment]::SetEnvironmentVariable would
+          # write back expanded %VARIABLES% and turn REG_EXPAND_SZ into REG_SZ.
+          $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
+          try {
+            $raw = [string]$key.GetValue('Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+            $listed = $raw -split ';' | Where-Object { $_.Trim().TrimEnd('\') -ieq $dir }
+            if (-not $listed) {
+              $kind = if ($key.GetValueNames() -contains 'Path') { $key.GetValueKind('Path') } else { [Microsoft.Win32.RegistryValueKind]::ExpandString }
+              $key.SetValue('Path', $(if ($raw) { $raw.TrimEnd(';') + ';' + $dir } else { $dir }), $kind)
+              # Setting any user variable broadcasts the environment change to running programs.
+              [Environment]::SetEnvironmentVariable('NIRCMD_INSTALLING', '1', 'User')
+              [Environment]::SetEnvironmentVariable('NIRCMD_INSTALLING', $null, 'User')
+            }
+          } finally {
+            $key.Close()
           }
