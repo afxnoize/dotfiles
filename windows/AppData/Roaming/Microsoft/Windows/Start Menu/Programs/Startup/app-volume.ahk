@@ -3,10 +3,12 @@
 
 ; Per-application volume hotkeys backed by NirCmd.
 ; configuration.personal.dsc.yaml installs NirCmd into %LOCALAPPDATA%\Programs\NirCmd.
-NIRCMD := EnvGet("LOCALAPPDATA") "\Programs\NirCmd\nircmd.exe"
+; AutoHotkey v2 shares one case-insensitive namespace between functions and variables,
+; so this path must not be named after the NirCmd() function.
+NircmdExe := EnvGet("LOCALAPPDATA") "\Programs\NirCmd\nircmd.exe"
 
 NirCmd(args) {
-    Run('"' NIRCMD '" ' args, , "Hide")
+    Run('"' NircmdExe '" ' args, , "Hide")
 }
 
 ; Ctrl+Alt+M: toggle mute of the focused application (mute mode 2 = toggle)
