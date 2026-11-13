@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# Personal (non-development) setup for a Windows machine.
+# Usage: winget configure -f configuration.personal.dsc.yaml
+# app-volume.ahk (deployed by chezmoi) drives NirCmd through AutoHotkey.
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: autohotkey
+      directives:
+        description: Install AutoHotkey v2
+      settings:
+        id: AutoHotkey.AutoHotkey
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: argus
+      directives:
+        description: Install Argus task manager
+      settings:
+        id: Ray-lea.Argus
+        source: winget
+
+    # NirCmd is not in the winget repository, so fetch the official zip.
+    # NirSoft overwrites the zip in place on each release; when the hash check
+    # fails, review the new release and update $expected.
+    - resource: PSDscResources/Script
+      id: nircmd
+      directives:
+        description: Install NirCmd into %LOCALAPPDATA%\Programs\NirCmd and add it to user PATH
+      settings:
+        GetScript: |
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\NirCmd'
+          @{ Result = (Test-Path (Join-Path $dir 'nircmd.exe')).ToString() }
+        TestScript: |
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\NirCmd'
+          $userPath = [Environment]::GetEnvironmentVariable('Path', 'User') -split ';'
+          (Test-Path (Join-Path $dir 'nircmd.exe')) -and ($userPath -contains $dir)
+        SetScript: |
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\NirCmd'
+          $url = 'https://www.nirsoft.net/utils/nircmd-x64.zip'
+          # SHA256 of nircmd-x64.zip v2.87 (same value as Scoop's main bucket manifest)
+          $expected = '51e34ed379dd099a96bbf0a2266003361e2864fe3ef2f8baed76634909763a7c'
+          $zip = Join-Path $env:TEMP 'nircmd-x64.zip'
+          Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
+          $actual = (Get-FileHash -Path $zip -Algorithm SHA256).Hash.ToLower()
+          if ($actual -ne $expected) {
+            Remove-Item $zip
+            throw "nircmd-x64.zip hash mismatch: expected $expected, got $actual"
+          }
+          New-Item -ItemType Directory -Path $dir -Force | Out-Null
+          Expand-Archive -Path $zip -DestinationPath $dir -Force
+          Remove-Item $zip
+          $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+          if (($userPath -split ';') -notcontains $dir) {
+            [Environment]::SetEnvironmentVariable('Path', ($userPath.TrimEnd(';') + ';' + $dir), 'User')
+          }
