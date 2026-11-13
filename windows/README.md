@@ -44,6 +44,8 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 - 開発者モードを有効にする。chezmoi が管理者権限なしで symlink を作るために必要
 - ユーザー環境変数 `XDG_CONFIG_HOME` を `%USERPROFILE%\.config` に設定する。Neovim は既定では `%LOCALAPPDATA%\nvim` を読むため、この変数で `~/.config/nvim` を読ませる
 - `nix/modules/packages.nix` のうち Windows 版があるツールを winget で入れる
+- sops は winget から削除された（`Mozilla.SOPS`）ため、GitHub のリリースから `sops.exe` を取得して `%LOCALAPPDATA%\Programs\sops` に置き、ユーザーの `Path` に追加する
+  - 版と SHA256 は構成ファイルに固定している。更新するときは、TestScript と SetScript の両方の `$version` と、`$expected` を一緒に書き換える。ハッシュはリリースの `sops-v<版>.checksums.txt` にある amd64.exe の行を使う
 - herdr のデスクトップアプリを公式のインストーラ（`https://releases.herdr.dev/app/install.ps1`）で入れる
   - winget の `Herdr.Herdr` は CLI のランタイムで、デスクトップアプリは winget に登録されていない
   - インストーラは、リリースのマニフェストにある SHA256 でダウンロードを検証し、`%LOCALAPPDATA%\Programs\herdr-app` に置いてユーザーの `Path` に追加する。herdr-core がなければ一緒に入れる
