@@ -41,14 +41,33 @@ properties:
           # SHA256 of nircmd-x64.zip v2.87 (same value as Scoop's main bucket manifest)
           $expected = '51e34ed379dd099a96bbf0a2266003361e2864fe3ef2f8baed76634909763a7c'
           $zip = Join-Path $env:TEMP 'nircmd-x64.zip'
-          Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
-          $actual = (Get-FileHash -Path $zip -Algorithm SHA256).Hash.ToLower()
+          # curl.exe and .NET APIs instead of Invoke-WebRequest / Get-FileHash /
+          # Expand-Archive: winget's hosted PowerShell builds its own module path,
+          # so those cmdlets may not load. curl.exe ships with Windows 10 1803+.
+          curl.exe -fsSL $url -o $zip
+          if ($LASTEXITCODE) { throw "nircmd-x64.zip download failed: $url" }
+          $stream = [IO.File]::OpenRead($zip)
+          try {
+            $actual = -join ([Security.Cryptography.SHA256]::Create().ComputeHash($stream) | ForEach-Object { $_.ToString('x2') })
+          } finally {
+            $stream.Close()
+          }
           if ($actual -ne $expected) {
             Remove-Item $zip
             throw "nircmd-x64.zip hash mismatch: expected $expected, got $actual"
           }
           New-Item -ItemType Directory -Path $dir -Force | Out-Null
-          Expand-Archive -Path $zip -DestinationPath $dir -Force
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $archive = [IO.Compression.ZipFile]::OpenRead($zip)
+          try {
+            foreach ($entry in $archive.Entries) {
+              if ($entry.Name) {
+                [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $dir $entry.Name), $true)
+              }
+            }
+          } finally {
+            $archive.Dispose()
+          }
           Remove-Item $zip
           # Edit the raw registry value: [Environment]::SetEnvironmentVariable would
           # write back expanded %VARIABLES% and turn REG_EXPAND_SZ into REG_SZ.
