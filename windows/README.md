@@ -34,6 +34,8 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 - herdr のデスクトップアプリを公式のインストーラ（`https://releases.herdr.dev/app/install.ps1`）で入れる
   - winget の `Herdr.Herdr` は CLI のランタイムで、デスクトップアプリは winget に登録されていない
   - インストーラは、リリースのマニフェストにある SHA256 でダウンロードを検証し、`%LOCALAPPDATA%\Programs\herdr-app` に置いてユーザーの `Path` に追加する。herdr-core がなければ一緒に入れる
+  - この検証で防げるのは、ダウンロードの破損だけ。マニフェストはアプリと同じ `releases.herdr.dev` から取るため、配布サーバーが改ざんされた場合は防げない
+  - インストーラ自体も、herdr-core のインストーラも、版を固定せずに取得して実行する
   - 入れた後はアプリが自分で更新する。構成ファイルはアプリの有無だけを見る
 
 `packages.nix` から入れないもの:
