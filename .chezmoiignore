@@ -48,3 +48,6 @@ result
 
 # repo-level tests (not shipped to user)
 tests
+
+# windows/ is a separate chezmoi source for Windows (sourceDir points there)
+windows

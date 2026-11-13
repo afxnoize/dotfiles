@@ -89,6 +89,10 @@ chsh -s "$HOME/.nix-profile/bin/zsh"
 
 ログインし直すと Zsh が起動する。zinit プラグインは初回起動時に自動インストールされる。
 
+## Windows
+
+Windows は `windows/` を別の chezmoi ソースとして管理する。手順は [`windows/README.md`](windows/README.md) を読む。
+
 ## 日常の操作
 
 ```sh

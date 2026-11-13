@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# Personal (non-development) setup for a Windows machine.
+# Usage: winget configure -f configuration.personal.dsc.yaml
+# app-volume.ahk (deployed by chezmoi) drives NirCmd through AutoHotkey.
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: autohotkey
+      directives:
+        description: Install AutoHotkey v2
+      settings:
+        id: AutoHotkey.AutoHotkey
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: argus
+      directives:
+        description: Install Argus task manager
+      settings:
+        id: Ray-lea.Argus
+        source: winget
+
+    # NirCmd is not in the winget repository, so fetch the official zip.
+    # NirSoft overwrites the zip in place on each release; when the hash check
+    # fails, review the new release and update $expected.
+    - resource: PSDscResources/Script
+      id: nircmd
+      directives:
+        description: Install NirCmd into %LOCALAPPDATA%\Programs\NirCmd and add it to user PATH
+      settings:
+        GetScript: |
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\NirCmd'
+          @{ Result = (Test-Path (Join-Path $dir 'nircmd.exe')).ToString() }
+        TestScript: |
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\NirCmd'
+          $userPath = [Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | ForEach-Object { $_.Trim().TrimEnd('\') }
+          (Test-Path (Join-Path $dir 'nircmd.exe')) -and ($userPath -icontains $dir)
+        SetScript: |
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\NirCmd'
+          $url = 'https://www.nirsoft.net/utils/nircmd-x64.zip'
+          # SHA256 of nircmd-x64.zip v2.87 (same value as Scoop's main bucket manifest)
+          $expected = '51e34ed379dd099a96bbf0a2266003361e2864fe3ef2f8baed76634909763a7c'
+          $zip = Join-Path $env:TEMP 'nircmd-x64.zip'
+          # curl.exe and .NET APIs instead of Invoke-WebRequest / Get-FileHash /
+          # Expand-Archive: winget's hosted PowerShell builds its own module path,
+          # so those cmdlets may not load. curl.exe ships with Windows 10 1803+.
+          curl.exe -fsSL $url -o $zip
+          if ($LASTEXITCODE) { throw "nircmd-x64.zip download failed: $url" }
+          $stream = [IO.File]::OpenRead($zip)
+          try {
+            $actual = -join ([Security.Cryptography.SHA256]::Create().ComputeHash($stream) | ForEach-Object { $_.ToString('x2') })
+          } finally {
+            $stream.Close()
+          }
+          if ($actual -ne $expected) {
+            Remove-Item $zip
+            throw "nircmd-x64.zip hash mismatch: expected $expected, got $actual"
+          }
+          New-Item -ItemType Directory -Path $dir -Force | Out-Null
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $archive = [IO.Compression.ZipFile]::OpenRead($zip)
+          try {
+            foreach ($entry in $archive.Entries) {
+              if ($entry.Name) {
+                [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $dir $entry.Name), $true)
+              }
+            }
+          } finally {
+            $archive.Dispose()
+          }
+          Remove-Item $zip
+          # Edit the raw registry value: [Environment]::SetEnvironmentVariable would
+          # write back expanded %VARIABLES% and turn REG_EXPAND_SZ into REG_SZ.
+          $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
+          try {
+            $raw = [string]$key.GetValue('Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+            $listed = $raw -split ';' | Where-Object { $_.Trim().TrimEnd('\') -ieq $dir }
+            if (-not $listed) {
+              $kind = if ($key.GetValueNames() -contains 'Path') { $key.GetValueKind('Path') } else { [Microsoft.Win32.RegistryValueKind]::ExpandString }
+              $key.SetValue('Path', $(if ($raw) { $raw.TrimEnd(';') + ';' + $dir } else { $dir }), $kind)
+              # Setting any user variable broadcasts the environment change to running programs.
+              [Environment]::SetEnvironmentVariable('NIRCMD_INSTALLING', '1', 'User')
+              [Environment]::SetEnvironmentVariable('NIRCMD_INSTALLING', $null, 'User')
+            }
+          } finally {
+            $key.Close()
+          }

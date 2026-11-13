@@ -1,0 +1,7 @@
+{{- /* Asked once at `chezmoi init`; answer is kept in the generated config. */ -}}
+{{- $personal := promptBoolOnce . "personal" "Personal machine (deploy AutoHotkey scripts; requires configuration.personal.dsc.yaml)" -}}
+# windows/ is the source root on Windows; persist it so later commands find it.
+sourceDir = {{ .chezmoi.sourceDir | quote }}
+
+[data]
+personal = {{ $personal }}

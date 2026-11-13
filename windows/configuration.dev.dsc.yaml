@@ -1,0 +1,229 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+# Development setup for a Windows machine.
+# Usage: winget configure -f configuration.dev.dsc.yaml
+# Windows counterpart of nix/modules/packages.nix. Tools without a Windows build
+# (nix tooling, cage, devbox, tmux) are left out.
+properties:
+  configurationVersion: 0.2.0
+  resources:
+    # --- System settings ---
+    - resource: Microsoft.Windows.Settings/WindowsSettings
+      id: developerMode
+      directives:
+        description: Enable Developer Mode so chezmoi can create symlinks without elevation
+        securityContext: elevated
+        allowPrerelease: true
+      settings:
+        DeveloperMode: true
+
+    - resource: PSDscResources/Script
+      id: xdgConfigHome
+      directives:
+        description: Set user XDG_CONFIG_HOME to ~/.config so nvim reads the shared config
+      settings:
+        GetScript: |
+          @{ Result = [Environment]::GetEnvironmentVariable('XDG_CONFIG_HOME', 'User') }
+        TestScript: |
+          [Environment]::GetEnvironmentVariable('XDG_CONFIG_HOME', 'User') -eq (Join-Path $env:USERPROFILE '.config')
+        SetScript: |
+          [Environment]::SetEnvironmentVariable('XDG_CONFIG_HOME', (Join-Path $env:USERPROFILE '.config'), 'User')
+
+    # --- Shell ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: powershell
+      directives:
+        description: Install PowerShell 7
+      settings:
+        id: Microsoft.PowerShell
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: ohMyPosh
+      directives:
+        description: Install oh-my-posh
+      settings:
+        id: JanDeDobbeleer.OhMyPosh
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: wezterm
+      directives:
+        description: Install WezTerm
+      settings:
+        id: wez.wezterm
+        source: winget
+
+    # --- VCS ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: git
+      directives:
+        description: Install Git
+      settings:
+        id: Git.Git
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: gh
+      directives:
+        description: Install GitHub CLI
+      settings:
+        id: GitHub.cli
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: ghq
+      directives:
+        description: Install ghq
+      settings:
+        id: x-motemen.ghq
+        source: winget
+
+    # --- Editor ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: neovim
+      directives:
+        description: Install Neovim
+      settings:
+        id: Neovim.Neovim
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: treeSitter
+      directives:
+        description: Install tree-sitter CLI (nvim-treesitter compiles parsers with it)
+      settings:
+        id: tree-sitter.tree-sitter-cli
+        source: winget
+
+    # --- CLI tools ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: fzf
+      directives:
+        description: Install fzf
+      settings:
+        id: junegunn.fzf
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: ripgrep
+      directives:
+        description: Install ripgrep
+      settings:
+        id: BurntSushi.ripgrep.MSVC
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: fd
+      directives:
+        description: Install fd
+      settings:
+        id: sharkdp.fd
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: bat
+      directives:
+        description: Install bat
+      settings:
+        id: sharkdp.bat
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: bottom
+      directives:
+        description: Install bottom
+      settings:
+        id: Clement.bottom
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: eza
+      directives:
+        description: Install eza
+      settings:
+        id: eza-community.eza
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: jq
+      directives:
+        description: Install jq
+      settings:
+        id: jqlang.jq
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: zoxide
+      directives:
+        description: Install zoxide
+      settings:
+        id: ajeetdsouza.zoxide
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: yazi
+      directives:
+        description: Install yazi
+      settings:
+        id: sxyazi.yazi
+        source: winget
+
+    # --- Dev tools ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: mise
+      directives:
+        description: Install mise
+      settings:
+        id: jdx.mise
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: just
+      directives:
+        description: Install just
+      settings:
+        id: Casey.Just
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: chezmoi
+      directives:
+        description: Install chezmoi
+      settings:
+        id: twpayne.chezmoi
+        source: winget
+
+    # --- Secrets ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: bitwardenCli
+      directives:
+        description: Install Bitwarden CLI
+      settings:
+        id: Bitwarden.CLI
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: sops
+      directives:
+        description: Install sops
+      settings:
+        id: Mozilla.SOPS
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: age
+      directives:
+        description: Install age
+      settings:
+        id: FiloSottile.age
+        source: winget
+
+    # --- AI ---
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: claudeCode
+      directives:
+        description: Install Claude Code
+      settings:
+        id: Anthropic.ClaudeCode
+        source: winget
+
+    # The herdr desktop app is not in the winget repository (Herdr.Herdr is the
+    # CLI runtime), so run the official installer. It verifies the download
+    # against the SHA256 in the release manifest, installs into
+    # %LOCALAPPDATA%\Programs\herdr-app, adds it to user PATH, and installs
+    # herdr-core when missing. The app updates itself after that.
+    - resource: PSDscResources/Script
+      id: herdrApp
+      directives:
+        description: Install the herdr desktop app with its official installer
+      settings:
+        GetScript: |
+          $exe = Join-Path $env:LOCALAPPDATA 'Programs\herdr-app\herdr-app.exe'
+          @{ Result = (Test-Path $exe).ToString() }
+        TestScript: |
+          Test-Path (Join-Path $env:LOCALAPPDATA 'Programs\herdr-app\herdr-app.exe')
+        SetScript: |
+          Invoke-RestMethod 'https://releases.herdr.dev/app/install.ps1' | Invoke-Expression
