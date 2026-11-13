@@ -9,20 +9,33 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 
 ## セットアップ
 
-1. 使う構成ファイルを検証してから適用する。両方使うマシンでは両方を適用する
-   - 管理者でないターミナルで実行する。Script リソースは実行ユーザーの環境変数と `%LOCALAPPDATA%` に書き込むため、別アカウントの管理者シェルで実行すると、そのアカウント側に書き込まれる
+管理者でないターミナルで実行する。Script リソースは実行ユーザーの環境変数と `%LOCALAPPDATA%` に書き込むため、別アカウントの管理者シェルで実行すると、そのアカウント側に書き込まれる。
+
+1. git を入れてリポジトリを clone する。構成ファイルはリポジトリの中にあるため、git だけは先に単独で入れる
 
    ```powershell
+   winget install --id Git.Git -e
+   # 新しいターミナルを開いて git を PATH に通してから
+   git clone https://github.com/afxnoize/dotfiles.git $HOME\repos\github.com\afxnoize\dotfiles
+   ```
+
+2. 使う構成ファイルを検証してから適用する。両方使うマシンでは両方を適用する
+
+   ```powershell
+   cd $HOME\repos\github.com\afxnoize\dotfiles\windows
    winget configure validate -f configuration.dev.dsc.yaml
    winget configure -f configuration.dev.dsc.yaml
    ```
 
-2. このディレクトリをソースにして chezmoi を初期化し、apply する。chezmoi と git は `configuration.dev.dsc.yaml` が入れる
+3. 新しいターミナルを開く。winget が入れた chezmoi などは、開き直すまで PATH に入らない
+
+4. このディレクトリをソースにして chezmoi を初期化し、apply する。chezmoi は `configuration.dev.dsc.yaml` が入れる
    - 初期化のときに、個人用のマシンかを一度だけ聞かれる。答えは生成される設定ファイルの `[data] personal` に残る
    - `.chezmoi.toml.tmpl` が `sourceDir` を設定ファイルに書くため、2 回目以降は `--source` を付けなくてよい
+   - 既存の chezmoi の設定ファイルは、`.chezmoi.toml.tmpl` から作り直したものに置き換わる。以前の設定（リポジトリ直下のテンプレートから作った `[secret]` など）は残らない
 
    ```powershell
-   chezmoi init --source <リポジトリのパス>\windows
+   chezmoi init --source $HOME\repos\github.com\afxnoize\dotfiles\windows
    chezmoi apply
    ```
 
