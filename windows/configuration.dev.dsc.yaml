@@ -186,13 +186,62 @@ properties:
       settings:
         id: Bitwarden.CLI
         source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
+    # Mozilla.SOPS was removed from the winget repository (microsoft/winget-pkgs#421378),
+    # so fetch the release binary from GitHub. On upgrade, change $version in both
+    # TestScript and SetScript, and $expected, together;
+    # the hash is the amd64.exe line of sops-v<version>.checksums.txt.
+    - resource: PSDscResources/Script
       id: sops
       directives:
-        description: Install sops
+        description: Install sops into %LOCALAPPDATA%\Programs\sops and add it to user PATH
       settings:
-        id: Mozilla.SOPS
-        source: winget
+        GetScript: |
+          $exe = Join-Path $env:LOCALAPPDATA 'Programs\sops\sops.exe'
+          @{ Result = $(if (Test-Path $exe) { [string](& $exe --disable-version-check --version) } else { '' }) }
+        TestScript: |
+          $version = '3.13.3'
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\sops'
+          $exe = Join-Path $dir 'sops.exe'
+          $userPath = [Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | ForEach-Object { $_.Trim().TrimEnd('\') }
+          (Test-Path $exe) -and ([string](& $exe --disable-version-check --version) -match "^sops $([regex]::Escape($version))\b") -and ($userPath -icontains $dir)
+        SetScript: |
+          $version = '3.13.3'
+          $expected = 'a4a9a398858fe8b2ef72d9686d930bf7c5cece9be74ad83ac3b53cfdd70e6b1c'
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\sops'
+          $url = "https://github.com/getsops/sops/releases/download/v$version/sops-v$version.amd64.exe"
+          $tmp = Join-Path $env:TEMP "sops-v$version.amd64.exe"
+          # curl.exe and .NET APIs instead of PowerShell cmdlets: winget's hosted
+          # PowerShell builds its own module path, so those cmdlets may not load.
+          curl.exe -fsSL $url -o $tmp
+          if ($LASTEXITCODE) { throw "sops download failed: $url" }
+          $stream = [IO.File]::OpenRead($tmp)
+          try {
+            $actual = -join ([Security.Cryptography.SHA256]::Create().ComputeHash($stream) | ForEach-Object { $_.ToString('x2') })
+          } finally {
+            $stream.Close()
+          }
+          if ($actual -ne $expected) {
+            Remove-Item $tmp
+            throw "sops-v$version.amd64.exe hash mismatch: expected $expected, got $actual"
+          }
+          New-Item -ItemType Directory -Path $dir -Force | Out-Null
+          Move-Item -Path $tmp -Destination (Join-Path $dir 'sops.exe') -Force
+          # Edit the raw registry value: [Environment]::SetEnvironmentVariable would
+          # write back expanded %VARIABLES% and turn REG_EXPAND_SZ into REG_SZ.
+          $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
+          try {
+            $raw = [string]$key.GetValue('Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+            $listed = $raw -split ';' | Where-Object { $_.Trim().TrimEnd('\') -ieq $dir }
+            if (-not $listed) {
+              $kind = if ($key.GetValueNames() -contains 'Path') { $key.GetValueKind('Path') } else { [Microsoft.Win32.RegistryValueKind]::ExpandString }
+              $key.SetValue('Path', $(if ($raw) { $raw.TrimEnd(';') + ';' + $dir } else { $dir }), $kind)
+              # Setting any user variable broadcasts the environment change to running programs.
+              [Environment]::SetEnvironmentVariable('SOPS_INSTALLING', '1', 'User')
+              [Environment]::SetEnvironmentVariable('SOPS_INSTALLING', $null, 'User')
+            }
+          } finally {
+            $key.Close()
+          }
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: age
       directives:
