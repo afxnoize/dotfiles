@@ -126,7 +126,7 @@ telegram-supercharged restore   # 公式に戻す
 - 差し替え先は `installed_plugins.json` の user scope の `installPath`。最新バージョンのディレクトリを機械的に選ぶと、読み込まれない版を直して無反応になる
 - 公式 plugin が更新されると新しいバージョンのディレクトリができ、差し替えが外れる。`install` を再実行すれば直る
 - `install` は反映までに、Telegram を使う claude セッションの再起動が要る
-- 作業用の clone は `$XDG_RUNTIME_DIR` に作る。cage から書ける `/tmp` では、検証とコピーの間に書き換えられうるため
+- 作業用の clone は `$XDG_RUNTIME_DIR`（未設定なら `/run/user/<uid>`）に作る。cage から書ける `/tmp` では、検証とコピーの間に書き換えられうるため
 - 公式と supercharged の `server.ts` は排他用のファイルが別（公式は `bot.pid`、supercharged は `data/telegram.lock`）で、互いを見ない。混ぜて動かすと 2 本が polling して 409 になり、DM はどちらかに落ちる
   - supercharged どうしなら、先に起動した 1 本だけが DM を受け取り、残りは送信のみの MCP モードになる
   - すでに動いている公式の `bun server.ts` は、再起動するまで古いコードのまま

@@ -31,6 +31,19 @@ die() {
 config_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 cache_root="$config_dir/plugins/cache/claude-plugins-official/telegram"
 
+# Where the temporary checkout goes. Not /tmp: the cage base preset allows writes
+# to /tmp and $TMPDIR, and the sandboxed agent runs as the same uid, so it could
+# edit the checkout between the verification and the copy. The per-user runtime
+# dir is not writable from the cage. A shell that logind does not track (no
+# pam_systemd) leaves $XDG_RUNTIME_DIR unset even though /run/user/UID exists,
+# so fall back to that path instead of failing.
+runtime_dir() {
+  local dir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+  [[ -d "$dir" && "$(stat -c %u -- "$dir")" == "$(id -u)" ]] ||
+    die "runtime dir $dir is missing or not owned by you; set XDG_RUNTIME_DIR"
+  printf '%s\n' "$dir"
+}
+
 # Claude Code runs the plugin from the installPath recorded for the user scope.
 # Picking the newest directory instead would patch a version that is not loaded
 # (both 0.0.4 and 0.0.7 can sit in the cache).
@@ -73,14 +86,13 @@ replace_file() {
 }
 
 cmd_install() {
-  local target
+  local target dir
   target=$(resolve_target)
 
-  # Not /tmp: the cage base preset allows writes to /tmp and $TMPDIR, and the
-  # sandboxed agent runs as the same uid, so it could edit the checkout between
-  # the verification and the copy. $XDG_RUNTIME_DIR is not writable from the cage.
   # Global, not local: the EXIT trap runs after this function has returned.
-  work=$(mktemp -d -p "${XDG_RUNTIME_DIR:?XDG_RUNTIME_DIR is not set}")
+  dir=$(runtime_dir)
+  # Landlock does not show up in [[ -w ]]; only the mktemp itself fails in the cage.
+  work=$(mktemp -d -p "$dir") || die "cannot create a temp dir in $dir; run this outside the cage"
   trap 'rm -rf -- "$work"' EXIT
 
   # cwd is a fresh repository so that no other repository config is in effect.
