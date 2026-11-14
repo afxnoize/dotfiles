@@ -51,6 +51,8 @@ let
     claude-code
     rtk
     ccusage
+    happy-coder # happy
+    herdr-core # hc
   ];
 
   sandboxTools = with pkgs; [
