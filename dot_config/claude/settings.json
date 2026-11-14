@@ -51,7 +51,14 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "sonnet",
+  "model": "opus",
+  "skillOverrides": {
+    "codex-cli": "off",
+    "diff-only": "off",
+    "duckdb-wasm": "off",
+    "find-skills": "off",
+    "research": "off"
+  },
   "hooks": {
     "PreToolUse": [
       {
@@ -242,16 +249,10 @@
   "enabledPlugins": {
     "moonbit-practice@moonbit-practice": false,
     "telegram@claude-plugins-official": true,
-    "voltagent-research@voltagent-subagents": false
-  },
-  "skillOverrides": {
-    "codex-cli": "off",
-    "diff-only": "off",
-    "duckdb-wasm": "off",
-    "find-skills": "off",
-    "just-pro": "off",
-    "justfile-expert": "off",
-    "research": "off"
+    "voltagent-research@voltagent-subagents": false,
+    "claude-md-management@anthropic-plugin-directory": true,
+    "imozuru@imozuru": true,
+    "pstack@pstack-claude": true
   },
   "extraKnownMarketplaces": {
     "anthropics-skills": {
@@ -277,14 +278,21 @@
         "source": "git",
         "url": "https://github.com/VoltAgent/awesome-claude-code-subagents.git"
       }
+    },
+    "pstack-claude": {
+      "source": {
+        "source": "github",
+        "repo": "michael-denyer/pstack-claude"
+      }
     }
   },
   "viewMode": "focus",
   "language": "japanese",
-  "advisorModel": "opus",
   "modelSettings": {
     "claude-sonnet-5-5": {
       "effortLevel": "xhigh"
     }
-  }
+  },
+  "advisorModel": "fable",
+  "tui": "fullscreen"
 }
