@@ -16,6 +16,7 @@ chezmoi + Nix Home-Manager の二段構成 dotfiles リポジトリ。役割分�
 ## Directory Guide
 - `nix/` を編集するとき → [`nix/CONVENTIONS.md`](nix/CONVENTIONS.md)（Flake & Home-Manager 設定の規約）
 - `dot_config/nvim/` を編集するとき → [`dot_config/nvim/CONVENTIONS.md`](dot_config/nvim/CONVENTIONS.md)（Neovim 設定の規約）
+- `dot_config/claude/` の指示ファイルを編集するとき → 常時ロードするルールは `rules/*.md` に領域ごとに置く（`paths` frontmatter がないため全部起動時に読まれる）。入口の `CLAUDE.md` には import と構成メモだけを置く。persona は `~/.config/claude/CLAUDE.local.md` に置き、chezmoi 管理外・repo 外のままにする
 
 ## 設定ファイル編集ルール
 - 編集対象はリポジトリ内の `dot_*` ソースファイル。`~/.config/` 配下は chezmoi apply で生成される派生物なので、直接編集しても次の apply で上書きされる
