@@ -71,6 +71,12 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 - `AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/app-volume.ahk`: ログオン時に起動する AutoHotkey v2 スクリプト。NirCmd で前面のアプリの音量とミュートを切り替える
   - 個人用のマシンにだけ配る。AutoHotkey がないマシンに置くと、ログオン時に `.ahk` を開くアプリの選択画面が出るため
 
+- `dot_config/git/config.tmpl`: git の設定。Linux と共通の設定 `nix/modules/git/common.gitconfig` を、apply のときにテンプレートで埋め込む
+  - 実行時の `[include]` でリポジトリのファイルを読まないのは、working copy の書き換えが apply を経ずに反映されないようにするため。clone 先を動かしても、設定が黙って消えることもない
+  - 共通の設定を変えたら、Windows でも `chezmoi apply` する
+  - マシン固有の設定は、Linux と同じく `~/.config/git/local.config` に書く
+- `dot_config/git/ignore`: グローバルの gitignore。Linux 側（`nix/modules/git/default.nix` の `ignores`）と同じ内容を複製している
+
 ## 未対応
 
 - PowerShell profile は、まだリポジトリ直下の `readonly_Documents/` にある。scoop（posh-git、scoop-completion、mise のパス）と、マシン固有の oh-my-posh の init パスに依存している
@@ -78,3 +84,4 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 - WezTerm が指定するフォント（Cica、Symbols Nerd Font Mono、Iosevka Term、Fira Code）は入れていない
 - nvim-treesitter のパーサのビルドに使う C コンパイラは入れていない
 - Claude Code の設定は、どのファイルを持っていくか決めていない
+- git の credential helper は設定していない。Git for Windows のインストーラが設定する Git Credential Manager がそのまま使われる。Linux と同じ `git-credential-gh-user.sh` を Git for Windows の sh で動かせるかは未確認
