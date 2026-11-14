@@ -3,13 +3,6 @@ presets:
     allow:
       - "." # current
       - "$XDG_CACHE_HOME" # ~/.cache
-      # Not the whole of $XDG_STATE_HOME: unsandboxed processes load code from it.
-      # nix/profiles holds the symlinks behind ~/.nix-profile (PATH), mise/trusted-configs
-      # decides which .mise.toml may run, nvim/view is sourced by the loadview autocmd and
-      # nvim/lazy/pkg-cache.lua is loaded by lazy.nvim. Grant only the data-only parts.
-      # Side effects inside cage (e.g. Ctrl-G prompt editing): nvim saves no views (autocmds.lua uses
-      # silent! mkview), and lazy.nvim cannot rewrite pkg-cache.lua, so it reports an error only when
-      # that cache is stale; the next nvim outside cage regenerates it.
       - "$XDG_STATE_HOME/zsh" # shell history
       - "$XDG_STATE_HOME/claude" # claude locks
       - "$XDG_STATE_HOME/mise/tracked-configs"
@@ -42,6 +35,7 @@ presets:
       - "$CODEX_HOME"
       - "$HOME/.serena"
       - ".serena"
+      - "$HOME/.happy"
 
   dev-tools:
     allow:
