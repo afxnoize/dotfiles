@@ -35,7 +35,7 @@ presets:
       - "$CODEX_HOME"
       - "$HOME/.serena"
       - ".serena"
-      - "$HOME/.happy"
+      - "$XDG_CONFIG_HOME/happy"
 
   dev-tools:
     allow:
