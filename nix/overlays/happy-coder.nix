@@ -9,8 +9,8 @@
 # claude update by `claude-update` applies to the next local session.
 # --set-default keeps HAPPY_CLAUDE_PATH overridable from the environment.
 # HAPPY_HOME_DIR moves happy's data (settings, access.key, daemon state, logs)
-# from ~/.happy to $XDG_CONFIG_HOME/happy. It is resolved at run time so it
-# follows XDG_CONFIG_HOME, and the daemon inherits it from the launching happy.
+# from ~/.happy to $XDG_STATE_HOME/happy. It is resolved at run time so it
+# follows XDG_STATE_HOME, and the daemon inherits it from the launching happy.
 # Only bin/happy is wrapped: happy starts its MCP bridge via
 # `node .../bin/happy-mcp.mjs`, never through bin/happy-mcp.
 { inputs, system, claudePath }:
@@ -28,7 +28,7 @@ in
     postBuild = ''
       wrapProgram "$out/bin/happy" \
         --set-default HAPPY_CLAUDE_PATH ${final.lib.escapeShellArg claudePath} \
-        --run 'export HAPPY_HOME_DIR="''${HAPPY_HOME_DIR-''${XDG_CONFIG_HOME:-$HOME/.config}/happy}"'
+        --run 'export HAPPY_HOME_DIR="''${HAPPY_HOME_DIR-''${XDG_STATE_HOME:-$HOME/.local/state}/happy}"'
     '';
   };
 }
