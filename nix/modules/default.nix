@@ -5,5 +5,6 @@
     ./git
     ./tmux
     ./direnv
+    ./claude
   ];
 }

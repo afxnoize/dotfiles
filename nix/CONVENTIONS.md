@@ -35,6 +35,7 @@
 - push していない変更は反映されず、手動 `hms` で入れた未 push の変更は次回の timer で main の内容に戻る。working copy の `flake.lock` も更新されないので、lock の更新を残したいときはローカルで `hmu claude-code` して commit・push する（放置すると手動 `hms` が古い rev に戻る）
 - GitHub API の rate limit で更新できない日は exit 1 で終わる（nix は警告だけで cached lock に戻るため、スクリプト側で検出している）。結果は `journalctl --user -u claude-update` で確認する
 - 反映されるのは次回起動から。実行中の claude は旧バイナリのまま動き続ける
+- `modules/claude/` の activation が `~/.local/bin/claude` に実ファイルの shim（`~/.nix-profile/bin/claude` を exec する）を置く。`~/.local/bin/claude` を実ファイルとして探すツール（happy など）向け。`home.file` だと store へのシンボリックリンクになるため activation で `install` している。shebang が `/bin/sh` なのは、コピーしたファイルが GC root にならず、store の bash を指すと gc 後に壊れるため。管理外のファイルなので、module を消しても shim は残る
 - timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now claude-update.timer`（`.chezmoiignore` の `.chezmoiscripts/*` で chezmoi scripts が無効なため、apply では有効化されない）
 
 ### stable リリースの自動追従
