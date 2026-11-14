@@ -1,9 +1,12 @@
 # happy-coder from llm-agents, wrapped to default HAPPY_CLAUDE_PATH to the
 # Home-Manager profile's claude. Upstream's bin/happy falls back to
 # `command -v claude`, which depends on PATH order (~/.local/bin comes first).
+# HAPPY_CLAUDE_PATH only affects local-mode sessions started from a terminal
+# (scripts/claude_local_launcher.cjs). Sessions the daemon spawns run in remote
+# mode through the bundled claude-agent-sdk and its own claude binary, which this
+# setting does not change.
 # The path goes through the profile rather than a claude-code store path, so a
-# long-running happy daemon picks up claude updates made by `claude-update`
-# without a restart (the daemon only restarts when happy's own version changes).
+# claude update by `claude-update` applies to the next local session.
 # --set-default keeps HAPPY_CLAUDE_PATH overridable from the environment.
 # Only bin/happy is wrapped: happy starts its MCP bridge via
 # `node .../bin/happy-mcp.mjs`, never through bin/happy-mcp.

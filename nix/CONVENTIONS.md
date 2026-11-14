@@ -25,7 +25,7 @@
 - **nixpkgs (stable)**: 通常のパッケージ
 - **nixpkgs-unstable**: 最新版が必要なパッケージ（mise, git-wt 等）
 - **外部 flake**: llm-agents, cage 等（`inputs` で定義）
-- **happy-coder**: llm-agents の版を `overlays/happy-coder.nix` で包み、`HAPPY_CLAUDE_PATH` の既定値を `~/.nix-profile/bin/claude` にする。上流の `bin/happy` は未設定なら `command -v claude` を使うため、PATH の順序（`~/.local/bin` が先）次第で別の claude を拾う。claude-code の store パスに固定しないのは、常駐する happy デーモンが起動時の値を持ち続け、`claude-update` で claude だけ上がっても古い版を使い続けるため（デーモンは happy 自身の版が変わったときしか再起動しない）。`--set-default` なので環境変数で上書きできる
+- **happy-coder**: llm-agents の版を `overlays/happy-coder.nix` で包み、`HAPPY_CLAUDE_PATH` の既定値を `~/.nix-profile/bin/claude` にする。上流の `bin/happy` は未設定なら `command -v claude` を使うため、PATH の順序（`~/.local/bin` が先）次第で別の claude を拾う。効くのは端末から起動する local モードだけで、デーモンが起動する remote モード（スマホから起こすセッション）は happy に同梱の claude-agent-sdk の claude を使う。そちらの版は happy-coder の更新でしか上がらない。store パスでなく profile を経由するのは、`claude-update` で上がった claude を次の local セッションから使うため。`--set-default` なので環境変数で上書きできる
 - **カスタムバイナリ**: `tools/kakehashi/` のようにプラットフォーム別に分岐
 - **bun**: nixpkgs の版は upstream より遅れ、同梱の brotli に脆弱性（bun 1.4.4 で修正）が残る。そのため `bun-linux-x64` / `bun-linux-aarch64` を `flake = false` のファイル入力（upstream の latest release の zip）として持ち、`overlays/bun.nix` の overlay で `pkgs.bun` の `src` だけを差し替える（`flake.nix` の `overlays` から import する）。`tools/bunx` と PATH 上の `bun` は同じ `pkgs.bun` なのでまとめて追従する。更新は `nix flake update bun-linux-x64 bun-linux-aarch64`。nixpkgs が bun 1.4.4 以降を出したら、入力と overlay を削除して nixpkgs に戻す。linux 以外の system は nixpkgs の bun のまま
 
