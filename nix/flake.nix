@@ -56,6 +56,7 @@
             rtk = llm-agents.packages.${system}.rtk;
             ccusage = llm-agents.packages.${system}.ccusage;
             herdr-core = llm-agents.packages.${system}.herdr-core;
+            t3code = llm-agents.packages.${system}.t3code;
           })
           (import ./overlays/bun.nix { inherit inputs system; })
           (import ./overlays/happy-coder.nix {
