@@ -53,6 +53,7 @@ let
     rtk
     ccusage
     happy-coder # happy
+    herdr
     herdr-core # hc
     t3code # t3
   ];
