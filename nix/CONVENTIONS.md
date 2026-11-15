@@ -40,7 +40,7 @@
 - timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now claude-update.timer`（`.chezmoiignore` の `.chezmoiscripts/*` で chezmoi scripts が無効なため、apply では有効化されない）
 
 ### GitHub の認証（ghtkn）
-- git の `github.com` と `gist.github.com` の credential helper は `ghtkn git-credential`（`modules/git/default.nix`）。GitHub App の User Access Token を使い、8 時間で失効する
+- git の `github.com` と `gist.github.com` の credential helper は `ghtkn git-credential`（`modules/git/common.gitconfig`。Windows と共有）。GitHub App の User Access Token を使い、8 時間で失効する
 - どのアカウントのトークンを使うかは、`~/.config/ghtkn/ghtkn.yaml` の `git_owner` でリポジトリの owner ごとに決める。この設定ファイルはアカウント名と Client ID を含むため、chezmoi でも Nix でも管理しない
 - トークンの保存先は agent backend にする（`ghtkn.yaml` に `backend: type: agent`）。refresh token による自動更新は agent backend でしか使えない。keyring backend は Secret Service を要するが、導入時の Manjaro（KDE）では Secret Service が動いていなかった
 - agent は systemd user unit `ghtkn-agent`（`dot_config/systemd/user/`）で cage の外に常駐させる。有効化は初回だけ手動で `systemctl --user daemon-reload && systemctl --user enable --now ghtkn-agent`
