@@ -1,1 +1,16 @@
-{{ include "../nix/modules/git/common.gitconfig" -}}
+{{- /* Embed the shared settings at apply time instead of a runtime [include] of the
+       working copy: edits reach this machine only through `chezmoi apply`, and a
+       moved clone cannot silently drop them. */ -}}
+{{ include "../nix/modules/git/common.gitconfig" }}
+# The empty helper drops Git Credential Manager, which the Git for Windows
+# installer sets in the system config, for GitHub only.
+[credential "https://github.com"]
+	useHttpPath = true
+	helper =
+	helper = "!ghtkn git-credential"
+[credential "https://gist.github.com"]
+	useHttpPath = true
+	helper =
+	helper = "!ghtkn git-credential"
+[include]
+	path = "~/.config/git/local.config"
