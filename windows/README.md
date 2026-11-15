@@ -44,6 +44,11 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 - 開発者モードを有効にする。chezmoi が管理者権限なしで symlink を作るために必要
 - ユーザー環境変数 `XDG_CONFIG_HOME` を `%USERPROFILE%\.config` に設定する。Neovim は既定では `%LOCALAPPDATA%\nvim` を読むため、この変数で `~/.config/nvim` を読ませる
 - `nix/modules/packages.nix` のうち Windows 版があるツールを winget で入れる
+- WezTerm の nightly 版を、GitHub の `nightly` リリースにある `WezTerm-nightly-setup.exe` から入れる
+  - winget の `wez.wezterm.nightly` は使わない。上書きされ続けるインストーラの URL に SHA256 を固定しているため、winget の bot がマニフェストを更新するまでハッシュ不一致で失敗する
+  - ダウンロードはハッシュで検証しない
+  - 安定版と同じ Inno Setup の AppId を使うため、安定版が入っていれば同じ場所に上書きする。構成ファイルは、最後の安定版（`20240203-110809-5046fc22`）以外の版が入っていれば導入済みとみなす
+  - 入れた後は更新しない。新しい nightly にするときは、構成ファイルを流さず、インストーラを手で入れ直す
 - `packages.nix` にない T3 Code（コーディングエージェントの GUI）を winget の `T3Tools.T3Code` で入れる
 - sops は winget から削除された（`Mozilla.SOPS`）ため、GitHub のリリースから `sops.exe` を取得して `%LOCALAPPDATA%\Programs\sops` に置き、ユーザーの `Path` に追加する
   - 版と SHA256 は構成ファイルに固定している。更新するときは、TestScript と SetScript の両方の `$version` と、`$expected` を一緒に書き換える。ハッシュはリリースの `sops-v<版>.checksums.txt` にある amd64.exe の行を使う

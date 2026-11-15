@@ -43,13 +43,40 @@ properties:
       settings:
         id: JanDeDobbeleer.OhMyPosh
         source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
+    # WezTerm nightly comes straight from the GitHub "nightly" release.
+    # winget's wez.wezterm.nightly pins a SHA256 for an installer URL that is
+    # overwritten on every nightly build, so it fails with a hash mismatch
+    # until the winget bot refreshes the manifest. The download is not verified.
+    # The nightly installer shares its Inno Setup AppId with the stable one, so
+    # it installs over a stable WezTerm in place.
+    - resource: PSDscResources/Script
       id: wezterm
       directives:
-        description: Install WezTerm (nightly build)
+        description: Install WezTerm nightly from the GitHub nightly release
+        securityContext: elevated
       settings:
-        id: wez.wezterm.nightly
-        source: winget
+        GetScript: |
+          $exe = Join-Path $env:ProgramFiles 'WezTerm\wezterm.exe'
+          @{ Result = $(if (Test-Path $exe) { [string](& $exe --version) } else { '' }) }
+        TestScript: |
+          # 20240203-110809-5046fc22 is the last stable release; any other
+          # version string means a nightly build is installed.
+          $exe = Join-Path $env:ProgramFiles 'WezTerm\wezterm.exe'
+          (Test-Path $exe) -and ([string](& $exe --version) -notmatch '20240203-110809-5046fc22')
+        SetScript: |
+          $url = 'https://github.com/wezterm/wezterm/releases/download/nightly/WezTerm-nightly-setup.exe'
+          $tmp = Join-Path $env:TEMP 'WezTerm-nightly-setup.exe'
+          # curl.exe and .NET APIs instead of PowerShell cmdlets: winget's hosted
+          # PowerShell builds its own module path, so those cmdlets may not load.
+          curl.exe -fsSL $url -o $tmp
+          if ($LASTEXITCODE) { throw "WezTerm nightly download failed: $url" }
+          try {
+            $proc = [Diagnostics.Process]::Start($tmp, '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-')
+            $proc.WaitForExit()
+            if ($proc.ExitCode) { throw "WezTerm nightly installer failed with exit code $($proc.ExitCode)" }
+          } finally {
+            [IO.File]::Delete($tmp)
+          }
 
     # --- VCS ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
