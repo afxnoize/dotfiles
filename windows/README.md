@@ -86,11 +86,12 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
   - ghtkn の設定ファイルは `%APPDATA%\ghtkn\ghtkn.yaml` に置く。Windows の ghtkn は `XDG_CONFIG_HOME` を見ない。App の Client ID と `git_owner` を書くファイルで、chezmoi では管理しない
   - トークンは Windows Credential Manager（ghtkn の既定の keyring backend）に入る。Windows の ghtkn は refresh token に対応しないため、8 時間ごとに `ghtkn auth <App 名>` でブラウザ承認をやり直す
 - `dot_config/git/ignore.tmpl`: グローバルの gitignore。Linux と共通の `nix/modules/git/ignore` を埋め込む
+- `dot_config/symlink_wezterm.tmpl`: `~/.config/wezterm` を、リポジトリ直下の `dot_config/wezterm` への symlink にする
 
 ## 未対応
 
 - PowerShell profile は、まだリポジトリ直下の `readonly_Documents/` にある。scoop（posh-git、scoop-completion、mise のパス）と、マシン固有の oh-my-posh の init パスに依存している
-- Neovim と WezTerm の設定は、まだリンクしていない
+- Neovim の設定は、まだリンクしていない
 - WezTerm が指定するフォント（Cica、Symbols Nerd Font Mono、Iosevka Term、Fira Code）は入れていない
 - nvim-treesitter のパーサのビルドに使う C コンパイラは入れていない
 - Claude Code の設定は、どのファイルを持っていくか決めていない
