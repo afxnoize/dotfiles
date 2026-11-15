@@ -2,9 +2,9 @@
 # Per-machine git config. Save as ~/.config/git/local.config; it is included
 # from the Nix-generated ~/.config/git/config and is not managed by chezmoi/Nix.
 #
-# The credential helper (git-credential-gh-user) lives in
-# nix/modules/git/default.nix, and the default identity in common.gitconfig. This file maps owners to other identities and
-# decides which owners are reached over HTTPS.
+# This file maps owners to other identities and decides which owners are
+# reached over HTTPS. Which account's token git gets is decided by git_owner in
+# ~/.config/ghtkn/ghtkn.yaml, not here.
 
 # One includeIf per owner and URL form. hasconfig:remote.*.url matches the URL
 # as written in the repository config, before insteadOf rewrites it.
@@ -16,6 +16,6 @@
 # Rewrite scp-style remotes of those owners to HTTPS. An SSH key is bound to one
 # account, so the helper (which picks the account per remote) only takes effect
 # over HTTPS. Scope it to the owners above instead of all of github.com: owners
-# that stay on an SSH key keep working on machines without a `gh auth login`.
+# that stay on an SSH key keep working on machines without ghtkn set up.
 [url "https://github.com/example-org/"]
 	insteadOf = git@github.com:example-org/

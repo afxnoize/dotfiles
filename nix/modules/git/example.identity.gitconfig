@@ -1,10 +1,9 @@
 # vim: ft=gitconfig
-# One account's identity. Save as ~/.config/git/identities/<name>.config and
-# include it from local.config. The account must be logged in with `gh auth login`.
+# One account's commit identity. Save as ~/.config/git/identities/<name>.config
+# and include it from local.config. The account's GitHub App must be listed in
+# ~/.config/ghtkn/ghtkn.yaml with git_owner set to the owners it pushes to.
 [user]
 	name = Your Name
 	email = you@example.com
 [github]
 	user = your-github-login
-[credential "https://github.com"]
-	username = your-github-login

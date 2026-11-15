@@ -38,6 +38,14 @@
 - 反映されるのは次回起動から。実行中の claude は旧バイナリのまま動き続ける
 - timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now claude-update.timer`（`.chezmoiignore` の `.chezmoiscripts/*` で chezmoi scripts が無効なため、apply では有効化されない）
 
+### GitHub の認証（ghtkn）
+- git の `github.com` と `gist.github.com` の credential helper は `ghtkn git-credential`（`modules/git/default.nix`）。GitHub App の User Access Token を使い、8 時間で失効する
+- どのアカウントのトークンを使うかは、`~/.config/ghtkn/ghtkn.yaml` の `git_owner` でリポジトリの owner ごとに決める。この設定ファイルはアカウント名と Client ID を含むため、chezmoi でも Nix でも管理しない
+- トークンの保存先は agent backend にする（`ghtkn.yaml` に `backend: type: agent`）。refresh token による自動更新は agent backend でしか使えない。keyring backend は Secret Service を要するが、導入時の Manjaro（KDE）では Secret Service が動いていなかった
+- agent は systemd user unit `ghtkn-agent`（`dot_config/systemd/user/`）で cage の外に常駐させる。有効化は初回だけ手動で `systemctl --user daemon-reload && systemctl --user enable --now ghtkn-agent`
+- agent は起動するたびにロックされた状態で始まる。ログイン後と ghtkn の更新後は、自分の端末で `ghtkn agent unlock --enable-refresh` を実行する。トークンが 7 日使われず消えたときは `ghtkn auth <App 名>` で取り直す
+- socket は `$XDG_RUNTIME_DIR/ghtkn/agent.sock` に置く。`XDG_RUNTIME_DIR` がない端末では ghtkn が `~/.cache` に socket を探しに行くため、`dot_zshenv` で `/run/user/$UID` を補う。cage は `~/.cache` に書き込めるので、socket をそこに置くと偽の socket に差し替えられて unlock のパスフレーズを盗まれうる
+
 ### stable リリースの自動追従
 - 週次の `flake-update`（`nix flake update`）は、URL に書いたブランチの中でしか追従しない。`nixos-25.11` のままでは 26.05 に上がらず、EOL したブランチには cacert などの修正が届かなくなる
 - `.github/workflows/nixos-release-bump.yaml` が毎月 2 日 05:00 JST に最新の stable を検出し、`nixpkgs` と `home-manager` の URL を書き換えて PR を出す（ブランチ `chore/nixos-release-bump`）。実体は `.github/scripts/nixos-release-bump.sh`

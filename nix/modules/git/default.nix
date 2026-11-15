@@ -1,14 +1,9 @@
-{ pkgs, ... }:
+{ pkgs-unstable, ... }:
 
 let
-  # Serves the token of the requested account, independent of `gh auth switch`.
-  # Referenced by store path so git does not depend on PATH.
-  ghUserCredential = pkgs.writeShellApplication {
-    name = "git-credential-gh-user";
-    runtimeInputs = [ pkgs.gh pkgs.git ];
-    text = builtins.readFile ./git-credential-gh-user.sh;
-  };
-  ghUserHelper = "${ghUserCredential}/bin/git-credential-gh-user";
+  # Picks the GitHub App by repository owner (git_owner in ghtkn.yaml), which
+  # needs credential.useHttpPath.
+  ghtknHelper = "${pkgs-unstable.ghtkn}/bin/ghtkn git-credential";
 in
 {
   programs.git = {
@@ -18,11 +13,8 @@ in
       # Shared settings (identity, aliases, core, tools) live in common.gitconfig.
       credential = {
         useHttpPath = true;
-        "https://github.com" = {
-          username = "afxnoize";
-          helper = ghUserHelper;
-        };
-        "https://gist.github.com".helper = ghUserHelper;
+        "https://github.com".helper = ghtknHelper;
+        "https://gist.github.com".helper = ghtknHelper;
       };
     };
 
@@ -41,4 +33,3 @@ in
     ];
   };
 }
-

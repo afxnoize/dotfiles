@@ -67,6 +67,13 @@ properties:
         id: GitHub.cli
         source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: ghtkn
+      directives:
+        description: Install ghtkn (git credential helper backed by GitHub App user access tokens)
+      settings:
+        id: suzuki-shunsuke.ghtkn
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: ghq
       directives:
         description: Install ghq

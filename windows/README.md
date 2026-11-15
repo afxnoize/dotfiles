@@ -76,6 +76,10 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
   - 実行時の `[include]` でリポジトリのファイルを読まないのは、working copy の書き換えが apply を経ずに反映されないようにするため。clone 先を動かしても、設定が黙って消えることもない
   - 共通の設定を変えたら、Windows でも `chezmoi apply` する
   - マシン固有の設定は、Linux と同じく `~/.config/git/local.config` に書く
+  - GitHub（`github.com` と `gist.github.com`）の credential helper は `ghtkn git-credential` にする
+  - Git for Windows のインストーラは、system の設定に Git Credential Manager を入れる。GitHub に限り、空の `helper =` でこれを外す。ほかのホストは Git Credential Manager のまま
+  - ghtkn の設定ファイルは `%APPDATA%\ghtkn\ghtkn.yaml` に置く。Windows の ghtkn は `XDG_CONFIG_HOME` を見ない。App の Client ID と `git_owner` を書くファイルで、chezmoi では管理しない
+  - トークンは Windows Credential Manager（ghtkn の既定の keyring backend）に入る。Windows の ghtkn は refresh token に対応しないため、8 時間ごとに `ghtkn auth <App 名>` でブラウザ承認をやり直す
 - `dot_config/git/ignore`: グローバルの gitignore。Linux 側（`nix/modules/git/default.nix` の `ignores`）と同じ内容を複製している
 
 ## 未対応
@@ -85,4 +89,3 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 - WezTerm が指定するフォント（Cica、Symbols Nerd Font Mono、Iosevka Term、Fira Code）は入れていない
 - nvim-treesitter のパーサのビルドに使う C コンパイラは入れていない
 - Claude Code の設定は、どのファイルを持っていくか決めていない
-- git の credential helper は設定していない。Git for Windows のインストーラが設定する Git Credential Manager がそのまま使われる。Linux と同じ `git-credential-gh-user.sh` を Git for Windows の sh で動かせるかは未確認
