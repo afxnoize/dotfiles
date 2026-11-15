@@ -46,9 +46,9 @@ properties:
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: wezterm
       directives:
-        description: Install WezTerm
+        description: Install WezTerm (nightly build)
       settings:
-        id: wez.wezterm
+        id: wez.wezterm.nightly
         source: winget
 
     # --- VCS ---
