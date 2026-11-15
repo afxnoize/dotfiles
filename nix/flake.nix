@@ -45,6 +45,8 @@
   outputs = { nixpkgs, nixpkgs-unstable, home-manager, neovim-nightly-overlay, claude-code, llm-agents, cage, nix-index-database, ... }@inputs:
     let
       system = builtins.currentSystem;
+      username = builtins.getEnv "USER";
+      homeDirectory = builtins.getEnv "HOME";
       pkgs = import nixpkgs {
         overlays = [
           neovim-nightly-overlay.overlays.default
@@ -53,14 +55,18 @@
             cage = cage.packages.${system}.default;
             rtk = llm-agents.packages.${system}.rtk;
             ccusage = llm-agents.packages.${system}.ccusage;
+            herdr-core = llm-agents.packages.${system}.herdr-core;
+            t3code = llm-agents.packages.${system}.t3code;
           })
           (import ./overlays/bun.nix { inherit inputs system; })
+          (import ./overlays/happy-coder.nix {
+            inherit inputs system;
+            claudePath = "${homeDirectory}/.nix-profile/bin/claude";
+          })
         ];
         inherit system;
       };
       pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
-      username = builtins.getEnv "USER";
-      homeDirectory = builtins.getEnv "HOME";
     in {
       homeConfigurations.${username} =
         home-manager.lib.homeManagerConfiguration {

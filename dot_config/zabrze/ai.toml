@@ -46,6 +46,11 @@ global = true
 context = '^(?:cage\s+)?claude(?:\s+-\S+)*\s+\S+$'
 
 [[snippets]]
+name = "happy"
+trigger = "hp"
+snippet = "happy"
+
+[[snippets]]
 name = "skills add"
 trigger = "skills"
 snippet = "bunx skills add"
