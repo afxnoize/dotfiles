@@ -77,15 +77,15 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 - `AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/app-volume.ahk`: ログオン時に起動する AutoHotkey v2 スクリプト。NirCmd で前面のアプリの音量とミュートを切り替える
   - 個人用のマシンにだけ配る。AutoHotkey がないマシンに置くと、ログオン時に `.ahk` を開くアプリの選択画面が出るため
 
-- `dot_config/git/config.tmpl`: git の設定。Linux と共通の設定 `nix/modules/git/common.gitconfig` を、apply のときにテンプレートで埋め込む
+- `dot_config/git/config.tmpl`: git の設定。Linux と共通の設定 `nix/modules/git/common.gitconfig` を、apply のときにテンプレートで埋め込む。Windows だけの設定はない
   - 実行時の `[include]` でリポジトリのファイルを読まないのは、working copy の書き換えが apply を経ずに反映されないようにするため。clone 先を動かしても、設定が黙って消えることもない
   - 共通の設定を変えたら、Windows でも `chezmoi apply` する
   - マシン固有の設定は、Linux と同じく `~/.config/git/local.config` に書く
   - GitHub（`github.com` と `gist.github.com`）の credential helper は `ghtkn git-credential` にする
-  - Git for Windows のインストーラは、system の設定に Git Credential Manager を入れる。GitHub に限り、空の `helper =` でこれを外す。ほかのホストは Git Credential Manager のまま
+  - Git for Windows のインストーラは、system の設定に Git Credential Manager を入れる。GitHub に限り、空の `helper =` でこれを外す。ほかのホストは Git Credential Manager のまま。Linux では外す対象がないため、何も起きない
   - ghtkn の設定ファイルは `%APPDATA%\ghtkn\ghtkn.yaml` に置く。Windows の ghtkn は `XDG_CONFIG_HOME` を見ない。App の Client ID と `git_owner` を書くファイルで、chezmoi では管理しない
   - トークンは Windows Credential Manager（ghtkn の既定の keyring backend）に入る。Windows の ghtkn は refresh token に対応しないため、8 時間ごとに `ghtkn auth <App 名>` でブラウザ承認をやり直す
-- `dot_config/git/ignore`: グローバルの gitignore。Linux 側（`nix/modules/git/default.nix` の `ignores`）と同じ内容を複製している
+- `dot_config/git/ignore.tmpl`: グローバルの gitignore。Linux と共通の `nix/modules/git/ignore` を埋め込む
 
 ## 未対応
 
