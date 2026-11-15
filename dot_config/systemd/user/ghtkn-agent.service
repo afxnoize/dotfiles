@@ -1,0 +1,10 @@
+[Unit]
+Description=ghtkn agent
+
+[Service]
+ExecStart=%h/.nix-profile/bin/ghtkn agent start
+# `ghtkn agent stop` exits 0, so Restart=always would bring it straight back.
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

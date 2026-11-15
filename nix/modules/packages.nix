@@ -13,6 +13,7 @@ let
     gh
     ghq
     pkgs-unstable.git-wt
+    pkgs-unstable.ghtkn
   ];
 
   editorTools = with pkgs; [
