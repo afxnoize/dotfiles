@@ -258,6 +258,13 @@ properties:
       settings:
         id: Anthropic.ClaudeCode
         source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: t3code
+      directives:
+        description: Install T3 Code
+      settings:
+        id: T3Tools.T3Code
+        source: winget
 
     # The herdr desktop app is not in the winget repository (Herdr.Herdr is the
     # CLI runtime), so run the official installer. It verifies the download
