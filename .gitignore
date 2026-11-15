@@ -10,3 +10,5 @@ result
 
 # APM dependencies
 apm_modules/
+
+dot_config/wezterm/local.lua
