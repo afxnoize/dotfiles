@@ -15,35 +15,7 @@ in
     enable = true;
 
     settings = {
-      user = {
-        name= "noize";
-        email = "22848261+afxnoize@users.noreply.github.com";
-      };
-
-      alias = {
-        graph = "log --graph --date=short --decorate=short --pretty=format:'%Cgreen%h %Creset%cn %Cred%d %Creset%s'";
-        gr = "graph";
-        b = "branch";
-        br = "branch";
-        s = "status";
-        a = "add";
-        ad = "add";
-        cm = "commit";
-        sw = "switch";
-        d = "diff";
-        df = "diff";
-        # staged diff
-        ds = "diff --cached";
-        cp = "cherry-pick";
-        st = "stash push -m";
-        sta = "stash apply";
-        stp = "stash pop";
-        stl = "stash list";
-        ft = "fetch";
-        ftp = "fetch -p";
-        ignore = "!gi() { curl -sL https://www.toptal.com/developers/gitignore/api/$@ ;}; gi";
-      };
-
+      # Shared settings (identity, aliases, core, tools) live in common.gitconfig.
       credential = {
         useHttpPath = true;
         "https://github.com" = {
@@ -52,41 +24,12 @@ in
         };
         "https://gist.github.com".helper = ghUserHelper;
       };
-      github.user = "afxnoize";
-      core = {
-        editor = "nvim";
-        whitespace = "cr-at-eol";
-        autocrlf = "input";
-        quotePath = false;
-      };
-
-      gpg.program = "gpg";
-      commit.gpgsign = false;
-
-      push.autoSetupRemote = true;
-      pull.rebase = true;
-      diff.tool = "nvimdiff";
-      difftool = {
-        prompt = false;
-        "nvimdiff".cmd = ''nvim -d "$LOCAL" "$REMOTE"'';
-      };
-      merge.tool = "nvimdiff";
-      mergetool = {
-        prompt = false;
-        keepBackup = false;
-        "diffview".cmd = ''nvim -n -c "DiffviewOpen" "$MERGE"'';
-        "nvimdiff".layout = "LOCAL,BASE,REMOTE / MERGED";
-      };
-      init.defaultBranch = "main";
-
-      ghq.root = "~/repos";
-      wt = {
-        basedir = ".wt";
-        nocd = false;
-      };
     };
 
+    # A path literal copies the file into the Nix store, so edits to the working
+    # copy take effect only after a rebuild. local.config comes last to override.
     includes = [
+      { path = ./common.gitconfig; }
       { path = "~/.config/git/local.config"; }
     ];
 

@@ -2,8 +2,8 @@
 # Per-machine git config. Save as ~/.config/git/local.config; it is included
 # from the Nix-generated ~/.config/git/config and is not managed by chezmoi/Nix.
 #
-# The credential helper (git-credential-gh-user) and the default identity live
-# in nix/modules/git/default.nix. This file maps owners to other identities and
+# The credential helper (git-credential-gh-user) lives in
+# nix/modules/git/default.nix, and the default identity in common.gitconfig. This file maps owners to other identities and
 # decides which owners are reached over HTTPS.
 
 # One includeIf per owner and URL form. hasconfig:remote.*.url matches the URL

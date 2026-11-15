@@ -1,0 +1,6 @@
+{{- /* Embed the shared settings at apply time instead of a runtime [include] of the
+       working copy: edits reach this machine only through `chezmoi apply`, and a
+       moved clone cannot silently drop them. */ -}}
+{{ include "../nix/modules/git/common.gitconfig" }}
+[include]
+	path = "~/.config/git/local.config"

@@ -1,0 +1,4 @@
+/.vscode
+.*-version
+**/.claude/settings.local.json
+.plans/
