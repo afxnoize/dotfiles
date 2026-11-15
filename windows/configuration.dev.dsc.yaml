@@ -43,12 +43,6 @@ properties:
       settings:
         id: JanDeDobbeleer.OhMyPosh
         source: winget
-    # WezTerm nightly comes straight from the GitHub "nightly" release.
-    # winget's wez.wezterm.nightly pins a SHA256 for an installer URL that is
-    # overwritten on every nightly build, so it fails with a hash mismatch
-    # until the winget bot refreshes the manifest. The download is not verified.
-    # The nightly installer shares its Inno Setup AppId with the stable one, so
-    # it installs over a stable WezTerm in place.
     - resource: PSDscResources/Script
       id: wezterm
       directives:
@@ -220,10 +214,7 @@ properties:
       settings:
         id: Bitwarden.CLI
         source: winget
-    # Mozilla.SOPS was removed from the winget repository (microsoft/winget-pkgs#421378),
-    # so fetch the release binary from GitHub. On upgrade, change $version in both
-    # TestScript and SetScript, and $expected, together;
-    # the hash is the amd64.exe line of sops-v<version>.checksums.txt.
+    # On upgrade, change $version in both scripts and $expected (amd64.exe line of sops-v<version>.checksums.txt).
     - resource: PSDscResources/Script
       id: sops
       directives:
@@ -300,11 +291,6 @@ properties:
         id: T3Tools.T3Code
         source: winget
 
-    # The herdr desktop app is not in the winget repository (Herdr.Herdr is the
-    # CLI runtime), so run the official installer. It verifies the download
-    # against the SHA256 in the release manifest, installs into
-    # %LOCALAPPDATA%\Programs\herdr-app, adds it to user PATH, and installs
-    # herdr-core when missing. The app updates itself after that.
     - resource: PSDscResources/Script
       id: herdrApp
       directives:
