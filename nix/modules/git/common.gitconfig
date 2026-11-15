@@ -2,6 +2,7 @@
 # Git settings shared by Linux and Windows.
 # Linux: included from nix/modules/git/default.nix (copied into the Nix store).
 # Windows: embedded into ~/.config/git/config by windows/dot_config/git/config.tmpl.
+# OS-specific settings such as the credential helper do not belong here.
 
 [user]
 	name = "noize"
@@ -82,18 +83,3 @@
 [wt]
 	basedir = ".wt"
 	nocd = false
-
-# ghtkn picks the GitHub App by repository owner, which needs useHttpPath.
-# The empty helper drops Git Credential Manager set by the Git for Windows installer.
-[credential "https://github.com"]
-	useHttpPath = true
-	helper =
-	helper = "!ghtkn git-credential"
-[credential "https://gist.github.com"]
-	useHttpPath = true
-	helper =
-	helper = "!ghtkn git-credential"
-
-# Keep last so machine-specific settings override everything above.
-[include]
-	path = "~/.config/git/local.config"
