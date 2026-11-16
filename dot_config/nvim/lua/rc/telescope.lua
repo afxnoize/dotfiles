@@ -39,21 +39,22 @@ function M.init()
 	vim.keymap.set('n', '[telescope]t', builtin('help_tags') {})
 	vim.keymap.set('n', '[telescope]r', builtin('resume') {})
 	vim.keymap.set('n', '[telescope]e', builtin('diagnostics') {})
-	vim.keymap.set('n', 'sf', extensions('file_browser', 'file_browser') {
-		path = '%:p:h',
-		cwd = telescope_buffer_dir(),
-		respect_gitignore = false,
-		hidden = true,
-		grouped = true,
-		layout_strategy = 'horizontal',
-		collapse_dirs = true,
-		layout_config = {
-			prompt_position = 'top',
-			height = 0.85,
-			width = 0.85,
-		},
-	}
-	)
+	vim.keymap.set('n', 'sf', function()
+		extensions('file_browser', 'file_browser') {
+			path = '%:p:h',
+			cwd = telescope_buffer_dir(),
+			respect_gitignore = false,
+			hidden = true,
+			grouped = true,
+			layout_strategy = 'horizontal',
+			collapse_dirs = true,
+			layout_config = {
+				prompt_position = 'top',
+				height = 0.85,
+				width = 0.85,
+			},
+		}()
+	end)
 end
 
 function M.config()

@@ -26,14 +26,10 @@ vim.g.searchx = {
 	markers = vim.fn.split('ABCDEFGHIJKLMNOPQRSTUVWXYZ', [[.\zs]]),
 	-- Convert search pattern.
 	convert = function(input)
-		local c = [[\k]]
-		local function escape_lua_pattern(s)
-			return s:gsub("([^%w])", "%%%1")
-		end
-		if not c:match(escape_lua_pattern(input)) then
+		if vim.fn.match(input, [[\k]]) == -1 then
 			return [[\V]] .. input
 		end
-		return string.sub(input, 0, 1) .. vim.fn.substitute(string.sub(input, 1), [[\\\@<! ]], [[.\\{-}]], 'g')
+		return input:sub(1, 1) .. vim.fn.substitute(input:sub(2), [[\\\@<! ]], [[.\\{-}]], 'g')
 	end,
 }
 
