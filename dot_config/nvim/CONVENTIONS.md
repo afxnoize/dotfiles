@@ -47,3 +47,4 @@ plugin.setup({ ... })
 - kakehashi の `searchPaths` に nvim-treesitter の `runtime` を入れている。autoInstall が落とす `typescript/highlights.scm` は `; inherits: ecma` なのに `ecma` を落とさず、足さないと TS の semantic token が空になるため
 - lazy.nvim は `defaults.lazy = true`。`event` / `cmd` / `ft` / `keys` のどれも無いプラグインは、他から `require` されない限り一度も load されない（setup() が走らず、設定が黙って無効になる）。常時 load したいものは `lazy = false` を付ける
 - skkeleton（日本語入力）が有効なため、cmp のソース設定に skkeleton が含まれる
+- snacks.nvim は `opts` に書いたモジュールだけが有効になる。使うのは `vim.ui.input`（`input`）と `vim.ui.select`（`picker` の `ui_select`）の置き換えだけで、キーマップは定義しない
