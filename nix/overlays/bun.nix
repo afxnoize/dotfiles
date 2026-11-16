@@ -1,6 +1,7 @@
-# nixpkgs bun lags upstream and bundles a vulnerable brotli (fixed in bun 1.4.4).
-# Drop this overlay and the bun-linux-* inputs once nixpkgs ships bun >= 1.4.4.
-# Other systems keep the nixpkgs bun.
+# Standing policy: bun is pinned to the upstream latest release on purpose, not
+# to nixpkgs (which lags upstream and once bundled a vulnerable brotli, fixed in
+# bun 1.4.4). claude-update refreshes the bun-linux-* inputs daily. Keep this
+# overlay even when nixpkgs catches up. Other systems keep the nixpkgs bun.
 { inputs, system }:
 
 final: prev:
