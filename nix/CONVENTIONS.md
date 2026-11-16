@@ -29,14 +29,21 @@
 - **カスタムバイナリ**: `tools/kakehashi/` のようにプラットフォーム別に分岐
 - **bun**: nixpkgs の版は upstream より遅れ、同梱の brotli に脆弱性（bun 1.4.4 で修正）が残る。そのため `bun-linux-x64` / `bun-linux-aarch64` を `flake = false` のファイル入力（upstream の latest release の zip）として持ち、`overlays/bun.nix` の overlay で `pkgs.bun` の `src` だけを差し替える（`flake.nix` の `overlays` から import する）。`tools/bunx` と PATH 上の `bun` は同じ `pkgs.bun` なのでまとめて追従する。更新は `nix flake update bun-linux-x64 bun-linux-aarch64`。nixpkgs が bun 1.4.4 以降を出したら、入力と overlay を削除して nixpkgs に戻す。linux 以外の system は nixpkgs の bun のまま
 
-### claude-code の自動更新
-- systemd user timer `claude-update`（月・木 03:00 JST）が `claude-code` 入力だけ `flake.lock` を更新し、`nh home switch` まで実行する。実体は `dot_local/bin/executable_claude-update`、unit は `dot_config/systemd/user/`
+### 最新版を追う入力の自動更新（claude-update）
+- systemd user timer `claude-update`（毎日 03:00 JST）が、次の 4 入力だけ `flake.lock` を更新し、`nh home switch` まで実行する。実体は `dot_local/bin/executable_claude-update`、unit は `dot_config/systemd/user/`。名前は `claude-code` だけを更新していた頃のまま残している（改名すると systemd の有効化し直しが要るため）
+  - `claude-code`: sadjow/claude-code-nix
+  - `llm-agents`: numtide/llm-agents.nix。rtk、ccusage、herdr、t3code、happy-coder などが一緒に上がる
+  - `bun-linux-x64` / `bun-linux-aarch64`: upstream の latest release の zip（ファイル入力）
+- 追う入力の一覧は、スクリプト冒頭の `inputs` 配列に 1 箇所だけ持つ。足すときはここに名前を足す
+- `claude-code` と `llm-agents` には `follows` を付けない。配布元が検証した nixpkgs から外れ、配布元の binary cache が使えなくなるため
+- 無人で上がるので、壊れた版が入ったら Home-Manager の世代を戻す。switch の前に版を比べて止める仕組みは入れていない
 - ビルド元はローカルの working copy ではなく、リモート（`https://github.com/afxnoize/dotfiles.git` の `main`）を毎回 shallow clone した一時ディレクトリ。cage 内の agent は working copy と `.git` を書き換えられるため、working copy を読む・git を実行すると、悪意ある nix module や `core.fsmonitor` を無人・サンドボックス外で実行させられてしまう。リモートの URL もスクリプトに固定している
 - 一時ディレクトリは `/tmp` ではなく `$XDG_RUNTIME_DIR` 配下に作る（cage の `base` preset は `/tmp` を書込許可しており、同一 uid の agent が clone を改ざんできるため）。終了時に削除される
-- push していない変更は反映されず、手動 `hms` で入れた未 push の変更は次回の timer で main の内容に戻る。working copy の `flake.lock` も更新されないので、lock の更新を残したいときはローカルで `hmu claude-code` して commit・push する（放置すると手動 `hms` が古い rev に戻る）
+- push していない変更は反映されず、手動 `hms` で入れた未 push の変更は次回の timer で main の内容に戻る。working copy の `flake.lock` も更新されないので、lock の更新を残したいときはローカルで `hmu <入力名>` して commit・push する（放置すると手動 `hms` が古い rev に戻る）
 - GitHub API の rate limit で更新できない日は exit 1 で終わる（nix は警告だけで cached lock に戻るため、スクリプト側で検出している）。結果は `journalctl --user -u claude-update` で確認する
 - 反映されるのは次回起動から。実行中の claude は旧バイナリのまま動き続ける
 - timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now claude-update.timer`（`.chezmoiignore` の `.chezmoiscripts/*` で chezmoi scripts が無効なため、apply では有効化されない）
+- `OnCalendar` を変えたときは、apply のあとに `systemctl --user daemon-reload && systemctl --user restart claude-update.timer` で反映する
 
 ### GitHub の認証（ghtkn）
 - git の `github.com` と `gist.github.com` の credential helper は `ghtkn git-credential`（`modules/git/default.nix`）。GitHub App の User Access Token を使い、8 時間で失効する

@@ -1,5 +1,5 @@
 [Unit]
-Description=Update claude-code flake input and switch home-manager
+Description=Update latest-tracking flake inputs and switch home-manager
 
 [Service]
 Type=oneshot
