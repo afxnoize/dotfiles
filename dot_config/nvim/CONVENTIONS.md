@@ -46,4 +46,5 @@ plugin.setup({ ... })
 - 2スペース indent の filetype（css, html, javascript 系, json, jsonc, nix, sass, scss, typescript 系, vue, xhtml ほか php, eruby など html を連鎖読み込みするもの）は `lua/autocmds.lua` の `TwoSpaceIndent` に集約している。個別の `ftplugin/` は作らず、ここに足す。`typescript.tsx` のような複合 filetype は `.` で分割して各要素を判定するため、要素側（typescript）が載っていれば足りる
 - kakehashi の `searchPaths` に nvim-treesitter の `runtime` を入れている。autoInstall が落とす `typescript/highlights.scm` は `; inherits: ecma` なのに `ecma` を落とさず、足さないと TS の semantic token が空になるため
 - lazy.nvim は `defaults.lazy = true`。`event` / `cmd` / `ft` / `keys` のどれも無いプラグインは、他から `require` されない限り一度も load されない（setup() が走らず、設定が黙って無効になる）。常時 load したいものは `lazy = false` を付ける
-- skkeleton（日本語入力）が有効なため、cmp のソース設定に skkeleton が含まれる
+- skkeleton（日本語入力）は有効だが、cmp のソースには含めない（cmp-skkeleton は入れていない）
+- snacks.nvim は `opts` に書いたモジュールだけが有効になる。使うのは `vim.ui.input`（`input`）と `vim.ui.select`（`picker` の `ui_select`）の置き換えだけで、キーマップは定義しない

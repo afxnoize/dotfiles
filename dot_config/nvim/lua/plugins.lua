@@ -26,8 +26,13 @@ lazy.setup({
 
 	-- ui
 	{
-		'stevearc/dressing.nvim',
+		'folke/snacks.nvim',
+		priority = 1000,
 		lazy = false,
+		opts = {
+			input = {},
+			picker = { ui_select = true },
+		},
 	},
 
 	-- statusline
@@ -35,25 +40,6 @@ lazy.setup({
 		'nvim-lualine/lualine.nvim',
 		lazy = false,
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
-	},
-
-	-- fades inactive buffers
-	{
-		'tadaa/vimade',
-		event = {
-			'WinEnter',
-			'WinNew',
-		},
-		enabled = false,
-		-- enabled = function ()
-		--   return vim.fn.has('python') == 1 or vim.fn.has('python3')
-		-- end
-	},
-
-	{
-		'levouh/tint.nvim',
-		lazy = false,
-		config = true,
 	},
 
 	-- filer
@@ -109,8 +95,6 @@ lazy.setup({
 		dependencies = {
 			'hrsh7th/cmp-nvim-lsp',
 			'hrsh7th/cmp-buffer',
-			'hrsh7th/cmp-path',
-			'hrsh7th/cmp-cmdline',
 			-- snippet engine
 			{
 				'L3MON4D3/LuaSnip',
@@ -123,26 +107,21 @@ lazy.setup({
 			'saadparwaiz1/cmp_luasnip',
 			-- pictogram
 			'onsails/lspkind.nvim',
-			{
-				-- input japanese
-				'rinx/cmp-skkeleton',
-				-- enabled = false,
-				dependencies = {
-					{
-						'vim-skk/skkeleton',
-						lazy = false,
-					},
-					{
-						'delphinus/skkeleton_indicator.nvim',
-						event = 'InsertEnter',
-						config = true,
-					},
-				},
-			},
 		},
 		config = function()
 			require('rc/cmp').config()
 		end,
+	},
+
+	-- input japanese
+	{
+		'vim-skk/skkeleton',
+		lazy = false,
+	},
+	{
+		'delphinus/skkeleton_indicator.nvim',
+		event = 'InsertEnter',
+		config = true,
 	},
 
 	-- linter formatter
@@ -404,12 +383,12 @@ lazy.setup({
 	-- Markdown
 	{
 		'iamcco/markdown-preview.nvim',
-		build = 'cd app && yarn install',
+		-- Not a function build: lazy.nvim does not load the plugin first, so the autoload call fails
+		build = ':call mkdp#util#install()',
 		init = function()
 			vim.g.mkdp_filetypes = { 'markdown' }
 		end,
 		ft = { 'markdown' },
-		-- { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
 	},
 
 	{
@@ -558,5 +537,6 @@ lazy.setup({
 })
 
 -- colorscheme
+require('rc/normalnc').setup()
 vim.opt.background = 'light'
 vim.cmd.colorscheme('catppuccin-latte')
