@@ -111,7 +111,7 @@ function M.config()
 						['h'] = fb_actions.goto_parent_dir,
 						['<C-h>'] = fb_actions.toggle_hidden,
 						['/'] = function()
-							vim.cmd('startinsert')
+							vim.cmd.startinsert()
 						end,
 					},
 				},

@@ -4,22 +4,17 @@
 
 vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { noremap = false })
 
-vim.cmd([[
-  call add(g:skkeleton#mapped_keys, '<C-n>')
-  call add(g:skkeleton#mapped_keys, '<C-p>')
-]])
+-- Evaluating the variable autoloads skkeleton, which defines the default keys
+local mapped_keys = vim.fn.eval('g:skkeleton#mapped_keys')
+vim.list_extend(mapped_keys, { '<C-n>', '<C-p>' })
+vim.g['skkeleton#mapped_keys'] = mapped_keys
 vim.api.nvim_create_autocmd('User', {
 	group = vim.api.nvim_create_augroup('skkeleton-initialize-pre', {}),
 	pattern = 'skkeleton-initialize-pre',
 	callback = function()
-		vim.cmd([[
-      call skkeleton#config({
-        \ 'eggLikeNewline': v:true,
-        \ 'debug': v:true,
-        \ })
-      call skkeleton#register_keymap('insert', '<C-n>', 'henkanFirst')
-      call skkeleton#register_keymap('henkan', '<C-n>', 'henkanForward')
-      call skkeleton#register_keymap('henkan', '<C-p>', 'henkanBackward')
-    ]])
+		vim.fn['skkeleton#config']({ eggLikeNewline = true, debug = true })
+		vim.fn['skkeleton#register_keymap']('insert', '<C-n>', 'henkanFirst')
+		vim.fn['skkeleton#register_keymap']('henkan', '<C-n>', 'henkanForward')
+		vim.fn['skkeleton#register_keymap']('henkan', '<C-p>', 'henkanBackward')
 	end
 })

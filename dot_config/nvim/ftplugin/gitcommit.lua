@@ -1,5 +1,5 @@
 -- BB abbreviate {{{
-vim.cmd('inoreabbrev <buffer> BB BREAKING CHANGE:')
+vim.keymap.set('ia', 'BB', 'BREAKING CHANGE:', { buffer = true, desc = 'Expand BB to BREAKING CHANGE:' })
 -- }}}
 
 -- Complete types {{{

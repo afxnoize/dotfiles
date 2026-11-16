@@ -18,7 +18,7 @@ if vim.fn.executable('git') == 1 then
 		vim.opt_local.grepprg = 'git grep -I --line-number'
 		vim.cmd('silent grep! ' .. opts.args)
 		vim.opt_local.grepprg = current_grepprg
-		vim.cmd('redraw!')
+		vim.cmd.redraw({ bang = true })
 	end, { nargs = 1 })
 end
 
@@ -31,7 +31,7 @@ if vim.fn.executable('rg') == 1 then
 		vim.cmd('silent grep! ' .. opts.args)
 		vim.opt_local.grepprg = current_grepprg
 		vim.opt_local.grepformat = current_grepformat
-		vim.cmd('redraw!')
+		vim.cmd.redraw({ bang = true })
 	end, { nargs = 1 })
 end
 
@@ -41,7 +41,7 @@ if vim.fn.executable('jvgrep') == 1 then
 		vim.opt_local.grepprg = 'jvgrep'
 		vim.cmd('silent grep! ' .. opts.args .. ' ./*')
 		vim.opt_local.grepprg = current_grepprg
-		vim.cmd('redraw!')
+		vim.cmd.redraw({ bang = true })
 	end, { nargs = 1 })
 end
 -- }}}
