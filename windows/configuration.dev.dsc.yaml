@@ -71,6 +71,74 @@ properties:
           } finally {
             [IO.File]::Delete($tmp)
           }
+    - resource: PSDscResources/Script
+      id: fonts
+      directives:
+        description: Install Cica, UDEV Gothic and PleckJP for the current user
+      settings:
+        GetScript: |
+          $stampDir = Join-Path $env:LOCALAPPDATA 'dotfiles\fonts'
+          @{ Result = $(if (Test-Path $stampDir) { (Get-ChildItem -Path $stampDir -Name) -join ',' } else { '' }) }
+        TestScript: |
+          $fonts = @{
+            Cica       = 'cbd1bcf1f3fd1ddbffe444369c76e42529add8538b25aeb75ab682d398b0506f'
+            UDEVGothic = 'c104c171f6ed8922ca52d74cd915a271e427f1e884e51431aae71d99e8b3b47b'
+            PleckJP    = 'ba58f5a6862099d126a47a353de8e8a909da5311a6d8848f36d32bc9d0abdf80'
+          }
+          $stampDir = Join-Path $env:LOCALAPPDATA 'dotfiles\fonts'
+          $missing = $fonts.Keys | Where-Object {
+            $stamp = Join-Path $stampDir $_
+            -not (Test-Path $stamp) -or [IO.File]::ReadAllText($stamp).Trim() -ne $fonts[$_]
+          }
+          -not $missing
+        SetScript: |
+          $fonts = @(
+            @{ Name = 'Cica'; Files = 'Cica-*.ttf'; Sha256 = 'cbd1bcf1f3fd1ddbffe444369c76e42529add8538b25aeb75ab682d398b0506f'
+               Url = 'https://github.com/miiton/Cica/releases/download/v5.0.3/Cica_v5.0.3.zip' }
+            @{ Name = 'UDEVGothic'; Files = 'UDEVGothic-*.ttf'; Sha256 = 'c104c171f6ed8922ca52d74cd915a271e427f1e884e51431aae71d99e8b3b47b'
+               Url = 'https://github.com/yuru7/udev-gothic/releases/download/v2.2.0/UDEVGothic_v2.2.0.zip' }
+            @{ Name = 'PleckJP'; Files = 'PleckJP-*.ttf'; Sha256 = 'ba58f5a6862099d126a47a353de8e8a909da5311a6d8848f36d32bc9d0abdf80'
+               Url = 'https://github.com/ryota2357/PleckJP/releases/download/v2.2.1/PleckJP_v2.2.1.zip' }
+          )
+          $fontDir = Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\Fonts'
+          $stampDir = Join-Path $env:LOCALAPPDATA 'dotfiles\fonts'
+          New-Item -ItemType Directory -Path $fontDir, $stampDir -Force -ErrorAction Stop | Out-Null
+          # Per-user fonts are registered under HKCU with the full path of the file.
+          $key = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey('Software\Microsoft\Windows NT\CurrentVersion\Fonts')
+          try {
+            foreach ($font in $fonts) {
+              $stamp = Join-Path $stampDir $font.Name
+              if ((Test-Path $stamp) -and [IO.File]::ReadAllText($stamp).Trim() -eq $font.Sha256) { continue }
+              $zip = Join-Path $env:TEMP "$($font.Name).zip"
+              $extracted = Join-Path $env:TEMP "$($font.Name)-fonts"
+              try {
+                curl.exe -fsSL $font.Url -o $zip
+                if ($LASTEXITCODE) { throw "$($font.Name) download failed: $($font.Url)" }
+                $stream = [IO.File]::OpenRead($zip)
+                try {
+                  $actual = -join ([Security.Cryptography.SHA256]::Create().ComputeHash($stream) | ForEach-Object { $_.ToString('x2') })
+                } finally {
+                  $stream.Close()
+                }
+                if ($actual -ne $font.Sha256) { throw "$($font.Name) hash mismatch: expected $($font.Sha256), got $actual" }
+                New-Item -ItemType Directory -Path $extracted -Force -ErrorAction Stop | Out-Null
+                tar.exe -xf $zip -C $extracted
+                if ($LASTEXITCODE) { throw "$($font.Name) extraction failed: $zip" }
+                $ttfs = Get-ChildItem -Path $extracted -Recurse -Filter $font.Files
+                if (-not $ttfs) { throw "$($font.Name): no files match $($font.Files)" }
+                foreach ($ttf in $ttfs) {
+                  $dest = Join-Path $fontDir $ttf.Name
+                  Copy-Item -Path $ttf.FullName -Destination $dest -Force -ErrorAction Stop
+                  $key.SetValue("$($ttf.BaseName) (TrueType)", $dest)
+                }
+                [IO.File]::WriteAllText($stamp, $font.Sha256)
+              } finally {
+                Remove-Item -Path $zip, $extracted -Recurse -Force -ErrorAction SilentlyContinue
+              }
+            }
+          } finally {
+            $key.Close()
+          }
 
     # --- VCS ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
