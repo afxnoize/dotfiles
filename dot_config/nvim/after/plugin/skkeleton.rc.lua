@@ -4,7 +4,6 @@
 
 vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { noremap = false, desc = 'Toggle skkeleton' })
 
--- Evaluating the variable autoloads skkeleton, which defines the default keys
 local mapped_keys = vim.fn.eval('g:skkeleton#mapped_keys')
 vim.list_extend(mapped_keys, { '<C-n>', '<C-p>' })
 vim.g['skkeleton#mapped_keys'] = mapped_keys
