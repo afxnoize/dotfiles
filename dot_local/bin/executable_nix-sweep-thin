@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Usage: nix-sweep-thin [--days N] [nix-sweep cleanout options...] <profile>...
+#   profile: home | user | <path to profile symlink>
+# Keeps the newest generation of each day within the last N days (default 14),
+# drops everything else, and hands the list to `nix-sweep cleanout -g`.
+set -euo pipefail
+
+days=14
+profiles=()
+passthrough=()
+while (($#)); do
+  case $1 in
+    --days) days=$2; shift 2 ;;
+    -*) passthrough+=("$1"); shift ;;
+    *) profiles+=("$1"); shift ;;
+  esac
+done
+((${#profiles[@]})) || { echo "usage: nix-sweep-thin [--days N] <profile>..." >&2; exit 2; }
+((${#passthrough[@]})) || passthrough=(--gc --interactive)
+
+state=${XDG_STATE_HOME:-$HOME/.local/state}/nix/profiles
+now=$(date +%s)
+
+for name in "${profiles[@]}"; do
+  case $name in
+    home) profile=$state/home-manager ;;
+    user) profile=$state/profile ;;
+    *) profile=$name ;;
+  esac
+
+  current=$(readlink "$profile")
+  current=${current%-link}
+  current=${current##*-}
+
+  declare -A kept_day=()
+  drops=()
+  while read -r gen ts; do
+    [[ $gen == "$current" ]] && { kept_day[$(date -d "@$ts" +%F)]=1; continue; }
+    if (( (now - ts) / 86400 >= days )); then
+      drops+=(-g "$gen")
+      continue
+    fi
+    day=$(date -d "@$ts" +%F)
+    if [[ -n ${kept_day[$day]:-} ]]; then
+      drops+=(-g "$gen")
+    else
+      kept_day[$day]=1
+    fi
+  done < <(
+    for link in "$profile"-*-link; do
+      gen=${link%-link}
+      gen=${gen##*-}
+      printf '%s %s\n' "$gen" "$(stat -c %Y "$link")"
+    done | sort -n -r
+  )
+  unset kept_day
+
+  if ((${#drops[@]})); then
+    nix-sweep cleanout "$name" "${drops[@]}" "${passthrough[@]}"
+  else
+    echo "nix-sweep-thin: nothing to remove in $name"
+  fi
+done
