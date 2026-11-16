@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run by claude-update.service (systemd user timer), i.e. outside the cage sandbox.
+# Run by flake-latest-update.service (systemd user timer), i.e. outside the cage sandbox.
 #
 # This builds the pushed main branch of the remote, from a fresh shallow clone
 # in a private temp dir. It never reads or runs git in the local working copy.
@@ -18,7 +18,7 @@ readonly latest_inputs=(claude-code llm-agents bun-linux-x64 bun-linux-aarch64)
 readonly remote="https://github.com/afxnoize/dotfiles.git"
 readonly branch="main"
 
-log() { printf 'claude-update: %s\n' "$*"; }
+log() { printf 'flake-latest-update: %s\n' "$*"; }
 
 # Not /tmp: the cage base preset allows writes to /tmp and $TMPDIR, and the
 # sandboxed agent runs as the same uid, so it could edit the clone between the

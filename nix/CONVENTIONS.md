@@ -25,12 +25,12 @@
 - **nixpkgs (stable)**: 通常のパッケージ
 - **nixpkgs-unstable**: 最新版が必要なパッケージ（mise, git-wt 等）
 - **外部 flake**: llm-agents, cage 等（`inputs` で定義）
-- **happy-coder**: llm-agents の版を `overlays/happy-coder.nix` で包み、`HAPPY_CLAUDE_PATH` の既定値を `~/.nix-profile/bin/claude` にする。上流の `bin/happy` は未設定なら `command -v claude` を使うため、PATH の順序（`~/.local/bin` が先）次第で別の claude を拾う。効くのは端末から起動する local モードだけで、デーモンが起動する remote モード（スマホから起こすセッション）は happy に同梱の claude-agent-sdk の claude を使う。そちらの版は happy-coder の更新でしか上がらない。store パスでなく profile を経由するのは、`claude-update` で上がった claude を次の local セッションから使うため。`--set-default` なので環境変数で上書きできる。データ置き場は `HAPPY_HOME_DIR` で `$XDG_STATE_HOME/happy` に移している（実行時に解決し、デーモンは起動した happy から引き継ぐ）
+- **happy-coder**: llm-agents の版を `overlays/happy-coder.nix` で包み、`HAPPY_CLAUDE_PATH` の既定値を `~/.nix-profile/bin/claude` にする。上流の `bin/happy` は未設定なら `command -v claude` を使うため、PATH の順序（`~/.local/bin` が先）次第で別の claude を拾う。効くのは端末から起動する local モードだけで、デーモンが起動する remote モード（スマホから起こすセッション）は happy に同梱の claude-agent-sdk の claude を使う。そちらの版は happy-coder の更新でしか上がらない。store パスでなく profile を経由するのは、`flake-latest-update` で上がった claude を次の local セッションから使うため。`--set-default` なので環境変数で上書きできる。データ置き場は `HAPPY_HOME_DIR` で `$XDG_STATE_HOME/happy` に移している（実行時に解決し、デーモンは起動した happy から引き継ぐ）
 - **カスタムバイナリ**: `tools/kakehashi/` のようにプラットフォーム別に分岐
-- **bun**: upstream の latest release に意図して固定し、nixpkgs の版には頼らない。理由は、nixpkgs の版が upstream より遅れ、同梱の brotli に脆弱性（bun 1.4.4 で修正）が残っていたため。`bun-linux-x64` / `bun-linux-aarch64` を `flake = false` のファイル入力（upstream の latest release の zip）として持ち、`overlays/bun.nix` の overlay で `pkgs.bun` の `src` だけを差し替える（`flake.nix` の `overlays` から import する）。`tools/bunx` と PATH 上の `bun` は同じ `pkgs.bun` なのでまとめて追従する。更新は `claude-update` が毎日行う（手で上げるなら `nix flake update bun-linux-x64 bun-linux-aarch64`）。nixpkgs が追いついても、入力と overlay は削除しない。linux 以外の system は nixpkgs の bun のまま
+- **bun**: upstream の latest release に意図して固定し、nixpkgs の版には頼らない。理由は、nixpkgs の版が upstream より遅れ、同梱の brotli に脆弱性（bun 1.4.4 で修正）が残っていたため。`bun-linux-x64` / `bun-linux-aarch64` を `flake = false` のファイル入力（upstream の latest release の zip）として持ち、`overlays/bun.nix` の overlay で `pkgs.bun` の `src` だけを差し替える（`flake.nix` の `overlays` から import する）。`tools/bunx` と PATH 上の `bun` は同じ `pkgs.bun` なのでまとめて追従する。更新は `flake-latest-update` が毎日行う（手で上げるなら `nix flake update bun-linux-x64 bun-linux-aarch64`）。nixpkgs が追いついても、入力と overlay は削除しない。linux 以外の system は nixpkgs の bun のまま
 
-### 最新版を追う入力の自動更新（claude-update）
-- systemd user timer `claude-update`（毎日 03:00 JST）が、次の 4 入力だけ `flake.lock` を更新し、`nh home switch` まで実行する。実体は `dot_local/bin/executable_claude-update`、unit は `dot_config/systemd/user/`。名前は `claude-code` だけを更新していた頃のまま残している（改名すると systemd の有効化し直しが要るため）
+### 最新版を追う入力の自動更新（flake-latest-update）
+- systemd user timer `flake-latest-update`（毎日 03:00 JST）が、次の 4 入力だけ `flake.lock` を更新し、`nh home switch` まで実行する。実体は `dot_local/bin/executable_flake-latest-update`、unit は `dot_config/systemd/user/`
   - `claude-code`: sadjow/claude-code-nix
   - `llm-agents`: numtide/llm-agents.nix。rtk、ccusage、herdr、t3code、happy-coder などが一緒に上がる
   - `bun-linux-x64` / `bun-linux-aarch64`: upstream の latest release の zip（ファイル入力）
@@ -40,10 +40,10 @@
 - ビルド元はローカルの working copy ではなく、リモート（`https://github.com/afxnoize/dotfiles.git` の `main`）を毎回 shallow clone した一時ディレクトリ。cage 内の agent は working copy と `.git` を書き換えられるため、working copy を読む・git を実行すると、悪意ある nix module や `core.fsmonitor` を無人・サンドボックス外で実行させられてしまう。リモートの URL もスクリプトに固定している
 - 一時ディレクトリは `/tmp` ではなく `$XDG_RUNTIME_DIR` 配下に作る（cage の `base` preset は `/tmp` を書込許可しており、同一 uid の agent が clone を改ざんできるため）。終了時に削除される
 - push していない変更は反映されず、手動 `hms` で入れた未 push の変更は次回の timer で main の内容に戻る。working copy の `flake.lock` も更新されないので、lock の更新を残したいときはローカルで `hmu <入力名>` して commit・push する（放置すると手動 `hms` が古い rev に戻る）
-- GitHub API の rate limit で更新できない日は exit 1 で終わる（nix は警告だけで cached lock に戻るため、スクリプト側で検出している）。結果は `journalctl --user -u claude-update` で確認する
+- GitHub API の rate limit で更新できない日は exit 1 で終わる（nix は警告だけで cached lock に戻るため、スクリプト側で検出している）。結果は `journalctl --user -u flake-latest-update` で確認する
 - 反映されるのは次回起動から。実行中の claude は旧バイナリのまま動き続ける
-- timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now claude-update.timer`（`.chezmoiignore` の `.chezmoiscripts/*` で chezmoi scripts が無効なため、apply では有効化されない）
-- `OnCalendar` を変えたときは、apply のあとに `systemctl --user daemon-reload && systemctl --user restart claude-update.timer` で反映する
+- timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now flake-latest-update.timer`（`.chezmoiignore` の `.chezmoiscripts/*` で chezmoi scripts が無効なため、apply では有効化されない）
+- `OnCalendar` を変えたときは、apply のあとに `systemctl --user daemon-reload && systemctl --user restart flake-latest-update.timer` で反映する
 
 ### GitHub の認証（ghtkn）
 - git の `github.com` と `gist.github.com` の credential helper は `ghtkn git-credential`（`modules/git/default.nix`）。GitHub App の User Access Token を使い、8 時間で失効する
@@ -61,7 +61,7 @@
 - CI は `nix eval` による評価だけを行う。ビルドは重いので、PR の確認者が手元で `nix build --impure` する。評価に失敗した場合は draft PR になる
 - `home.stateVersion` は自動では上げない。互換性の記録であり、上げると既定値が静かに変わりうるため、リリースの追従とは別に判断する
 - 動作確認は `bash .github/scripts/nixos-release-bump.sh --check`（変更せずに採用候補だけ表示）と `bash .github/scripts/nixos-release-bump.test.sh`（判定ロジックのテスト）
-- merge すると、次回の `claude-update` が main の内容でビルドして switch する。起きているうちに手元で `hms` を実行し、activation の問題を先に確認する
+- merge すると、次回の `flake-latest-update` が main の内容でビルドして switch する。起きているうちに手元で `hms` を実行し、activation の問題を先に確認する
 
 ### Gotchas
 - `builtins.getEnv` を使っているため `--impure` 必須
