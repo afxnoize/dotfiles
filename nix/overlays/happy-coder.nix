@@ -6,7 +6,7 @@
 # mode through the bundled claude-agent-sdk and its own claude binary, which this
 # setting does not change.
 # The path goes through the profile rather than a claude-code store path, so a
-# claude update by `claude-update` applies to the next local session.
+# claude update by `flake-latest-update` applies to the next local session.
 # --set-default keeps HAPPY_CLAUDE_PATH overridable from the environment.
 # HAPPY_HOME_DIR moves happy's data (settings, access.key, daemon state, logs)
 # from ~/.happy to $XDG_STATE_HOME/happy. It is resolved at run time so it

@@ -1,6 +1,5 @@
 #!/bin/bash
-# Update the claude-code flake input, then switch home-manager (hmu claude-code + hms).
-# Run by claude-update.service (systemd user timer), i.e. outside the cage sandbox.
+# Run by flake-latest-update.service (systemd user timer), i.e. outside the cage sandbox.
 #
 # This builds the pushed main branch of the remote, from a fresh shallow clone
 # in a private temp dir. It never reads or runs git in the local working copy.
@@ -8,8 +7,10 @@
 #   - Local unpushed work is not applied (and a manual hms that was never pushed
 #     is reverted by the next run).
 #   - The working-copy flake.lock is not updated. To persist a lock bump, run
-#     `hmu claude-code` locally and commit it.
+#     `hmu <input>...` locally and commit it.
 set -euo pipefail
+
+readonly latest_inputs=(claude-code llm-agents bun-linux-x64 bun-linux-aarch64)
 
 # Hard-coded on purpose: a sandboxed (cage) agent can write the working copy's
 # .git (allow-git), so the remote URL and any git config read from there are
@@ -17,7 +18,7 @@ set -euo pipefail
 readonly remote="https://github.com/afxnoize/dotfiles.git"
 readonly branch="main"
 
-log() { printf 'claude-update: %s\n' "$*"; }
+log() { printf 'flake-latest-update: %s\n' "$*"; }
 
 # Not /tmp: the cage base preset allows writes to /tmp and $TMPDIR, and the
 # sandboxed agent runs as the same uid, so it could edit the clone between the
@@ -35,10 +36,20 @@ GIT_TERMINAL_PROMPT=0 git clone --quiet --depth 1 --branch "$branch" "$remote" "
 }
 flake="$work/src/nix"
 
-rev() { jq -r '.nodes["claude-code"].locked.rev' "$flake/flake.lock"; }
-before=$(rev)
+lock_id() {
+  jq -r --arg n "$1" '.nodes[.nodes.root.inputs[$n]].locked | .rev // .narHash' "$flake/flake.lock"
+}
+short() {
+  local id=${1#sha256-}
+  printf '%s' "${id:0:7}"
+}
 
-out=$(nix flake update claude-code --flake "$flake" 2>&1) || {
+declare -A before
+for name in "${latest_inputs[@]}"; do
+  before[$name]=$(lock_id "$name")
+done
+
+out=$(nix flake update "${latest_inputs[@]}" --flake "$flake" 2>&1) || {
   printf '%s\n' "$out"
   log "flake update failed"
   exit 1
@@ -52,12 +63,14 @@ if grep -q 'using cached version' <<<"$out"; then
   exit 1
 fi
 
-after=$(rev)
-if [[ "$before" == "$after" ]]; then
-  log "claude-code is already at ${after:0:7}"
-else
-  log "claude-code ${before:0:7} -> ${after:0:7}"
-fi
+for name in "${latest_inputs[@]}"; do
+  after=$(lock_id "$name")
+  if [[ "${before[$name]}" == "$after" ]]; then
+    log "$name is already at $(short "$after")"
+  else
+    log "$name $(short "${before[$name]}") -> $(short "$after")"
+  fi
+done
 
 # Always switch, even when the lock did not change, so a switch that failed
 # on a previous run is retried instead of being skipped forever.

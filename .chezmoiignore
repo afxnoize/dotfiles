@@ -26,7 +26,7 @@ serena/
 .config/zsh/**
 .config/zabrze/**
 .config/systemd/**
-.local/bin/claude-update
+.local/bin/flake-latest-update
 .local/bin/telegram-supercharged
 {{ end }}
 

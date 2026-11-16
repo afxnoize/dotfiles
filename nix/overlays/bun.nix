@@ -1,6 +1,3 @@
-# nixpkgs bun lags upstream and bundles a vulnerable brotli (fixed in bun 1.4.4).
-# Drop this overlay and the bun-linux-* inputs once nixpkgs ships bun >= 1.4.4.
-# Other systems keep the nixpkgs bun.
 { inputs, system }:
 
 final: prev:
