@@ -9,8 +9,6 @@ fi
 
 {{ $secrets := output "sops" "-d" "--output-type" "json" (joinPath .chezmoi.sourceDir "mcp/secrets.yaml") | fromJson -}}
 
-# Secrets reach jq as JSON on fd 3 through a quoted heredoc, so the shell never
-# interprets their characters and they stay out of jq's argv.
 jq --slurpfile secrets /dev/fd/3 '
   $secrets[0] as $s
   |
