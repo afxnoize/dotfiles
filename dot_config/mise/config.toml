@@ -1,31 +1,6 @@
 [tools]
-node = "latest"
-deno = "latest"
-uv = "latest"
-python = "3.14"
-usage = "latest"
-yarn = "latest"
-"pipx:tldr" = "latest"
-"github:duckdb/duckdb" = "latest"
-go = "latest"
 moonbit = "latest"
-"npm:@openai/codex" = "latest"
-aws = { version = "latest", symlink_bins = "true" }
-"aqua:k1LoW/mo" = { version = "latest", symlink_bins = "true" }
-"pipx:oci-cli" = "latest"
-pnpm = "10.28.1"
-rust = "latest"
-"pipx:b2" = "4.6.0"
-"github:fwdcloudsec/granted" = "latest"
-direnv = "latest"
 "github:microsoft/apm" = "latest"
-"npm:@rivolink/leaf" = "latest"
 
 [settings]
 experimental = true
-
-[settings.pipx]
-uvx = true
-
-[settings.npm]
-package_manager = "bun"
