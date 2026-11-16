@@ -1,14 +1,16 @@
 { pkgs, ... }:
 
 let
-  wrappers = pkgs.lib.mapAttrsToList (
-    cmd: pkg:
-    pkgs.writeShellScriptBin cmd ''
-      set -euo pipefail
-      exec ${pkgs.bun}/bin/bunx --bun --package ${pkgs.lib.escapeShellArg pkg} ${pkgs.lib.escapeShellArg cmd} "$@"
-    ''
-  ) (import ./registry.nix);
+  esc = pkgs.lib.escapeShellArg;
+  mkExec = cmd: pkg: "${pkgs.bun}/bin/bunx --bun --package ${esc pkg} ${esc cmd}";
+  wrappers =
+    (import ../mk-runtime-wrappers.nix { inherit pkgs; })
+      mkExec
+      (import ./registry.nix);
+
 in
 {
-  home.packages = [ pkgs.bun ] ++ wrappers;
+  home.packages =
+    [ pkgs.bun ]
+    ++ wrappers;
 }
