@@ -9,7 +9,7 @@ if not vim.uv.fs_stat(lazypath) then
 		lazypath,
 	}
 end
-vim.opt.rtp:prepend(lazypath)
+vim.opt.runtimepath:prepend(lazypath)
 
 local ok, lazy = pcall(require, 'lazy')
 if not ok then

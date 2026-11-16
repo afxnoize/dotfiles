@@ -17,7 +17,7 @@ vim.g.searchx = {
 	-- Auto jump if the recent input matches to any marker.
 	auto_accept = true,
 	-- The scrolloff value for moving to next/prev.
-	scrolloff = vim.o.scrolloff,
+	scrolloff = vim.opt.scrolloff:get(),
 	-- To enable scrolling animation.
 	scrolltime = 0,
 	-- To enable auto nohlsearch after cursor is moved
