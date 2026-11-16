@@ -6,14 +6,15 @@
 - 新規モジュール追加時は `modules/default.nix` のimportリストに追加すること
 
 ### Tools / Runtime Wrapper パターン
-- `tools/mk-runtime-wrappers.nix` はランタイム（npx, bunx等）のラッパーを生成する汎用関数
-- 各ツールは `registry.nix` にコマンド→パッケージのマッピングを定義
-- 新しいコマンドを追加する場合は対応する `registry.nix` にエントリを追加する
+- `tools/mk-runtime-wrappers.nix` は、registry の「コマンド名 = パッケージ名」から wrapper を生成する汎用関数。実行行は呼び出し側が `mkExec = cmd: pkg: "..."` で渡す
+- npm の CLI は `tools/bunx/registry.nix` に登録する。`tools/bunx/default.nix` の `mkExec` が `bunx --bun --package <パッケージ> <コマンド>` を組み立てる
+- `--package` でパッケージとコマンドを分けて渡す。`bunx <コマンド>` だけだと、bunx が PATH 上の同名の wrapper 自身を呼んでしまう
 
 ```nix
 # registry.nix の例
 {
-  takt = "@anthropic-ai/takt";   # コマンド名 = パッケージ名
+  takt = "takt";
+  leaf = "@rivolink/leaf";
 }
 ```
 

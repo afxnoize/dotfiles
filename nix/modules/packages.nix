@@ -40,6 +40,7 @@ let
     pkgs-unstable.uv
     pkgs-unstable.usage
     pkgs-unstable.deno
+    nodejs
     just
     chezmoi
   ];

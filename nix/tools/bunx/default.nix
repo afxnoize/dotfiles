@@ -1,10 +1,11 @@
 { pkgs, ... }:
 
 let
-  runtime = "${pkgs.bun}/bin/bunx --bun";
+  esc = pkgs.lib.escapeShellArg;
+  mkExec = cmd: pkg: "${pkgs.bun}/bin/bunx --bun --package ${esc pkg} ${esc cmd}";
   wrappers =
     (import ../mk-runtime-wrappers.nix { inherit pkgs; })
-      runtime
+      mkExec
       (import ./registry.nix);
 
 in
