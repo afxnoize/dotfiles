@@ -43,25 +43,6 @@ lazy.setup({
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
 	},
 
-	-- fades inactive buffers
-	{
-		'tadaa/vimade',
-		event = {
-			'WinEnter',
-			'WinNew',
-		},
-		enabled = false,
-		-- enabled = function ()
-		--   return vim.fn.has('python') == 1 or vim.fn.has('python3')
-		-- end
-	},
-
-	{
-		'levouh/tint.nvim',
-		lazy = false,
-		config = true,
-	},
-
 	-- filer
 	{
 		'lambdalisue/fern.vim',
@@ -564,5 +545,6 @@ lazy.setup({
 })
 
 -- colorscheme
+require('rc/normalnc').setup()
 vim.opt.background = 'light'
 vim.cmd.colorscheme('catppuccin-latte')
