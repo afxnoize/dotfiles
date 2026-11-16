@@ -24,12 +24,7 @@ in
       { path = ./common.gitconfig; }
       { path = "~/.config/git/local.config"; }
     ];
-
-    ignores = [
-      "/.vscode"
-      ".*-version" # anyenv local version
-      "**/.claude/settings.local.json"
-      ".plans/" # Claude Code plans directory
-    ];
   };
+
+  xdg.configFile."git/ignore".source = ./ignore;
 }

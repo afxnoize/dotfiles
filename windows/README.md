@@ -49,6 +49,9 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
   - ダウンロードはハッシュで検証しない
   - 安定版と同じ Inno Setup の AppId を使うため、安定版が入っていれば同じ場所に上書きする。構成ファイルは、最後の安定版（`20240203-110809-5046fc22`）以外の版が入っていれば導入済みとみなす
   - 入れた後は更新しない。新しい nightly にするときは、構成ファイルを流さず、インストーラを手で入れ直す
+- フォント（Cica、UDEV Gothic、PleckJP）を GitHub のリリースから取得し、現在のユーザーに入れる
+  - 版と SHA256 は構成ファイルに固定している。更新するときは、TestScript と SetScript の両方のハッシュと、SetScript の URL を書き換える
+  - 入れた zip のハッシュを `%LOCALAPPDATA%\dotfiles\fonts` に記録し、構成ファイルのハッシュと違うフォントだけを入れ直す
 - `packages.nix` にない T3 Code（コーディングエージェントの GUI）を winget の `T3Tools.T3Code` で入れる
 - sops は winget から削除された（`Mozilla.SOPS`）ため、GitHub のリリースから `sops.exe` を取得して `%LOCALAPPDATA%\Programs\sops` に置き、ユーザーの `Path` に追加する
   - 版と SHA256 は構成ファイルに固定している。更新するときは、TestScript と SetScript の両方の `$version` と、`$expected` を一緒に書き換える。ハッシュはリリースの `sops-v<版>.checksums.txt` にある amd64.exe の行を使う
@@ -61,7 +64,7 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 
 `packages.nix` から入れないもの:
 
-- Nix 関連、cage、devbox、tmux: Windows 版がない
+- Nix 関連、cage、tmux: Windows 版がない
 - git-wt: winget に登録されていない
 - gti: 使わない
 - rtk、ccusage: 未確認。必要なら mise か npm で入れる
@@ -85,12 +88,12 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
   - Git for Windows のインストーラは、system の設定に Git Credential Manager を入れる。GitHub に限り、空の `helper =` でこれを外す。ほかのホストは Git Credential Manager のまま
   - ghtkn の設定ファイルは `%APPDATA%\ghtkn\ghtkn.yaml` に置く。Windows の ghtkn は `XDG_CONFIG_HOME` を見ない。App の Client ID と `git_owner` を書くファイルで、chezmoi では管理しない
   - トークンは Windows Credential Manager（ghtkn の既定の keyring backend）に入る。Windows の ghtkn は refresh token に対応しないため、8 時間ごとに `ghtkn auth <App 名>` でブラウザ承認をやり直す
-- `dot_config/git/ignore`: グローバルの gitignore。Linux 側（`nix/modules/git/default.nix` の `ignores`）と同じ内容を複製している
+- `dot_config/git/ignore.tmpl`: グローバルの gitignore。Linux と共通の `nix/modules/git/ignore` を埋め込む
+- `dot_config/symlink_wezterm.tmpl`: `~/.config/wezterm` を、リポジトリ直下の `dot_config/wezterm` への symlink にする
 
 ## 未対応
 
 - PowerShell profile は、まだリポジトリ直下の `readonly_Documents/` にある。scoop（posh-git、scoop-completion、mise のパス）と、マシン固有の oh-my-posh の init パスに依存している
-- Neovim と WezTerm の設定は、まだリンクしていない
-- WezTerm が指定するフォント（Cica、Symbols Nerd Font Mono、Iosevka Term、Fira Code）は入れていない
+- Neovim の設定は、まだリンクしていない
 - nvim-treesitter のパーサのビルドに使う C コンパイラは入れていない
 - Claude Code の設定は、どのファイルを持っていくか決めていない
