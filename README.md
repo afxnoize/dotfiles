@@ -69,7 +69,7 @@ chmod 600 ~/.config/sops/age/keys.txt
 ### 5. chezmoi の初期化と適用
 
 chezmoi と symlink（`~/.local/share/chezmoi` → リポジトリ）は Step 3 の Home-Manager で設定済み。
-mise に残るグローバルツールは moonbit だけ。入れるには `mise install` を実行する。
+mise に残るグローバルツールは moonbit だけ。`chezmoi apply` のときに chezmoi の script が `mise install` を実行する。
 
 ```sh
 chezmoi apply
