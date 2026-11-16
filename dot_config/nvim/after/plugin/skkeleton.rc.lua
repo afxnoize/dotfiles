@@ -9,7 +9,7 @@ local mapped_keys = vim.fn.eval('g:skkeleton#mapped_keys')
 vim.list_extend(mapped_keys, { '<C-n>', '<C-p>' })
 vim.g['skkeleton#mapped_keys'] = mapped_keys
 vim.api.nvim_create_autocmd('User', {
-	group = vim.api.nvim_create_augroup('skkeleton-initialize-pre', {}),
+	group = vim.api.nvim_create_augroup('skkeleton-initialize-pre', { clear = true }),
 	pattern = 'skkeleton-initialize-pre',
 	callback = function()
 		vim.fn['skkeleton#config']({ eggLikeNewline = true, debug = true })

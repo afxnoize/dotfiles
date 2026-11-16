@@ -2,6 +2,7 @@
 -- It has no mason package, so it is enabled explicitly (see lsp/kakehashi.lua). This block sits
 -- above the mason checks below, which return early, so kakehashi does not depend on mason loading.
 vim.api.nvim_create_autocmd('LspAttach', {
+	group = vim.api.nvim_create_augroup('KakehashiInherit', { clear = true }),
 	callback = function(ev)
 		local client = vim.lsp.get_client_by_id(ev.data.client_id)
 		if client and client.name == 'kakehashi' then
@@ -62,7 +63,7 @@ local formatting_disabled = { vtsls = true, lua_ls = true }
 
 -- AuthCmd: LspAttach {{{
 vim.api.nvim_create_autocmd('LspAttach', {
-	group = vim.api.nvim_create_augroup('mylspconfig', {}),
+	group = vim.api.nvim_create_augroup('mylspconfig', { clear = true }),
 	callback = function(args)
 		local client = vim.lsp.get_client_by_id(args.data.client_id)
 		if client and formatting_disabled[client.name] then

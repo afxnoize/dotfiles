@@ -11,7 +11,7 @@ end
 
 function M.setup()
 	vim.api.nvim_create_autocmd('ColorScheme', {
-		group = vim.api.nvim_create_augroup('normalnc', {}),
+		group = vim.api.nvim_create_augroup('normalnc', { clear = true }),
 		callback = function()
 			local normal = vim.api.nvim_get_hl(0, { name = 'Normal', link = false })
 			if not (normal.bg and normal.fg) then
