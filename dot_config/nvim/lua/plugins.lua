@@ -384,12 +384,12 @@ lazy.setup({
 	-- Markdown
 	{
 		'iamcco/markdown-preview.nvim',
-		build = 'cd app && yarn install',
+		-- Not a function build: lazy.nvim does not load the plugin first, so the autoload call fails
+		build = ':call mkdp#util#install()',
 		init = function()
 			vim.g.mkdp_filetypes = { 'markdown' }
 		end,
 		ft = { 'markdown' },
-		-- { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
 	},
 
 	{
