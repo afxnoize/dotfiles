@@ -50,8 +50,7 @@
       "Read(~/.aws/**)",
       "Read(~/.config/sops/**)",
       "Read(~/.claude.json)",
-      "Read(~/.config/claude/.claude.json)",
-      "Read(~/.config/claude/channels/telegram/.env)"
+      "Read(~/.config/claude/.claude.json)"
     ],
     "defaultMode": "auto"
   },
