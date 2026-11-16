@@ -79,27 +79,13 @@ vim.api.nvim_create_autocmd('LspAttach', {
 		map('][', function() vim.diagnostic.jump({ count = -1 }) end, 'Previous diagnostic')
 		map(']]', function() vim.diagnostic.jump({ count = 1 }) end, 'Next diagnostic')
 		map(']e', vim.diagnostic.open_float, 'Show diagnostic')
-
-		-- Definitions
 		map(']d', vim.lsp.buf.definition, 'Go to definition')
-
-		-- Implementations
 		map(']i', vim.lsp.buf.implementation, 'Go to implementation')
-
-		-- References
 		map(']f', vim.lsp.buf.references, 'List references')
-
-		-- https://scrapbox.io/vim-jp/better_K_for_neovim_lua
-		map('K', function()
-			if not lua_help() then
-				vim.lsp.buf.hover()
-			end
-		end, 'Hover (help for vim.* in Lua)')
+		map('K', function() return not lua_help() and vim.lsp.buf.hover() end, 'Hover (help for vim.* in Lua)')
 		map(']r', vim.lsp.buf.rename, 'Rename')
 		map(']a', vim.lsp.buf.code_action, 'Code action')
-		map(']F', function()
-			vim.lsp.buf.format { async = true }
-		end, 'Format')
+		map(']F', function() vim.lsp.buf.format { async = true } end, 'Format')
 	end,
 })
 -- }}}
