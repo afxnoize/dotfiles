@@ -6,3 +6,5 @@ config/tmux/plugins
 .plans
 
 result
+
+dot_config/wezterm/local.lua

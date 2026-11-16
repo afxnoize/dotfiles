@@ -38,7 +38,7 @@ curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 
 ### 3. Home-Manager の初回適用
 
-全ツール（git, neovim, fzf, ripgrep, sops, age, mise, claude-code 等）が一括でインストールされる。
+git, neovim, fzf, ripgrep, sops, age, mise, claude-code, uv, deno, node などが一括でインストールされる。nixpkgs に無い moonbit だけは mise で入れる（Step 5）。
 
 ```sh
 cd ~/repos/github.com/afxnoize/dotfiles/nix
@@ -69,7 +69,7 @@ chmod 600 ~/.config/sops/age/keys.txt
 ### 5. chezmoi の初期化と適用
 
 chezmoi と symlink（`~/.local/share/chezmoi` → リポジトリ）は Step 3 の Home-Manager で設定済み。
-適用時に mise のグローバルツール（rust, node, go, python 等）も自動インストールされる。
+mise に残るグローバルツールは moonbit だけ。`chezmoi apply` のときに chezmoi の script が `mise install` を実行する。
 
 ```sh
 chezmoi apply
@@ -152,6 +152,7 @@ telegram-supercharged restore   # 公式に戻す
 | `dot_config/zabrze/` | スニペット展開（git, chezmoi, AI 用） |
 | `dot_config/claude/` | Claude Code 設定・スキル・subagent・hooks |
 | `.chezmoiscripts/` | chezmoi ライフサイクルスクリプト |
+| `.github/infra.yaml` | GitHub のリポジトリ設定（gh-infra の manifest）。`gh infra plan .github/infra.yaml` で差分を見て、`gh infra apply .github/infra.yaml` で反映する |
 
 ## 注意事項
 

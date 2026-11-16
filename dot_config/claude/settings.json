@@ -47,13 +47,15 @@
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(~/.ssh/**)",
-      "Read(~/.aws/**)"
+      "Read(~/.aws/**)",
+      "Read(~/.config/sops/**)",
+      "Read(~/.claude.json)",
+      "Read(~/.config/claude/.claude.json)"
     ],
     "defaultMode": "auto"
   },
   "model": "opus",
   "skillOverrides": {
-    "codex-cli": "off",
     "diff-only": "off",
     "duckdb-wasm": "off",
     "find-skills": "off",
