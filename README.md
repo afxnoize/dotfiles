@@ -152,6 +152,7 @@ telegram-supercharged restore   # 公式に戻す
 | `dot_config/zabrze/` | スニペット展開（git, chezmoi, AI 用） |
 | `dot_config/claude/` | Claude Code 設定・スキル・subagent・hooks |
 | `.chezmoiscripts/` | chezmoi ライフサイクルスクリプト |
+| `.github/infra/` | GitHub のリポジトリ設定（gh-infra の manifest）。`gh-infra plan .github/infra` で差分を見て、`gh-infra apply .github/infra` で反映する |
 
 ## 注意事項
 
