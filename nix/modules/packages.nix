@@ -40,7 +40,6 @@ let
     pkgs-unstable.uv
     pkgs-unstable.usage
     pkgs-unstable.deno
-    devbox
     just
     chezmoi
   ];

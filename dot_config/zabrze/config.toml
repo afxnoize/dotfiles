@@ -96,11 +96,6 @@ name = "tmux -u"
 trigger = "t"
 snippet = "tmux -u"
 
-[[snippets]]
-name = "devbox"
-trigger = "dv"
-snippet = "devbox"
-
 # k1LoW/mo {{{2
 [[snippets]]
 name = "mo --no-open"

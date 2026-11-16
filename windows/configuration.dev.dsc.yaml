@@ -2,7 +2,7 @@
 # Development setup for a Windows machine.
 # Usage: winget configure -f configuration.dev.dsc.yaml
 # Windows counterpart of nix/modules/packages.nix. Tools without a Windows build
-# (nix tooling, cage, devbox, tmux) are left out.
+# (nix tooling, cage, tmux) are left out.
 properties:
   configurationVersion: 0.2.0
   resources:
