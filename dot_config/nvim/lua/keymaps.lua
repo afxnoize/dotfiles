@@ -17,11 +17,11 @@
 local keymap = vim.keymap
 
 -- １文字貼り付け防止
-keymap.set('', 'x', '"_x')
+keymap.set({ 'n', 'x' }, 'x', '"_x')
 
 -- 水平移動
-keymap.set('', 'H', '^')
-keymap.set('', 'L', 'g_')
+keymap.set({ 'n', 'x', 'o' }, 'H', '^')
+keymap.set({ 'n', 'x', 'o' }, 'L', 'g_')
 
 -- インデントしても選択領域を保持
 keymap.set('v', '<', '<gv')
