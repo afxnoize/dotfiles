@@ -28,6 +28,11 @@
 - `[tab]` のような擬似プレフィクスは使わない。`<Leader><Tab>n` のように実キーで定義し、キーには必ず `desc` を付ける
 - プレフィクスだけのキー（`<Leader>f` や `m`）は `lua/keymaps.lua` で `<Nop>` にする。続くキーが未定義のとき、プレフィクスのキーだけを無効にするため
 
+### Lua の書き方
+- オプションは `vim.opt` で設定する。名前は省略形でなく正式名で書く（`rtp` でなく `runtimepath`）
+- autocmd は `command` 文字列でなく `callback` で書き、`nvim_create_augroup(name, { clear = true })` の名前付き augroup に入れる
+- グローバル関数と `v:lua` は使わない。キーマップには Lua 関数を直接渡す
+
 ### プラグイン設定のパターン
 ```lua
 -- after/plugin/ での安全なrequireパターン
