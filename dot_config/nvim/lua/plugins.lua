@@ -29,7 +29,6 @@ lazy.setup({
 		'folke/snacks.nvim',
 		priority = 1000,
 		lazy = false,
-		-- Only modules listed in opts are enabled
 		opts = {
 			input = {},
 			picker = { ui_select = true },
