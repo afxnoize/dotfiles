@@ -322,11 +322,15 @@ lazy.setup({
 	{
 		'yuki-yano/fuzzy-motion.vim',
 		dependencies = { 'vim-denops/denops.vim' },
-		lazy = false,
-		-- cmd = 'FuzzyMotion',
+		cmd = 'FuzzyMotion',
 		init = function()
 			vim.g.fuzzy_motion_auto_jump = false
 			vim.keymap.set('n', 'm<Space>', '<Cmd>FuzzyMotion<CR>', { desc = 'Fuzzy motion' })
+		end,
+		config = function()
+			if vim.fn['denops#server#status']() == 'running' then
+				vim.fn['denops#plugin#discover']()
+			end
 		end,
 	},
 
