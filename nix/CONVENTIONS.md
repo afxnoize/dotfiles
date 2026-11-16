@@ -6,14 +6,15 @@
 - 新規モジュール追加時は `modules/default.nix` のimportリストに追加すること
 
 ### Tools / Runtime Wrapper パターン
-- `tools/mk-runtime-wrappers.nix` はランタイム（npx, bunx等）のラッパーを生成する汎用関数
-- 各ツールは `registry.nix` にコマンド→パッケージのマッピングを定義
-- 新しいコマンドを追加する場合は対応する `registry.nix` にエントリを追加する
+- `tools/mk-runtime-wrappers.nix` は、registry の「コマンド名 = パッケージ名」から wrapper を生成する汎用関数。実行行は呼び出し側が `mkExec = cmd: pkg: "..."` で渡す
+- npm の CLI は `tools/bunx/registry.nix` に登録する。`tools/bunx/default.nix` の `mkExec` が `bunx --bun --package <パッケージ> <コマンド>` を組み立てる
+- `--package` でパッケージとコマンドを分けて渡す。`bunx <コマンド>` だけだと、bunx が PATH 上の同名の wrapper 自身を呼んでしまう
 
 ```nix
 # registry.nix の例
 {
-  takt = "@anthropic-ai/takt";   # コマンド名 = パッケージ名
+  takt = "takt";
+  leaf = "@rivolink/leaf";
 }
 ```
 
@@ -23,8 +24,10 @@
 
 ### パッケージソース
 - **nixpkgs (stable)**: 通常のパッケージ
-- **nixpkgs-unstable**: 最新版が必要なパッケージ（mise, git-wt 等）
+- **nixpkgs-unstable**: 最新版が必要なパッケージ（mise, uv, deno, git-wt 等）
 - **外部 flake**: llm-agents, cage 等（`inputs` で定義）
+- **mise**: moonbit だけ（nixpkgs にも llm-agents にも無いため）。グローバルのランタイムは Nix で持ち、プロジェクトのランタイムは flake の devShell と nix-direnv に任せる
+- 最新版が要るパッケージの取り方: nixpkgs-unstable で足りるならそれ、毎日追うなら llm-agents、どちらにもなければ mise
 - **happy-coder**: llm-agents の版を `overlays/happy-coder.nix` で包み、`HAPPY_CLAUDE_PATH` の既定値を `~/.nix-profile/bin/claude` にする。上流の `bin/happy` は未設定なら `command -v claude` を使うため、PATH の順序（`~/.local/bin` が先）次第で別の claude を拾う。効くのは端末から起動する local モードだけで、デーモンが起動する remote モード（スマホから起こすセッション）は happy に同梱の claude-agent-sdk の claude を使う。そちらの版は happy-coder の更新でしか上がらない。store パスでなく profile を経由するのは、`flake-latest-update` で上がった claude を次の local セッションから使うため。`--set-default` なので環境変数で上書きできる。データ置き場は `HAPPY_HOME_DIR` で `$XDG_STATE_HOME/happy` に移している（実行時に解決し、デーモンは起動した happy から引き継ぐ）
 - **Go のソースビルド**: nixpkgs に無い Go のツールは `tools/gh-infra/` のように `pkgs-unstable.buildGoModule` で build する。版を上げたら `hash` と `vendorHash` を更新する。gh の拡張は `xdg.dataFile."gh/extensions/<名前>"` に `bin` をつないで `gh <名前>` で呼べるようにする（`programs.gh` は `config.yml` を読み取り専用にするので使わない）
 - **カスタムバイナリ**: `tools/kakehashi/` のようにプラットフォーム別に分岐
@@ -43,7 +46,7 @@
 - push していない変更は反映されず、手動 `hms` で入れた未 push の変更は次回の timer で main の内容に戻る。working copy の `flake.lock` も更新されないので、lock の更新を残したいときはローカルで `hmu <入力名>` して commit・push する（放置すると手動 `hms` が古い rev に戻る）
 - GitHub API の rate limit で更新できない日は exit 1 で終わる（nix は警告だけで cached lock に戻るため、スクリプト側で検出している）。結果は `journalctl --user -u flake-latest-update` で確認する
 - 反映されるのは次回起動から。実行中の claude は旧バイナリのまま動き続ける
-- timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now flake-latest-update.timer`（`.chezmoiignore` の `.chezmoiscripts/*` で chezmoi scripts が無効なため、apply では有効化されない）
+- timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now flake-latest-update.timer`（timer を有効にする chezmoi script は無いため、apply では有効化されない）
 - `OnCalendar` を変えたときは、apply のあとに `systemctl --user daemon-reload && systemctl --user restart flake-latest-update.timer` で反映する
 
 ### GitHub の認証（ghtkn）

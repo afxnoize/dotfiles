@@ -68,9 +68,6 @@ opt.wrapscan = true
 opt.wildmode = 'list:longest'
 --- }}}
 
--- Suppress autoindent pasting clipboard (paste is turned off again by the InsertLeave autocmd in autocmds.lua)
-vim.keymap.set('n', '<F10>', [[<C-u>exe "normal" (getline(".")==""?"I":"o")<CR>i<C-o>:set paste<CR>]], {})
-
 -- Add asterisks in block comments
 opt.formatoptions:append({ 'r' })
 

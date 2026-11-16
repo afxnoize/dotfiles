@@ -56,7 +56,6 @@
   },
   "model": "opus",
   "skillOverrides": {
-    "codex-cli": "off",
     "diff-only": "off",
     "duckdb-wasm": "off",
     "find-skills": "off",

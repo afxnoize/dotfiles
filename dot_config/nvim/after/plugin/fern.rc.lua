@@ -1,4 +1,4 @@
-vim.keymap.set('', '<S-t>', '<Cmd>Fern . -drawer -reveal=% -toggle<CR>')
+vim.keymap.set('n', '<S-t>', '<Cmd>Fern . -drawer -reveal=% -toggle<CR>')
 
 vim.api.nvim_create_augroup('FernNoNumber', {})
 vim.api.nvim_create_autocmd('filetype', {

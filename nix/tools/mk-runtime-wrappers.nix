@@ -1,11 +1,11 @@
 { pkgs }:
 
-runtime: tools:
+mkExec: tools:
 
 pkgs.lib.mapAttrsToList
   (cmd: pkg:
     pkgs.writeShellScriptBin cmd ''
       set -euo pipefail
-      exec ${runtime} ${pkgs.lib.escapeShellArg pkg} "$@"
+      exec ${mkExec cmd pkg} "$@"
     '')
   tools

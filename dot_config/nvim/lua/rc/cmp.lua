@@ -62,7 +62,6 @@ function M.config()
 			{ name = 'nvim_lsp', priority = 100 },
 			{ name = 'luasnip',  priority = 30 },
 			{ name = 'buffer',   priority = 50 },
-			-- { name = 'skkeleton', priority = 100 },
 		},
 		formatting = {
 			format = lspkind.cmp_format { with_text = false, maxwidth = 50 },
