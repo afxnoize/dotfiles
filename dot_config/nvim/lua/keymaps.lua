@@ -89,7 +89,7 @@ keymap.set('n', '<Plug>(esc)<ESC>', 'i<ESC>', { noremap = true, desc = 'Send <Es
 -- floaterm
 local function floaterm(key, cmd, desc)
 	keymap.set('n', '<Leader>t' .. key, '<Cmd>' .. cmd .. '<CR>', { silent = true, desc = desc })
-	keymap.set('t', '<Leader>t' .. key, '<ESC><Cmd>' .. cmd .. '<CR>', { silent = true, desc = desc })
+	keymap.set('t', '<Leader>t' .. key, '<Cmd>' .. cmd .. '<CR>', { silent = true, desc = desc })
 end
 floaterm('c', 'FloatermNew', 'Floaterm: new')
 floaterm('p', 'FloatermPrev', 'Floaterm: previous')
