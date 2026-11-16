@@ -1,15 +1,14 @@
 { pkgs, ... }:
 
 let
-  runtime = "${pkgs.bun}/bin/bunx --bun";
-  wrappers =
-    (import ../mk-runtime-wrappers.nix { inherit pkgs; })
-      runtime
-      (import ./registry.nix);
-
+  wrappers = pkgs.lib.mapAttrsToList (
+    cmd: pkg:
+    pkgs.writeShellScriptBin cmd ''
+      set -euo pipefail
+      exec ${pkgs.bun}/bin/bunx --bun --package ${pkgs.lib.escapeShellArg pkg} ${pkgs.lib.escapeShellArg cmd} "$@"
+    ''
+  ) (import ./registry.nix);
 in
 {
-  home.packages =
-    [ pkgs.bun ]
-    ++ wrappers;
+  home.packages = [ pkgs.bun ] ++ wrappers;
 }
