@@ -1,3 +1,4 @@
 .config/nvim/after/plugin/oil.rc.lua
 .config/nvim/after/plugin/gina.rc.lua
 .config/claude/skills/codex-cli
+.config/nvim/plugin/git-prefix.rc.lua

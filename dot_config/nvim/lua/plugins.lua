@@ -9,7 +9,7 @@ if not vim.uv.fs_stat(lazypath) then
 		lazypath,
 	}
 end
-vim.opt.rtp:prepend(lazypath)
+vim.opt.runtimepath:prepend(lazypath)
 
 local ok, lazy = pcall(require, 'lazy')
 if not ok then
@@ -262,10 +262,10 @@ lazy.setup({
 	{
 		'monaqa/dial.nvim',
 		keys = {
-			{ '<C-a>', mode = { 'n', 'v' } },
-			{ '<C-x>', mode = { 'n', 'v' } },
-			{ 'g<C-a>', mode = { 'n', 'v' } },
-			{ 'g<C-x>', mode = { 'n', 'v' } },
+			{ '<C-a>', mode = { 'n', 'v' }, desc = 'Dial: increment' },
+			{ '<C-x>', mode = { 'n', 'v' }, desc = 'Dial: decrement' },
+			{ 'g<C-a>', mode = { 'n', 'v' }, desc = 'Dial: increment (cumulative)' },
+			{ 'g<C-x>', mode = { 'n', 'v' }, desc = 'Dial: decrement (cumulative)' },
 		},
 		config = function()
 			require('rc/dial').config()
@@ -284,8 +284,8 @@ lazy.setup({
 		'rhysd/clever-f.vim',
 		keys = { '<Plug>(clever-f-f)', '<Plug>(clever-f-F)' },
 		init = function()
-			vim.keymap.set({ 'n', 'x', 'o' }, 'f', '<Plug>(clever-f-f)', { noremap = false })
-			vim.keymap.set({ 'n', 'x', 'o' }, 'F', '<Plug>(clever-f-F)', { noremap = false })
+			vim.keymap.set({ 'n', 'x', 'o' }, 'f', '<Plug>(clever-f-f)', { noremap = false, desc = 'Find character forward (clever-f)' })
+			vim.keymap.set({ 'n', 'x', 'o' }, 'F', '<Plug>(clever-f-F)', { noremap = false, desc = 'Find character backward (clever-f)' })
 			vim.g.clever_f_not_overwrites_standard_mappings = 1
 		end,
 	},
@@ -322,11 +322,15 @@ lazy.setup({
 	{
 		'yuki-yano/fuzzy-motion.vim',
 		dependencies = { 'vim-denops/denops.vim' },
-		lazy = false,
-		-- cmd = 'FuzzyMotion',
+		cmd = 'FuzzyMotion',
 		init = function()
 			vim.g.fuzzy_motion_auto_jump = false
-			vim.keymap.set('n', '[motion]<Space>', '<Cmd>FuzzyMotion<CR>')
+			vim.keymap.set('n', 'm<Space>', '<Cmd>FuzzyMotion<CR>', { desc = 'Fuzzy motion' })
+		end,
+		config = function()
+			if vim.fn['denops#server#status']() == 'running' then
+				vim.fn['denops#plugin#discover']()
+			end
 		end,
 	},
 
@@ -334,7 +338,7 @@ lazy.setup({
 		'skanehira/jumpcursor.vim',
 		keys = '<Plug>(jumpcursor-jump)',
 		init = function()
-			vim.keymap.set('n', '[motion]j', '<Plug>(jumpcursor-jump)')
+			vim.keymap.set('n', 'mj', '<Plug>(jumpcursor-jump)', { desc = 'Jump cursor' })
 		end,
 	},
 
@@ -490,7 +494,7 @@ lazy.setup({
 			vim.g['cheatsheet#float_window_width_ratio'] = 0.8
 			vim.g['cheatsheet#float_window_height_ratio'] = 0.9
 			vim.api.nvim_create_user_command('CheatEdit', 'edit ~/.config/nvim/cheatsheet.md', {})
-			vim.keymap.set('n', '<leader>?', '<Cmd>Cheat<CR>', {})
+			vim.keymap.set('n', '<leader>?', '<Cmd>Cheat<CR>', { desc = 'Open cheatsheet' })
 		end,
 		cmd = { 'Cheat', 'CheatEdit' },
 	},
