@@ -23,8 +23,10 @@
 
 ### パッケージソース
 - **nixpkgs (stable)**: 通常のパッケージ
-- **nixpkgs-unstable**: 最新版が必要なパッケージ（mise, git-wt 等）
+- **nixpkgs-unstable**: 最新版が必要なパッケージ（mise, uv, deno, git-wt 等）
 - **外部 flake**: llm-agents, cage 等（`inputs` で定義）
+- **mise**: moonbit だけ（nixpkgs にも llm-agents にも無いため）。グローバルのランタイムは Nix で持ち、プロジェクトのランタイムは flake の devShell と nix-direnv に任せる
+- 最新版が要るパッケージの取り方: nixpkgs-unstable で足りるならそれ、毎日追うなら llm-agents、どちらにもなければ mise
 - **happy-coder**: llm-agents の版を `overlays/happy-coder.nix` で包み、`HAPPY_CLAUDE_PATH` の既定値を `~/.nix-profile/bin/claude` にする。上流の `bin/happy` は未設定なら `command -v claude` を使うため、PATH の順序（`~/.local/bin` が先）次第で別の claude を拾う。効くのは端末から起動する local モードだけで、デーモンが起動する remote モード（スマホから起こすセッション）は happy に同梱の claude-agent-sdk の claude を使う。そちらの版は happy-coder の更新でしか上がらない。store パスでなく profile を経由するのは、`claude-update` で上がった claude を次の local セッションから使うため。`--set-default` なので環境変数で上書きできる。データ置き場は `HAPPY_HOME_DIR` で `$XDG_STATE_HOME/happy` に移している（実行時に解決し、デーモンは起動した happy から引き継ぐ）
 - **Go のソースビルド**: nixpkgs に無い Go のツールは `tools/gh-infra/` のように `pkgs-unstable.buildGoModule` で build する。版を上げたら `hash` と `vendorHash` を更新する。gh の拡張は `xdg.dataFile."gh/extensions/<名前>"` に `bin` をつないで `gh <名前>` で呼べるようにする（`programs.gh` は `config.yml` を読み取り専用にするので使わない）
 - **カスタムバイナリ**: `tools/kakehashi/` のようにプラットフォーム別に分岐
