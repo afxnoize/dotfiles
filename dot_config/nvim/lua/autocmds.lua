@@ -40,12 +40,6 @@ create_autocmd('FileType', {
 	end,
 }) -- }}}
 
--- Turn off paste mode when leaving insert{{{
-create_autocmd('InsertLeave', {
-	pattern = '*',
-	command = 'set nopaste',
-}) -- }}}
-
 -- QuickFixGrep{{{
 create_autocmd('QuickFixCmdPost', {
 	group = create_augroup('QuickFixGrep', {}),
