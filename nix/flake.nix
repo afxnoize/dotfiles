@@ -23,7 +23,10 @@
 
     claude-code.url = "github:sadjow/claude-code-nix";
     llm-agents.url = "github:numtide/llm-agents.nix";
-    cage.url = "github:Warashi/cage";
+    cage = {
+      url = "github:Warashi/cage";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Latest upstream bun release, locked by narHash. Kept on purpose (see
     # overlays/bun.nix); claude-update refreshes these daily, or by hand with
