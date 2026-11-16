@@ -6,7 +6,3 @@ config/tmux/plugins
 .plans
 
 result
-
-
-# APM dependencies
-apm_modules/
