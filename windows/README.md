@@ -64,7 +64,7 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 
 `packages.nix` から入れないもの:
 
-- Nix 関連、cage、devbox、tmux: Windows 版がない
+- Nix 関連、cage、tmux: Windows 版がない
 - git-wt: winget に登録されていない
 - gti: 使わない
 - rtk、ccusage: 未確認。必要なら mise か npm で入れる
