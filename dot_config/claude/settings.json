@@ -47,7 +47,10 @@
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(~/.ssh/**)",
-      "Read(~/.aws/**)"
+      "Read(~/.aws/**)",
+      "Read(~/.config/sops/**)",
+      "Read(~/.claude.json)",
+      "Read(~/.config/claude/.claude.json)"
     ],
     "defaultMode": "auto"
   },
