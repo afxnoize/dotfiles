@@ -34,7 +34,7 @@
   - `claude-code`: sadjow/claude-code-nix
   - `llm-agents`: numtide/llm-agents.nix。rtk、ccusage、herdr、t3code、happy-coder などが一緒に上がる
   - `bun-linux-x64` / `bun-linux-aarch64`: upstream の latest release の zip（ファイル入力）
-- 追う入力の一覧は、スクリプト冒頭の `inputs` 配列に 1 箇所だけ持つ。足すときはここに名前を足す
+- 追う入力の一覧は、スクリプト冒頭の `latest_inputs` 配列に 1 箇所だけ持つ。足すときはここに名前を足す
 - `claude-code` と `llm-agents` には `follows` を付けない。配布元が検証した nixpkgs から外れ、配布元の binary cache が使えなくなるため
 - 無人で上がるので、壊れた版が入ったら Home-Manager の世代を戻す。switch の前に版を比べて止める仕組みは入れていない
 - ビルド元はローカルの working copy ではなく、リモート（`https://github.com/afxnoize/dotfiles.git` の `main`）を毎回 shallow clone した一時ディレクトリ。cage 内の agent は working copy と `.git` を書き換えられるため、working copy を読む・git を実行すると、悪意ある nix module や `core.fsmonitor` を無人・サンドボックス外で実行させられてしまう。リモートの URL もスクリプトに固定している

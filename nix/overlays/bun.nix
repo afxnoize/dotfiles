@@ -1,7 +1,3 @@
-# Standing policy: bun is pinned to the upstream latest release on purpose, not
-# to nixpkgs (which lags upstream and once bundled a vulnerable brotli, fixed in
-# bun 1.4.4). claude-update refreshes the bun-linux-* inputs daily. Keep this
-# overlay even when nixpkgs catches up. Other systems keep the nixpkgs bun.
 { inputs, system }:
 
 final: prev:

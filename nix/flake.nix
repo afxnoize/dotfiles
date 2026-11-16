@@ -28,9 +28,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Latest upstream bun release, locked by narHash. Kept on purpose (see
-    # overlays/bun.nix); claude-update refreshes these daily, or by hand with
-    # `nix flake update bun-linux-x64 bun-linux-aarch64`.
     bun-linux-x64 = {
       url = "file+https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64-baseline.zip";
       flake = false;

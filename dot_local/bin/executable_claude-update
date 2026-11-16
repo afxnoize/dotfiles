@@ -1,8 +1,5 @@
 #!/bin/bash
-# Update the latest-tracking flake inputs (see `inputs` below), then switch
-# home-manager (hmu <inputs> + hms).
-# Run daily by claude-update.service (systemd user timer), i.e. outside the cage
-# sandbox. The name is historical; renaming would need a manual systemd re-enable.
+# Run by claude-update.service (systemd user timer), i.e. outside the cage sandbox.
 #
 # This builds the pushed main branch of the remote, from a fresh shallow clone
 # in a private temp dir. It never reads or runs git in the local working copy.
@@ -13,9 +10,7 @@
 #     `hmu <input>...` locally and commit it.
 set -euo pipefail
 
-# Inputs that deliberately track the latest upstream. Add a name here to follow
-# it daily. The bun-* inputs are file inputs (locked by narHash, no rev).
-readonly inputs=(claude-code llm-agents bun-linux-x64 bun-linux-aarch64)
+readonly latest_inputs=(claude-code llm-agents bun-linux-x64 bun-linux-aarch64)
 
 # Hard-coded on purpose: a sandboxed (cage) agent can write the working copy's
 # .git (allow-git), so the remote URL and any git config read from there are
@@ -41,7 +36,6 @@ GIT_TERMINAL_PROMPT=0 git clone --quiet --depth 1 --branch "$branch" "$remote" "
 }
 flake="$work/src/nix"
 
-# Identity of a locked input: the git rev, or the narHash for file inputs.
 lock_id() {
   jq -r --arg n "$1" '.nodes[.nodes.root.inputs[$n]].locked | .rev // .narHash' "$flake/flake.lock"
 }
@@ -51,11 +45,11 @@ short() {
 }
 
 declare -A before
-for name in "${inputs[@]}"; do
+for name in "${latest_inputs[@]}"; do
   before[$name]=$(lock_id "$name")
 done
 
-out=$(nix flake update "${inputs[@]}" --flake "$flake" 2>&1) || {
+out=$(nix flake update "${latest_inputs[@]}" --flake "$flake" 2>&1) || {
   printf '%s\n' "$out"
   log "flake update failed"
   exit 1
@@ -69,7 +63,7 @@ if grep -q 'using cached version' <<<"$out"; then
   exit 1
 fi
 
-for name in "${inputs[@]}"; do
+for name in "${latest_inputs[@]}"; do
   after=$(lock_id "$name")
   if [[ "${before[$name]}" == "$after" ]]; then
     log "$name is already at $(short "$after")"
