@@ -96,8 +96,6 @@ lazy.setup({
 		dependencies = {
 			'hrsh7th/cmp-nvim-lsp',
 			'hrsh7th/cmp-buffer',
-			'hrsh7th/cmp-path',
-			'hrsh7th/cmp-cmdline',
 			-- snippet engine
 			{
 				'L3MON4D3/LuaSnip',
@@ -110,26 +108,21 @@ lazy.setup({
 			'saadparwaiz1/cmp_luasnip',
 			-- pictogram
 			'onsails/lspkind.nvim',
-			{
-				-- input japanese
-				'rinx/cmp-skkeleton',
-				-- enabled = false,
-				dependencies = {
-					{
-						'vim-skk/skkeleton',
-						lazy = false,
-					},
-					{
-						'delphinus/skkeleton_indicator.nvim',
-						event = 'InsertEnter',
-						config = true,
-					},
-				},
-			},
 		},
 		config = function()
 			require('rc/cmp').config()
 		end,
+	},
+
+	-- input japanese
+	{
+		'vim-skk/skkeleton',
+		lazy = false,
+	},
+	{
+		'delphinus/skkeleton_indicator.nvim',
+		event = 'InsertEnter',
+		config = true,
 	},
 
 	-- linter formatter
