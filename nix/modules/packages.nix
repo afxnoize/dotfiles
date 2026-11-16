@@ -37,9 +37,18 @@ let
 
   devTools = with pkgs; [
     pkgs-unstable.mise
+    pkgs-unstable.uv
+    pkgs-unstable.usage
+    pkgs-unstable.deno
     devbox
     just
     chezmoi
+  ];
+
+  cliTools = with pkgs; [
+    tldr
+    pkgs-unstable.duckdb
+    pkgs-unstable.oci-cli
   ];
 
   secretTools = with pkgs; [
@@ -72,6 +81,7 @@ in
     editorTools
     shellTools
     devTools
+    cliTools
     secretTools
     aiTools
     sandboxTools
