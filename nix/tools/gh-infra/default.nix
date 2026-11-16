@@ -25,5 +25,5 @@ let
   };
 in
 {
-  home.packages = [ gh-infra ];
+  xdg.dataFile."gh/extensions/gh-infra".source = "${gh-infra}/bin";
 }
