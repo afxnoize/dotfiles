@@ -1,5 +1,6 @@
 # Not deployed: bootstrap config and docs
 configuration.*.dsc.yaml
+scripts
 README.md
 
 # AutoHotkey scripts need AutoHotkey from configuration.personal.dsc.yaml.

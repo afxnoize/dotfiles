@@ -58,18 +58,14 @@ properties:
           $exe = Join-Path $env:ProgramFiles 'WezTerm\wezterm.exe'
           (Test-Path $exe) -and ([string](& $exe --version) -notmatch '20240203-110809-5046fc22')
         SetScript: |
-          $url = 'https://github.com/wezterm/wezterm/releases/download/nightly/WezTerm-nightly-setup.exe'
-          $tmp = Join-Path $env:TEMP 'WezTerm-nightly-setup.exe'
-          # curl.exe and .NET APIs instead of PowerShell cmdlets: winget's hosted
-          # PowerShell builds its own module path, so those cmdlets may not load.
-          curl.exe -fsSL $url -o $tmp
-          if ($LASTEXITCODE) { throw "WezTerm nightly download failed: $url" }
+          . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
+          $installer = Save-Download -Url 'https://github.com/wezterm/wezterm/releases/download/nightly/WezTerm-nightly-setup.exe'
           try {
-            $proc = [Diagnostics.Process]::Start($tmp, '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-')
+            $proc = [Diagnostics.Process]::Start($installer, '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-')
             $proc.WaitForExit()
             if ($proc.ExitCode) { throw "WezTerm nightly installer failed with exit code $($proc.ExitCode)" }
           } finally {
-            [IO.File]::Delete($tmp)
+            [IO.File]::Delete($installer)
           }
     - resource: PSDscResources/Script
       id: fonts
@@ -77,68 +73,22 @@ properties:
         description: Install Cica, UDEV Gothic and PleckJP for the current user
       settings:
         GetScript: |
-          $stampDir = Join-Path $env:LOCALAPPDATA 'dotfiles\fonts'
-          @{ Result = $(if (Test-Path $stampDir) { (Get-ChildItem -Path $stampDir -Name) -join ',' } else { '' }) }
+          $dir = Join-Path $env:LOCALAPPDATA 'dotfiles\releases'
+          @{ Result = $(if (Test-Path $dir) { (Get-ChildItem -Path $dir -Name) -join ',' } else { '' }) }
         TestScript: |
-          $fonts = @{
-            Cica       = 'cbd1bcf1f3fd1ddbffe444369c76e42529add8538b25aeb75ab682d398b0506f'
-            UDEVGothic = 'c104c171f6ed8922ca52d74cd915a271e427f1e884e51431aae71d99e8b3b47b'
-            PleckJP    = 'ba58f5a6862099d126a47a353de8e8a909da5311a6d8848f36d32bc9d0abdf80'
-          }
-          $stampDir = Join-Path $env:LOCALAPPDATA 'dotfiles\fonts'
-          $missing = $fonts.Keys | Where-Object {
-            $stamp = Join-Path $stampDir $_
-            -not (Test-Path $stamp) -or [IO.File]::ReadAllText($stamp).Trim() -ne $fonts[$_]
-          }
-          -not $missing
+          . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
+          (Test-Release -Name Cica -Sha256 'cbd1bcf1f3fd1ddbffe444369c76e42529add8538b25aeb75ab682d398b0506f') -and
+            (Test-Release -Name UDEVGothic -Sha256 'c104c171f6ed8922ca52d74cd915a271e427f1e884e51431aae71d99e8b3b47b') -and
+            (Test-Release -Name PleckJP -Sha256 'ba58f5a6862099d126a47a353de8e8a909da5311a6d8848f36d32bc9d0abdf80')
         SetScript: |
-          $fonts = @(
-            @{ Name = 'Cica'; Files = 'Cica-*.ttf'; Sha256 = 'cbd1bcf1f3fd1ddbffe444369c76e42529add8538b25aeb75ab682d398b0506f'
-               Url = 'https://github.com/miiton/Cica/releases/download/v5.0.3/Cica_v5.0.3.zip' }
-            @{ Name = 'UDEVGothic'; Files = 'UDEVGothic-*.ttf'; Sha256 = 'c104c171f6ed8922ca52d74cd915a271e427f1e884e51431aae71d99e8b3b47b'
-               Url = 'https://github.com/yuru7/udev-gothic/releases/download/v2.2.0/UDEVGothic_v2.2.0.zip' }
-            @{ Name = 'PleckJP'; Files = 'PleckJP-*.ttf'; Sha256 = 'ba58f5a6862099d126a47a353de8e8a909da5311a6d8848f36d32bc9d0abdf80'
-               Url = 'https://github.com/ryota2357/PleckJP/releases/download/v2.2.1/PleckJP_v2.2.1.zip' }
-          )
+          . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
           $fontDir = Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\Fonts'
-          $stampDir = Join-Path $env:LOCALAPPDATA 'dotfiles\fonts'
-          New-Item -ItemType Directory -Path $fontDir, $stampDir -Force -ErrorAction Stop | Out-Null
-          # Per-user fonts are registered under HKCU with the full path of the file.
-          $key = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey('Software\Microsoft\Windows NT\CurrentVersion\Fonts')
-          try {
-            foreach ($font in $fonts) {
-              $stamp = Join-Path $stampDir $font.Name
-              if ((Test-Path $stamp) -and [IO.File]::ReadAllText($stamp).Trim() -eq $font.Sha256) { continue }
-              $zip = Join-Path $env:TEMP "$($font.Name).zip"
-              $extracted = Join-Path $env:TEMP "$($font.Name)-fonts"
-              try {
-                curl.exe -fsSL $font.Url -o $zip
-                if ($LASTEXITCODE) { throw "$($font.Name) download failed: $($font.Url)" }
-                $stream = [IO.File]::OpenRead($zip)
-                try {
-                  $actual = -join ([Security.Cryptography.SHA256]::Create().ComputeHash($stream) | ForEach-Object { $_.ToString('x2') })
-                } finally {
-                  $stream.Close()
-                }
-                if ($actual -ne $font.Sha256) { throw "$($font.Name) hash mismatch: expected $($font.Sha256), got $actual" }
-                New-Item -ItemType Directory -Path $extracted -Force -ErrorAction Stop | Out-Null
-                tar.exe -xf $zip -C $extracted
-                if ($LASTEXITCODE) { throw "$($font.Name) extraction failed: $zip" }
-                $ttfs = Get-ChildItem -Path $extracted -Recurse -Filter $font.Files
-                if (-not $ttfs) { throw "$($font.Name): no files match $($font.Files)" }
-                foreach ($ttf in $ttfs) {
-                  $dest = Join-Path $fontDir $ttf.Name
-                  Copy-Item -Path $ttf.FullName -Destination $dest -Force -ErrorAction Stop
-                  $key.SetValue("$($ttf.BaseName) (TrueType)", $dest)
-                }
-                [IO.File]::WriteAllText($stamp, $font.Sha256)
-              } finally {
-                Remove-Item -Path $zip, $extracted -Recurse -Force -ErrorAction SilentlyContinue
-              }
-            }
-          } finally {
-            $key.Close()
-          }
+          Install-Release -Name Cica -Sha256 'cbd1bcf1f3fd1ddbffe444369c76e42529add8538b25aeb75ab682d398b0506f' -Dir $fontDir -Extract 'Cica-*.ttf' -RegisterFont `
+            -Url 'https://github.com/miiton/Cica/releases/download/v5.0.3/Cica_v5.0.3.zip'
+          Install-Release -Name UDEVGothic -Sha256 'c104c171f6ed8922ca52d74cd915a271e427f1e884e51431aae71d99e8b3b47b' -Dir $fontDir -Extract 'UDEVGothic-*.ttf' -RegisterFont `
+            -Url 'https://github.com/yuru7/udev-gothic/releases/download/v2.2.0/UDEVGothic_v2.2.0.zip'
+          Install-Release -Name PleckJP -Sha256 'ba58f5a6862099d126a47a353de8e8a909da5311a6d8848f36d32bc9d0abdf80' -Dir $fontDir -Extract 'PleckJP-*.ttf' -RegisterFont `
+            -Url 'https://github.com/ryota2357/PleckJP/releases/download/v2.2.1/PleckJP_v2.2.1.zip'
 
     # --- VCS ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
@@ -282,7 +232,7 @@ properties:
       settings:
         id: Bitwarden.CLI
         source: winget
-    # On upgrade, change $version in both scripts and $expected (amd64.exe line of sops-v<version>.checksums.txt).
+    # On upgrade, change the URL and the hash in both scripts (amd64.exe line of sops-v<version>.checksums.txt).
     - resource: PSDscResources/Script
       id: sops
       directives:
@@ -292,49 +242,12 @@ properties:
           $exe = Join-Path $env:LOCALAPPDATA 'Programs\sops\sops.exe'
           @{ Result = $(if (Test-Path $exe) { [string](& $exe --disable-version-check --version) } else { '' }) }
         TestScript: |
-          $version = '3.13.3'
-          $dir = Join-Path $env:LOCALAPPDATA 'Programs\sops'
-          $exe = Join-Path $dir 'sops.exe'
-          $userPath = [Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | ForEach-Object { $_.Trim().TrimEnd('\') }
-          (Test-Path $exe) -and ([string](& $exe --disable-version-check --version) -match "^sops $([regex]::Escape($version))\b") -and ($userPath -icontains $dir)
+          . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
+          Test-Release -Name sops -Sha256 'a4a9a398858fe8b2ef72d9686d930bf7c5cece9be74ad83ac3b53cfdd70e6b1c' -PathDir (Join-Path $env:LOCALAPPDATA 'Programs\sops')
         SetScript: |
-          $version = '3.13.3'
-          $expected = 'a4a9a398858fe8b2ef72d9686d930bf7c5cece9be74ad83ac3b53cfdd70e6b1c'
-          $dir = Join-Path $env:LOCALAPPDATA 'Programs\sops'
-          $url = "https://github.com/getsops/sops/releases/download/v$version/sops-v$version.amd64.exe"
-          $tmp = Join-Path $env:TEMP "sops-v$version.amd64.exe"
-          # curl.exe and .NET APIs instead of PowerShell cmdlets: winget's hosted
-          # PowerShell builds its own module path, so those cmdlets may not load.
-          curl.exe -fsSL $url -o $tmp
-          if ($LASTEXITCODE) { throw "sops download failed: $url" }
-          $stream = [IO.File]::OpenRead($tmp)
-          try {
-            $actual = -join ([Security.Cryptography.SHA256]::Create().ComputeHash($stream) | ForEach-Object { $_.ToString('x2') })
-          } finally {
-            $stream.Close()
-          }
-          if ($actual -ne $expected) {
-            Remove-Item $tmp
-            throw "sops-v$version.amd64.exe hash mismatch: expected $expected, got $actual"
-          }
-          New-Item -ItemType Directory -Path $dir -Force | Out-Null
-          Move-Item -Path $tmp -Destination (Join-Path $dir 'sops.exe') -Force
-          # Edit the raw registry value: [Environment]::SetEnvironmentVariable would
-          # write back expanded %VARIABLES% and turn REG_EXPAND_SZ into REG_SZ.
-          $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
-          try {
-            $raw = [string]$key.GetValue('Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
-            $listed = $raw -split ';' | Where-Object { $_.Trim().TrimEnd('\') -ieq $dir }
-            if (-not $listed) {
-              $kind = if ($key.GetValueNames() -contains 'Path') { $key.GetValueKind('Path') } else { [Microsoft.Win32.RegistryValueKind]::ExpandString }
-              $key.SetValue('Path', $(if ($raw) { $raw.TrimEnd(';') + ';' + $dir } else { $dir }), $kind)
-              # Setting any user variable broadcasts the environment change to running programs.
-              [Environment]::SetEnvironmentVariable('SOPS_INSTALLING', '1', 'User')
-              [Environment]::SetEnvironmentVariable('SOPS_INSTALLING', $null, 'User')
-            }
-          } finally {
-            $key.Close()
-          }
+          . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
+          Install-Release -Name sops -Sha256 'a4a9a398858fe8b2ef72d9686d930bf7c5cece9be74ad83ac3b53cfdd70e6b1c' -Dir (Join-Path $env:LOCALAPPDATA 'Programs\sops') -FileName sops.exe -AddToPath `
+            -Url 'https://github.com/getsops/sops/releases/download/v3.13.3/sops-v3.13.3.amd64.exe'
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: age
       directives:
