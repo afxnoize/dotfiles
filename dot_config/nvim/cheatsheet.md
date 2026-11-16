@@ -4,7 +4,7 @@
   - `Ctrl-W`: delete word (back cursor)
 - In CommandLine mode
   - `Ctrl-R` + `register`: paste register
-- `m<Space>`: **FuzzyMotion** (`m` is `[motion]` prefix)
+- `m<Space>`: **FuzzyMotion**
 - `]F`: format using LSP (`vim.lsp.buf.format`)
 
 ## memo

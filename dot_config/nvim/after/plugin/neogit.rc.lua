@@ -4,7 +4,6 @@ local function open(opt)
 	end
 end
 
-local silent = { silent = true }
-vim.keymap.set('n', '[git]s', open({ kind = 'replace' }), silent)
-vim.keymap.set('n', '[git]b', open({ 'branch', kind = 'split' }), silent)
-vim.keymap.set('n', '[git]l', open({ 'log' }), silent)
+vim.keymap.set('n', '<Leader>gs', open({ kind = 'replace' }), { silent = true, desc = 'Neogit: status' })
+vim.keymap.set('n', '<Leader>gb', open({ 'branch', kind = 'split' }), { silent = true, desc = 'Neogit: branch' })
+vim.keymap.set('n', '<Leader>gl', open({ 'log' }), { silent = true, desc = 'Neogit: log' })

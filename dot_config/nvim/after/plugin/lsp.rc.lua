@@ -73,31 +73,33 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 		-- Mappings.
 		-- See `:help vim.lsp.*` for documentation on any of the below functions
-		local bufnr = args.buf
-		local bufopts = { noremap = true, silent = true, buffer = bufnr }
-		vim.keymap.set('n', '][', function() vim.diagnostic.jump({ count = -1 }) end, bufopts)
-		vim.keymap.set('n', ']]', function() vim.diagnostic.jump({ count = 1 }) end, bufopts)
-		vim.keymap.set('n', ']e', vim.diagnostic.open_float, bufopts)
+		local function map(lhs, rhs, desc)
+			vim.keymap.set('n', lhs, rhs, { noremap = true, silent = true, buffer = args.buf, desc = desc })
+		end
+		map('][', function() vim.diagnostic.jump({ count = -1 }) end, 'Previous diagnostic')
+		map(']]', function() vim.diagnostic.jump({ count = 1 }) end, 'Next diagnostic')
+		map(']e', vim.diagnostic.open_float, 'Show diagnostic')
 
 		-- Definitions
-		vim.keymap.set('n', ']d', vim.lsp.buf.definition, bufopts)
+		map(']d', vim.lsp.buf.definition, 'Go to definition')
 
 		-- Implementations
-		vim.keymap.set('n', ']i', vim.lsp.buf.implementation, bufopts)
+		map(']i', vim.lsp.buf.implementation, 'Go to implementation')
 
 		-- References
-		vim.keymap.set('n', ']f', vim.lsp.buf.references, bufopts)
+		map(']f', vim.lsp.buf.references, 'List references')
 
-		vim.keymap.set('n', 'K', function() -- https://scrapbox.io/vim-jp/better_K_for_neovim_lua
+		-- https://scrapbox.io/vim-jp/better_K_for_neovim_lua
+		map('K', function()
 			if not lua_help() then
 				vim.lsp.buf.hover()
 			end
-		end, bufopts)
-		vim.keymap.set('n', ']r', vim.lsp.buf.rename, bufopts)
-		vim.keymap.set('n', ']a', vim.lsp.buf.code_action, bufopts)
-		vim.keymap.set('n', ']F', function()
+		end, 'Hover (help for vim.* in Lua)')
+		map(']r', vim.lsp.buf.rename, 'Rename')
+		map(']a', vim.lsp.buf.code_action, 'Code action')
+		map(']F', function()
 			vim.lsp.buf.format { async = true }
-		end, bufopts)
+		end, 'Format')
 	end,
 })
 -- }}}

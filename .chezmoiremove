@@ -1,2 +1,3 @@
 .config/nvim/after/plugin/oil.rc.lua
 .config/nvim/after/plugin/gina.rc.lua
+.config/nvim/plugin/git-prefix.rc.lua

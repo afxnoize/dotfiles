@@ -1,17 +1,17 @@
 -- Overwrite / and ?.
-vim.keymap.set({ 'n', 'x' }, '?', [[<Cmd>call searchx#start({ 'dir': 0 })<CR>]])
-vim.keymap.set({ 'n', 'x' }, '/', [[<Cmd>call searchx#start({ 'dir': 1 })<CR>]])
+vim.keymap.set({ 'n', 'x' }, '?', [[<Cmd>call searchx#start({ 'dir': 0 })<CR>]], { desc = 'Search backward (searchx)' })
+vim.keymap.set({ 'n', 'x' }, '/', [[<Cmd>call searchx#start({ 'dir': 1 })<CR>]], { desc = 'Search forward (searchx)' })
 -- vim.keymap.set('c', ';', '<Cmd>call searchx#select()<CR>')
 
 -- Move to next/prev match.
-vim.keymap.set({ 'n', 'x' }, 'N', '<Cmd>call searchx#prev_dir()<CR>')
-vim.keymap.set({ 'n', 'x' }, 'n', '<Cmd>call searchx#next_dir()<CR>')
+vim.keymap.set({ 'n', 'x' }, 'N', '<Cmd>call searchx#prev_dir()<CR>', { desc = 'Previous match in search direction (searchx)' })
+vim.keymap.set({ 'n', 'x' }, 'n', '<Cmd>call searchx#next_dir()<CR>', { desc = 'Next match in search direction (searchx)' })
 -- Not mapped in cmdline mode: skkeleton toggles with <C-j> there (skkeleton.rc.lua)
-vim.keymap.set({ 'n', 'x' }, '<C-k>', '<Cmd>call searchx#prev()<CR>')
-vim.keymap.set({ 'n', 'x' }, '<C-j>', '<Cmd>call searchx#next()<CR>')
+vim.keymap.set({ 'n', 'x' }, '<C-k>', '<Cmd>call searchx#prev()<CR>', { desc = 'Previous match (searchx)' })
+vim.keymap.set({ 'n', 'x' }, '<C-j>', '<Cmd>call searchx#next()<CR>', { desc = 'Next match (searchx)' })
 
 -- Clear highlights
-vim.keymap.set('n', '<C-l>', '<Cmd>call searchx#clear()<CR>')
+vim.keymap.set('n', '<C-l>', '<Cmd>call searchx#clear()<CR>', { desc = 'Clear search highlight (searchx)' })
 
 vim.g.searchx = {
 	-- Auto jump if the recent input matches to any marker.

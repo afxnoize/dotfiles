@@ -2,7 +2,7 @@
 -- $ curl -OL https://skk-dev.github.io/dict/SKK-JISYO.L.gz
 -- put /usr/share/skk/SKK-JISYO.L
 
-vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { noremap = false })
+vim.keymap.set({ 'i', 'c' }, '<C-j>', '<Plug>(skkeleton-toggle)', { noremap = false, desc = 'Toggle skkeleton' })
 
 -- Evaluating the variable autoloads skkeleton, which defines the default keys
 local mapped_keys = vim.fn.eval('g:skkeleton#mapped_keys')
