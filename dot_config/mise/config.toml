@@ -1,6 +1,5 @@
 [tools]
 moonbit = "latest"
-"github:microsoft/apm" = "latest"
 
 [settings]
 experimental = true

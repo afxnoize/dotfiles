@@ -6,14 +6,15 @@
 - 新規モジュール追加時は `modules/default.nix` のimportリストに追加すること
 
 ### Tools / Runtime Wrapper パターン
-- `tools/mk-runtime-wrappers.nix` はランタイム（npx, bunx等）のラッパーを生成する汎用関数
-- 各ツールは `registry.nix` にコマンド→パッケージのマッピングを定義
-- 新しいコマンドを追加する場合は対応する `registry.nix` にエントリを追加する
+- `tools/mk-runtime-wrappers.nix` は、registry の「コマンド名 = パッケージ名」から wrapper を生成する汎用関数。実行行は呼び出し側が `mkExec = cmd: pkg: "..."` で渡す
+- npm の CLI は `tools/bunx/registry.nix` に登録する。`tools/bunx/default.nix` の `mkExec` が `bunx --bun --package <パッケージ> <コマンド>` を組み立てる
+- `--package` でパッケージとコマンドを分けて渡す。`bunx <コマンド>` だけだと、bunx が PATH 上の同名の wrapper 自身を呼んでしまう
 
 ```nix
 # registry.nix の例
 {
-  takt = "@anthropic-ai/takt";   # コマンド名 = パッケージ名
+  takt = "takt";
+  leaf = "@rivolink/leaf";
 }
 ```
 
@@ -39,7 +40,7 @@
 - push していない変更は反映されず、手動 `hms` で入れた未 push の変更は次回の timer で main の内容に戻る。working copy の `flake.lock` も更新されないので、lock の更新を残したいときはローカルで `hmu claude-code` して commit・push する（放置すると手動 `hms` が古い rev に戻る）
 - GitHub API の rate limit で更新できない日は exit 1 で終わる（nix は警告だけで cached lock に戻るため、スクリプト側で検出している）。結果は `journalctl --user -u claude-update` で確認する
 - 反映されるのは次回起動から。実行中の claude は旧バイナリのまま動き続ける
-- timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now claude-update.timer`（`.chezmoiignore` の `.chezmoiscripts/*` で chezmoi scripts が無効なため、apply では有効化されない）
+- timer の有効化は初回だけ手動: `systemctl --user daemon-reload && systemctl --user enable --now claude-update.timer`（timer を有効にする chezmoi script は無いため、apply では有効化されない）
 
 ### GitHub の認証（ghtkn）
 - git の `github.com` と `gist.github.com` の credential helper は `ghtkn git-credential`（`modules/git/default.nix`）。GitHub App の User Access Token を使い、8 時間で失効する
