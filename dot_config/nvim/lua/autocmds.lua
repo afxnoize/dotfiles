@@ -1,10 +1,12 @@
 local create_augroup = vim.api.nvim_create_augroup
 local create_autocmd = vim.api.nvim_create_autocmd
 
-create_autocmd('filetype', { -- {{{
-	group = create_augroup('DisableInsertNextlineComment', {}),
+create_autocmd('FileType', { -- {{{
+	group = create_augroup('DisableInsertNextlineComment', { clear = true }),
 	pattern = '*',
-	command = 'setlocal formatoptions-=ro',
+	callback = function()
+		vim.opt_local.formatoptions:remove({ 'r', 'o' })
+	end,
 }) -- }}}
 
 -- 2-space indent filetypes {{{
@@ -23,7 +25,7 @@ for _, ft in ipairs({
 end
 
 create_autocmd('FileType', {
-	group = create_augroup('TwoSpaceIndent', {}),
+	group = create_augroup('TwoSpaceIndent', { clear = true }),
 	pattern = '*',
 	callback = function(args)
 		for _, ft in ipairs(vim.split(args.match, '.', { plain = true })) do
@@ -38,44 +40,55 @@ create_autocmd('FileType', {
 	end,
 }) -- }}}
 
--- Turn off paste mode when leaving insert{{{
-create_autocmd('InsertLeave', {
-	pattern = '*',
-	command = 'set nopaste',
-}) -- }}}
-
 -- QuickFixGrep{{{
 create_autocmd('QuickFixCmdPost', {
-	group = create_augroup('QuickFixGrep', {}),
+	group = create_augroup('QuickFixGrep', { clear = true }),
 	pattern = { 'make', '*grep*' },
-	command = 'cwindow',
+	callback = function()
+		vim.cmd.cwindow()
+	end,
 }) -- }}}
 
 -- 背景透過{{{
 if vim.env.TRANSPARENT_TERM == '1' then
-	create_autocmd('Colorscheme', {
-		group = vim.api.nvim_create_augroup('TransparentBackground', {}),
+	local transparent_group = create_augroup('TransparentBackground', { clear = true })
+	create_autocmd('ColorScheme', {
+		group = transparent_group,
 		pattern = '*',
 		callback = function()
-			vim.api.nvim_set_hl(0, 'Normal', { ctermbg = 'NONE', guibg = 'NONE' })
-			vim.api.nvim_set_hl(0, 'NonText', { ctermbg = 'NONE', guibg = 'NONE' })
-			vim.api.nvim_set_hl(0, 'LineNr', { ctermbg = 'NONE', guibg = 'NONE' })
-			vim.api.nvim_set_hl(0, 'Folded', { ctermbg = 'NONE', guibg = 'NONE' })
-			vim.api.nvim_set_hl(0, 'EndOfBuffer', { ctermbg = 'NONE', guibg = 'NONE' })
+			for _, name in ipairs({ 'Normal', 'NonText', 'LineNr', 'Folded', 'EndOfBuffer' }) do
+				-- nvim_set_hl replaces the group, so keep the other attributes
+				local hl = vim.api.nvim_get_hl(0, { name = name, link = false })
+				hl.bg = 'NONE'
+				hl.ctermbg = 'NONE'
+				vim.api.nvim_set_hl(0, name, hl)
+			end
 		end,
 	})
+	vim.api.nvim_exec_autocmds('ColorScheme', { group = transparent_group })
 end -- }}}
 
 -- disable autofold at writing{{{
-local shut_up_auto_fold_at_writing = create_augroup('ShutUpAutoFoldAtWriting', {})
+local shut_up_auto_fold_at_writing = create_augroup('ShutUpAutoFoldAtWriting', { clear = true })
+local function has_view_target()
+	return vim.api.nvim_buf_get_name(0) ~= '' and vim.bo.buftype ~= 'nofile'
+end
 create_autocmd('BufWinLeave', {
 	group = shut_up_auto_fold_at_writing,
 	pattern = '*',
-	-- silent!: inside cage the view dir is read-only (it is sourced as code by loadview)
-	command = [[if expand('%') != '' && &buftype != 'nofile' | silent! mkview | endif]],
+	callback = function()
+		if has_view_target() then
+			-- silent!: inside cage the view dir is read-only (it is sourced as code by loadview)
+			vim.cmd.mkview({ mods = { silent = true, emsg_silent = true } })
+		end
+	end,
 })
 create_autocmd('BufWinEnter', {
 	group = shut_up_auto_fold_at_writing,
 	pattern = '*',
-	command = [[if expand('%') != '' && &buftype != 'nofile' | silent! loadview | endif]],
+	callback = function()
+		if has_view_target() then
+			vim.cmd.loadview({ mods = { silent = true, emsg_silent = true } })
+		end
+	end,
 }) -- }}}

@@ -25,6 +25,13 @@
 - `<Leader>f` — telescope
 - `]` — LSP操作（]d, ]i, ]f, ]r, ]a, ]F）。`]c` は diff 標準の変更箇所移動に空けてある
 - `m` — motion系
+- `[tab]` のような擬似プレフィクスは使わない。`<Leader><Tab>n` のように実キーで定義し、キーには必ず `desc` を付ける
+- プレフィクスだけのキー（`<Leader>f` や `m`）は `lua/keymaps.lua` で `<Nop>` にする。続くキーが未定義のとき、プレフィクスのキーだけを無効にするため
+
+### Lua の書き方
+- オプションは `vim.opt` で設定する。名前は省略形でなく正式名で書く（`rtp` でなく `runtimepath`）
+- autocmd は `command` 文字列でなく `callback` で書き、`nvim_create_augroup(name, { clear = true })` の名前付き augroup に入れる
+- グローバル関数と `v:lua` は使わない。キーマップには Lua 関数を直接渡す
 
 ### プラグイン設定のパターン
 ```lua
@@ -46,4 +53,5 @@ plugin.setup({ ... })
 - 2スペース indent の filetype（css, html, javascript 系, json, jsonc, nix, sass, scss, typescript 系, vue, xhtml ほか php, eruby など html を連鎖読み込みするもの）は `lua/autocmds.lua` の `TwoSpaceIndent` に集約している。個別の `ftplugin/` は作らず、ここに足す。`typescript.tsx` のような複合 filetype は `.` で分割して各要素を判定するため、要素側（typescript）が載っていれば足りる
 - kakehashi の `searchPaths` に nvim-treesitter の `runtime` を入れている。autoInstall が落とす `typescript/highlights.scm` は `; inherits: ecma` なのに `ecma` を落とさず、足さないと TS の semantic token が空になるため
 - lazy.nvim は `defaults.lazy = true`。`event` / `cmd` / `ft` / `keys` のどれも無いプラグインは、他から `require` されない限り一度も load されない（setup() が走らず、設定が黙って無効になる）。常時 load したいものは `lazy = false` を付ける
-- skkeleton（日本語入力）が有効なため、cmp のソース設定に skkeleton が含まれる
+- skkeleton（日本語入力）は有効だが、cmp のソースには含めない（cmp-skkeleton は入れていない）
+- snacks.nvim は `opts` に書いたモジュールだけが有効になる。使うのは `vim.ui.input`（`input`）と `vim.ui.select`（`picker` の `ui_select`）の置き換えだけで、キーマップは定義しない

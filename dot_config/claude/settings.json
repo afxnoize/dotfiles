@@ -47,13 +47,15 @@
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(~/.ssh/**)",
-      "Read(~/.aws/**)"
+      "Read(~/.aws/**)",
+      "Read(~/.config/sops/**)",
+      "Read(~/.claude.json)",
+      "Read(~/.config/claude/.claude.json)"
     ],
     "defaultMode": "auto"
   },
   "model": "opus",
   "skillOverrides": {
-    "codex-cli": "off",
     "diff-only": "off",
     "duckdb-wasm": "off",
     "find-skills": "off",
@@ -148,6 +150,16 @@
           {
             "type": "command",
             "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude session-start"
+          }
+        ]
+      },
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/herdr-agent-state.sh\" session",
+            "timeout": 10
           }
         ]
       }
@@ -247,12 +259,8 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "moonbit-practice@moonbit-practice": false,
     "telegram@claude-plugins-official": true,
-    "voltagent-research@voltagent-subagents": false,
-    "claude-md-management@anthropic-plugin-directory": true,
-    "imozuru@imozuru": true,
-    "pstack@pstack-claude": true
+    "claude-md-management@anthropic-plugin-directory": true
   },
   "extraKnownMarketplaces": {
     "anthropics-skills": {
@@ -271,18 +279,6 @@
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
-      }
-    },
-    "voltagent-subagents": {
-      "source": {
-        "source": "git",
-        "url": "https://github.com/VoltAgent/awesome-claude-code-subagents.git"
-      }
-    },
-    "pstack-claude": {
-      "source": {
-        "source": "github",
-        "repo": "michael-denyer/pstack-claude"
       }
     }
   },

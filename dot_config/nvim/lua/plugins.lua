@@ -9,7 +9,7 @@ if not vim.uv.fs_stat(lazypath) then
 		lazypath,
 	}
 end
-vim.opt.rtp:prepend(lazypath)
+vim.opt.runtimepath:prepend(lazypath)
 
 local ok, lazy = pcall(require, 'lazy')
 if not ok then
@@ -26,8 +26,13 @@ lazy.setup({
 
 	-- ui
 	{
-		'stevearc/dressing.nvim',
+		'folke/snacks.nvim',
+		priority = 1000,
 		lazy = false,
+		opts = {
+			input = {},
+			picker = { ui_select = true },
+		},
 	},
 
 	-- statusline
@@ -35,25 +40,6 @@ lazy.setup({
 		'nvim-lualine/lualine.nvim',
 		lazy = false,
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
-	},
-
-	-- fades inactive buffers
-	{
-		'tadaa/vimade',
-		event = {
-			'WinEnter',
-			'WinNew',
-		},
-		enabled = false,
-		-- enabled = function ()
-		--   return vim.fn.has('python') == 1 or vim.fn.has('python3')
-		-- end
-	},
-
-	{
-		'levouh/tint.nvim',
-		lazy = false,
-		config = true,
 	},
 
 	-- filer
@@ -109,8 +95,6 @@ lazy.setup({
 		dependencies = {
 			'hrsh7th/cmp-nvim-lsp',
 			'hrsh7th/cmp-buffer',
-			'hrsh7th/cmp-path',
-			'hrsh7th/cmp-cmdline',
 			-- snippet engine
 			{
 				'L3MON4D3/LuaSnip',
@@ -123,26 +107,21 @@ lazy.setup({
 			'saadparwaiz1/cmp_luasnip',
 			-- pictogram
 			'onsails/lspkind.nvim',
-			{
-				-- input japanese
-				'rinx/cmp-skkeleton',
-				-- enabled = false,
-				dependencies = {
-					{
-						'vim-skk/skkeleton',
-						lazy = false,
-					},
-					{
-						'delphinus/skkeleton_indicator.nvim',
-						event = 'InsertEnter',
-						config = true,
-					},
-				},
-			},
 		},
 		config = function()
 			require('rc/cmp').config()
 		end,
+	},
+
+	-- input japanese
+	{
+		'vim-skk/skkeleton',
+		lazy = false,
+	},
+	{
+		'delphinus/skkeleton_indicator.nvim',
+		event = 'InsertEnter',
+		config = true,
 	},
 
 	-- linter formatter
@@ -283,10 +262,10 @@ lazy.setup({
 	{
 		'monaqa/dial.nvim',
 		keys = {
-			{ '<C-a>', mode = { 'n', 'v' } },
-			{ '<C-x>', mode = { 'n', 'v' } },
-			{ 'g<C-a>', mode = { 'n', 'v' } },
-			{ 'g<C-x>', mode = { 'n', 'v' } },
+			{ '<C-a>', mode = { 'n', 'v' }, desc = 'Dial: increment' },
+			{ '<C-x>', mode = { 'n', 'v' }, desc = 'Dial: decrement' },
+			{ 'g<C-a>', mode = { 'n', 'v' }, desc = 'Dial: increment (cumulative)' },
+			{ 'g<C-x>', mode = { 'n', 'v' }, desc = 'Dial: decrement (cumulative)' },
 		},
 		config = function()
 			require('rc/dial').config()
@@ -305,8 +284,8 @@ lazy.setup({
 		'rhysd/clever-f.vim',
 		keys = { '<Plug>(clever-f-f)', '<Plug>(clever-f-F)' },
 		init = function()
-			vim.keymap.set({ 'n', 'x', 'o' }, 'f', '<Plug>(clever-f-f)', { noremap = false })
-			vim.keymap.set({ 'n', 'x', 'o' }, 'F', '<Plug>(clever-f-F)', { noremap = false })
+			vim.keymap.set({ 'n', 'x', 'o' }, 'f', '<Plug>(clever-f-f)', { noremap = false, desc = 'Find character forward (clever-f)' })
+			vim.keymap.set({ 'n', 'x', 'o' }, 'F', '<Plug>(clever-f-F)', { noremap = false, desc = 'Find character backward (clever-f)' })
 			vim.g.clever_f_not_overwrites_standard_mappings = 1
 		end,
 	},
@@ -343,11 +322,15 @@ lazy.setup({
 	{
 		'yuki-yano/fuzzy-motion.vim',
 		dependencies = { 'vim-denops/denops.vim' },
-		lazy = false,
-		-- cmd = 'FuzzyMotion',
+		cmd = 'FuzzyMotion',
 		init = function()
 			vim.g.fuzzy_motion_auto_jump = false
-			vim.keymap.set('n', '[motion]<Space>', '<Cmd>FuzzyMotion<CR>')
+			vim.keymap.set('n', 'm<Space>', '<Cmd>FuzzyMotion<CR>', { desc = 'Fuzzy motion' })
+		end,
+		config = function()
+			if vim.fn['denops#server#status']() == 'running' then
+				vim.fn['denops#plugin#discover']()
+			end
 		end,
 	},
 
@@ -355,7 +338,7 @@ lazy.setup({
 		'skanehira/jumpcursor.vim',
 		keys = '<Plug>(jumpcursor-jump)',
 		init = function()
-			vim.keymap.set('n', '[motion]j', '<Plug>(jumpcursor-jump)')
+			vim.keymap.set('n', 'mj', '<Plug>(jumpcursor-jump)', { desc = 'Jump cursor' })
 		end,
 	},
 
@@ -404,12 +387,12 @@ lazy.setup({
 	-- Markdown
 	{
 		'iamcco/markdown-preview.nvim',
-		build = 'cd app && yarn install',
+		-- Not a function build: lazy.nvim does not load the plugin first, so the autoload call fails
+		build = ':call mkdp#util#install()',
 		init = function()
 			vim.g.mkdp_filetypes = { 'markdown' }
 		end,
 		ft = { 'markdown' },
-		-- { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
 	},
 
 	{
@@ -511,7 +494,7 @@ lazy.setup({
 			vim.g['cheatsheet#float_window_width_ratio'] = 0.8
 			vim.g['cheatsheet#float_window_height_ratio'] = 0.9
 			vim.api.nvim_create_user_command('CheatEdit', 'edit ~/.config/nvim/cheatsheet.md', {})
-			vim.keymap.set('n', '<leader>?', '<Cmd>Cheat<CR>', {})
+			vim.keymap.set('n', '<leader>?', '<Cmd>Cheat<CR>', { desc = 'Open cheatsheet' })
 		end,
 		cmd = { 'Cheat', 'CheatEdit' },
 	},
@@ -558,5 +541,6 @@ lazy.setup({
 })
 
 -- colorscheme
+require('rc/normalnc').setup()
 vim.opt.background = 'light'
 vim.cmd.colorscheme('catppuccin-latte')

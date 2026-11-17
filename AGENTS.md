@@ -36,5 +36,5 @@ chezmoi + Nix Home-Manager の二段構成 dotfiles リポジトリ。役割分�
 
 ## Gotchas
 - Nix ビルドには `--impure` が必須（`builtins.getEnv` で環境変数を参照するため）
-- `chezmoi apply` 後、zshrc は自動で `zcompile` される（`.chezmoiscripts/` 参照）
+- `chezmoi apply` で `.zshrc` が変わると、`.chezmoiscripts/` の script が `zcompile` し直す
 - `.chezmoiignore` でOS別に管理対象を分岐しているため、ファイル追加時は対象OSを確認すること

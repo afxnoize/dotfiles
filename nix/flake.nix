@@ -23,16 +23,38 @@
 
     claude-code.url = "github:sadjow/claude-code-nix";
     llm-agents.url = "github:numtide/llm-agents.nix";
-    cage.url = "github:Warashi/cage";
+    cage = {
+      url = "github:Warashi/cage";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    # Latest upstream bun release, locked by narHash.
-    # Refresh with `nix flake update bun-linux-x64 bun-linux-aarch64`.
     bun-linux-x64 = {
       url = "file+https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64-baseline.zip";
       flake = false;
     };
     bun-linux-aarch64 = {
       url = "file+https://github.com/oven-sh/bun/releases/latest/download/bun-linux-aarch64.zip";
+      flake = false;
+    };
+
+    skill-stop-ai-slop-jp = {
+      url = "github:iKora128/stop-ai-slop-jp";
+      flake = false;
+    };
+    skills-mattpocock = {
+      url = "github:mattpocock/skills";
+      flake = false;
+    };
+    plugin-imozuru = {
+      url = "github:marycache/imozuru";
+      flake = false;
+    };
+    plugins-pstack = {
+      url = "github:michael-denyer/pstack-claude";
+      flake = false;
+    };
+    plugins-voltagent = {
+      url = "github:VoltAgent/awesome-claude-code-subagents";
       flake = false;
     };
 
@@ -56,7 +78,6 @@
             rtk = llm-agents.packages.${system}.rtk;
             ccusage = llm-agents.packages.${system}.ccusage;
             herdr = llm-agents.packages.${system}.herdr;
-            herdr-core = llm-agents.packages.${system}.herdr-core;
             t3code = llm-agents.packages.${system}.t3code;
           })
           (import ./overlays/bun.nix { inherit inputs system; })
@@ -77,7 +98,7 @@
             nix-index-database.homeModules.nix-index
           ];
           extraSpecialArgs = {
-            inherit username homeDirectory pkgs-unstable;
+            inherit inputs username homeDirectory pkgs-unstable;
           };
         };
     };

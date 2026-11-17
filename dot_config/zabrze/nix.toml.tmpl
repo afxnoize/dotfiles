@@ -16,7 +16,7 @@ snippet = 'nix flake update {} --flake {{ .chezmoi.sourceDir }}/nix'
 cursor = "{}"
 
 [[snippets]]
-name = "nix-sweep cleanout (user + home profiles, default preset)"
+name = "nix-sweep cleanout (user + home profiles, keep one generation per day)"
 trigger = "nsweep"
-snippet = 'nix-sweep cleanout user home'
+snippet = 'nix-sweep-thin user home'
 if = '(( ${+commands[nix-sweep]} ))'

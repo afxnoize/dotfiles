@@ -2,6 +2,7 @@
 -- It has no mason package, so it is enabled explicitly (see lsp/kakehashi.lua). This block sits
 -- above the mason checks below, which return early, so kakehashi does not depend on mason loading.
 vim.api.nvim_create_autocmd('LspAttach', {
+	group = vim.api.nvim_create_augroup('KakehashiInherit', { clear = true }),
 	callback = function(ev)
 		local client = vim.lsp.get_client_by_id(ev.data.client_id)
 		if client and client.name == 'kakehashi' then
@@ -62,7 +63,7 @@ local formatting_disabled = { vtsls = true, lua_ls = true }
 
 -- AuthCmd: LspAttach {{{
 vim.api.nvim_create_autocmd('LspAttach', {
-	group = vim.api.nvim_create_augroup('mylspconfig', {}),
+	group = vim.api.nvim_create_augroup('mylspconfig', { clear = true }),
 	callback = function(args)
 		local client = vim.lsp.get_client_by_id(args.data.client_id)
 		if client and formatting_disabled[client.name] then
@@ -72,31 +73,19 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 		-- Mappings.
 		-- See `:help vim.lsp.*` for documentation on any of the below functions
-		local bufnr = args.buf
-		local bufopts = { noremap = true, silent = true, buffer = bufnr }
-		vim.keymap.set('n', '][', function() vim.diagnostic.jump({ count = -1 }) end, bufopts)
-		vim.keymap.set('n', ']]', function() vim.diagnostic.jump({ count = 1 }) end, bufopts)
-		vim.keymap.set('n', ']e', vim.diagnostic.open_float, bufopts)
-
-		-- Definitions
-		vim.keymap.set('n', ']d', vim.lsp.buf.definition, bufopts)
-
-		-- Implementations
-		vim.keymap.set('n', ']i', vim.lsp.buf.implementation, bufopts)
-
-		-- References
-		vim.keymap.set('n', ']f', vim.lsp.buf.references, bufopts)
-
-		vim.keymap.set('n', 'K', function() -- https://scrapbox.io/vim-jp/better_K_for_neovim_lua
-			if not lua_help() then
-				vim.lsp.buf.hover()
-			end
-		end, bufopts)
-		vim.keymap.set('n', ']r', vim.lsp.buf.rename, bufopts)
-		vim.keymap.set('n', ']a', vim.lsp.buf.code_action, bufopts)
-		vim.keymap.set('n', ']F', function()
-			vim.lsp.buf.format { async = true }
-		end, bufopts)
+		local function map(lhs, rhs, desc)
+			vim.keymap.set('n', lhs, rhs, { noremap = true, silent = true, buffer = args.buf, desc = desc })
+		end
+		map('][', function() vim.diagnostic.jump({ count = -1 }) end, 'Previous diagnostic')
+		map(']]', function() vim.diagnostic.jump({ count = 1 }) end, 'Next diagnostic')
+		map(']e', vim.diagnostic.open_float, 'Show diagnostic')
+		map(']d', vim.lsp.buf.definition, 'Go to definition')
+		map(']i', vim.lsp.buf.implementation, 'Go to implementation')
+		map(']f', vim.lsp.buf.references, 'List references')
+		map('K', function() return not lua_help() and vim.lsp.buf.hover() end, 'Hover (help for vim.* in Lua)')
+		map(']r', vim.lsp.buf.rename, 'Rename')
+		map(']a', vim.lsp.buf.code_action, 'Code action')
+		map(']F', function() vim.lsp.buf.format { async = true } end, 'Format')
 	end,
 })
 -- }}}

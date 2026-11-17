@@ -23,37 +23,34 @@ function M.init()
 		return vim.fn.expand('%:p:h')
 	end
 
-	vim.keymap.set('', '[telescope]', '<Nop>')
-	vim.keymap.set('n', '<Leader>f', '[telescope]', { remap = true })
-
-	vim.keymap.set('n', '[telescope]f', builtin('find_files') {
+	vim.keymap.set('n', '<Leader>ff', builtin('find_files') {
 		no_ignore = false,
 		hidden = true,
-	}
-	)
-	vim.keymap.set('n', '[telescope]F', builtin('builtin') {})
-	vim.keymap.set('n', '[telescope]g', builtin('live_grep') {
+	}, { desc = 'Telescope: find files' })
+	vim.keymap.set('n', '<Leader>fF', builtin('builtin') {}, { desc = 'Telescope: builtin pickers' })
+	vim.keymap.set('n', '<Leader>fg', builtin('live_grep') {
 		hidden = true,
-	})
-	vim.keymap.set('n', '[telescope]b', builtin('buffers') {})
-	vim.keymap.set('n', '[telescope]t', builtin('help_tags') {})
-	vim.keymap.set('n', '[telescope]r', builtin('resume') {})
-	vim.keymap.set('n', '[telescope]e', builtin('diagnostics') {})
-	vim.keymap.set('n', 'sf', extensions('file_browser', 'file_browser') {
-		path = '%:p:h',
-		cwd = telescope_buffer_dir(),
-		respect_gitignore = false,
-		hidden = true,
-		grouped = true,
-		layout_strategy = 'horizontal',
-		collapse_dirs = true,
-		layout_config = {
-			prompt_position = 'top',
-			height = 0.85,
-			width = 0.85,
-		},
-	}
-	)
+	}, { desc = 'Telescope: live grep' })
+	vim.keymap.set('n', '<Leader>fb', builtin('buffers') {}, { desc = 'Telescope: buffers' })
+	vim.keymap.set('n', '<Leader>ft', builtin('help_tags') {}, { desc = 'Telescope: help tags' })
+	vim.keymap.set('n', '<Leader>fr', builtin('resume') {}, { desc = 'Telescope: resume' })
+	vim.keymap.set('n', '<Leader>fe', builtin('diagnostics') {}, { desc = 'Telescope: diagnostics' })
+	vim.keymap.set('n', 'sf', function()
+		extensions('file_browser', 'file_browser') {
+			path = '%:p:h',
+			cwd = telescope_buffer_dir(),
+			respect_gitignore = false,
+			hidden = true,
+			grouped = true,
+			layout_strategy = 'horizontal',
+			collapse_dirs = true,
+			layout_config = {
+				prompt_position = 'top',
+				height = 0.85,
+				width = 0.85,
+			},
+		}()
+	end, { desc = 'Telescope: file browser' })
 end
 
 function M.config()
@@ -110,7 +107,7 @@ function M.config()
 						['h'] = fb_actions.goto_parent_dir,
 						['<C-h>'] = fb_actions.toggle_hidden,
 						['/'] = function()
-							vim.cmd('startinsert')
+							vim.cmd.startinsert()
 						end,
 					},
 				},

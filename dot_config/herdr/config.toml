@@ -1,4 +1,62 @@
 onboarding = false
 
+[terminal]
+new_cwd = "follow"
+
 [keys]
 prefix = "ctrl+q"
+reload_config = "prefix+r"
+detach = "prefix+d"
+
+new_tab = "prefix+c"
+new_workspace = "prefix+ctrl+c"
+
+previous_workspace = "prefix+9"
+next_workspace = "prefix+0"
+
+previous_tab = ["prefix+p", "prefix+ctrl+p"]
+next_tab = ["prefix+n", "prefix+ctrl+n"]
+switch_tab = ["prefix+1", "prefix+2", "prefix+3", "prefix+4", "prefix+5", "prefix+6", "prefix+7", "prefix+8"]
+
+move_tab_previous = "prefix+shift+p"
+move_tab_next = "prefix+shift+n"
+
+goto = "prefix+w"
+workspace_picker = "prefix+s"
+
+rename_tab = "prefix+comma"
+rename_workspace = "prefix+$"
+rename_pane = "prefix+shift+t"
+
+split_vertical = ["prefix+v", "prefix+|"]
+split_horizontal = "prefix+minus"
+
+focus_pane_left = ["prefix+h", "prefix+ctrl+h"]
+focus_pane_down = ["prefix+j", "prefix+ctrl+j"]
+focus_pane_up = ["prefix+k", "prefix+ctrl+k"]
+focus_pane_right = ["prefix+l", "prefix+ctrl+l"]
+
+swap_pane_left = "prefix+shift+h"
+swap_pane_down = "prefix+shift+j"
+swap_pane_up = "prefix+shift+k"
+swap_pane_right = "prefix+shift+l"
+
+close_pane = "prefix+x"
+zoom = "prefix+z"
+resize_mode = "prefix+shift+r"
+
+previous_agent = "prefix+:"
+next_agent = ["prefix+;", "alt+;"]
+
+copy_mode = "prefix+["
+edit_scrollback = "prefix+shift+b"
+
+toggle_sidebar = "prefix+e"
+settings = "prefix+shift+s"
+
+[ui]
+status_indicators = "symbols"
+prompt_new_tab_name = false
+
+[ui.toast]
+delivery = "herdr"

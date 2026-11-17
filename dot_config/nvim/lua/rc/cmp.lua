@@ -62,17 +62,14 @@ function M.config()
 			{ name = 'nvim_lsp', priority = 100 },
 			{ name = 'luasnip',  priority = 30 },
 			{ name = 'buffer',   priority = 50 },
-			-- { name = 'skkeleton', priority = 100 },
 		},
 		formatting = {
 			format = lspkind.cmp_format { with_text = false, maxwidth = 50 },
 		},
 	}
 
-	vim.cmd([[
-    set completeopt=menuone,noinsert,noselect
-    highlight! default link CmpItemKind CmpItemMenuDefault
-  ]])
+	vim.opt.completeopt = { 'menuone', 'noinsert', 'noselect' }
+	vim.api.nvim_set_hl(0, 'CmpItemKind', { link = 'CmpItemMenuDefault', default = true })
 end
 
 return M

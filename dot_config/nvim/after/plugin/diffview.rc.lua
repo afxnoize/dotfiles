@@ -1,7 +1,6 @@
-local silent = { silent = true }
-vim.keymap.set('n', '[git]d', '<Cmd>DiffviewOpen<CR>', silent)
-vim.keymap.set('n', '[git]h', '<Cmd>DiffviewFileHistory %<CR>', silent)
-vim.keymap.set('n', '[git]H', '<Cmd>DiffviewFileHistory<CR>', silent)
+vim.keymap.set('n', '<Leader>gd', '<Cmd>DiffviewOpen<CR>', { silent = true, desc = 'Diffview: open' })
+vim.keymap.set('n', '<Leader>gh', '<Cmd>DiffviewFileHistory %<CR>', { silent = true, desc = 'Diffview: history of current file' })
+vim.keymap.set('n', '<Leader>gH', '<Cmd>DiffviewFileHistory<CR>', { silent = true, desc = 'Diffview: history of repository' })
 
 require('diffview').setup({
 	view = {

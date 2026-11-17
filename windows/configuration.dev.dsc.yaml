@@ -2,7 +2,7 @@
 # Development setup for a Windows machine.
 # Usage: winget configure -f configuration.dev.dsc.yaml
 # Windows counterpart of nix/modules/packages.nix. Tools without a Windows build
-# (nix tooling, cage, devbox, tmux) are left out.
+# (nix tooling, cage, tmux) are left out.
 properties:
   configurationVersion: 0.2.0
   resources:
@@ -271,16 +271,3 @@ properties:
       settings:
         id: T3Tools.T3Code
         source: winget
-
-    - resource: PSDscResources/Script
-      id: herdrApp
-      directives:
-        description: Install the herdr desktop app with its official installer
-      settings:
-        GetScript: |
-          $exe = Join-Path $env:LOCALAPPDATA 'Programs\herdr-app\herdr-app.exe'
-          @{ Result = (Test-Path $exe).ToString() }
-        TestScript: |
-          Test-Path (Join-Path $env:LOCALAPPDATA 'Programs\herdr-app\herdr-app.exe')
-        SetScript: |
-          Invoke-RestMethod 'https://releases.herdr.dev/app/install.ps1' | Invoke-Expression

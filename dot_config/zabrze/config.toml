@@ -69,6 +69,11 @@ snippet = "$abbr -i"
 evaluate = true
 
 [[snippets]]
+name = "rm -rf"
+trigger = "rmf"
+snippet = "rm -rf"
+
+[[snippets]]
 name = "mkdir -p"
 trigger = "mkdir"
 snippet = "mkdir -p"
@@ -84,6 +89,11 @@ trigger = "curl"
 snippet = "curl --compressed"
 
 [[snippets]]
+name = "ln --symbolic --no-dereference"
+trigger = "ln"
+snippet = "ln -sn"
+
+[[snippets]]
 name = ">/dev/null 2>&1"
 trigger = "null"
 snippet = ">/dev/null 2>&1"
@@ -95,47 +105,6 @@ global = true
 name = "tmux -u"
 trigger = "t"
 snippet = "tmux -u"
-
-[[snippets]]
-name = "devbox"
-trigger = "dv"
-snippet = "devbox"
-
-# k1LoW/mo {{{2
-[[snippets]]
-name = "mo --no-open"
-trigger = "mon"
-snippet = "mo --no-open"
-
-[[snippets]]
-name = "mo --no-open"
-trigger = "n"
-snippet = "--no-open"
-context = '^mo\s+'
-global = true
-
-[[snippets]]
-name = "mo --all"
-trigger = 'a'
-snippet = '**/*.md'
-context = '^mo\s+'
-global = true
-
-[[snippets]]
-name = "mo --target"
-trigger = 't'
-snippet = '--target'
-context = '^mo\s+'
-global = true
-
-[[snippets]]
-name = "mo --target <repository>"
-trigger = 'r'
-snippet = '${(q)$(basename "$(git rev-parse --show-toplevel)")}'
-evaluate = true
-global = true
-context = '^mo\s+--target\s+'
-# End of k1LoW/mo 2}}}
 
 [[snippets]]
 name = "just"

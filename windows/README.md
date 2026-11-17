@@ -58,16 +58,10 @@ winget にないツールとフォントは、構成ファイルの Script リ�
 - `packages.nix` にない T3 Code（コーディングエージェントの GUI）を winget の `T3Tools.T3Code` で入れる
 - sops は winget から削除された（`Mozilla.SOPS`）ため、GitHub のリリースから `sops.exe` を取得して `%LOCALAPPDATA%\Programs\sops` に置き、ユーザーの `Path` に追加する
   - 版と SHA256 は構成ファイルに固定している。更新するときは、SetScript の URL と、TestScript と SetScript の両方のハッシュを書き換える。ハッシュはリリースの `sops-v<版>.checksums.txt` にある amd64.exe の行を使う
-- herdr のデスクトップアプリを公式のインストーラ（`https://releases.herdr.dev/app/install.ps1`）で入れる
-  - winget の `Herdr.Herdr` は CLI のランタイムで、デスクトップアプリは winget に登録されていない
-  - インストーラは、リリースのマニフェストにある SHA256 でダウンロードを検証し、`%LOCALAPPDATA%\Programs\herdr-app` に置いてユーザーの `Path` に追加する。herdr-core がなければ一緒に入れる
-  - この検証で防げるのは、ダウンロードの破損だけ。マニフェストはアプリと同じ `releases.herdr.dev` から取るため、配布サーバーが改ざんされた場合は防げない
-  - インストーラ自体も、herdr-core のインストーラも、版を固定せずに取得して実行する
-  - 入れた後はアプリが自分で更新する。構成ファイルはアプリの有無だけを見る
 
 `packages.nix` から入れないもの:
 
-- Nix 関連、cage、devbox、tmux: Windows 版がない
+- Nix 関連、cage、tmux: Windows 版がない
 - git-wt: winget に登録されていない
 - gti: 使わない
 - rtk、ccusage: 未確認。必要なら mise か npm で入れる

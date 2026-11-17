@@ -1,12 +1,11 @@
-vim.keymap.set('', '<S-t>', '<Cmd>Fern . -drawer -reveal=% -toggle<CR>')
+vim.keymap.set('n', '<S-t>', '<Cmd>Fern . -drawer -reveal=% -toggle<CR>', { desc = 'Toggle Fern drawer' })
 
-vim.api.nvim_create_augroup('FernNoNumber', {})
-vim.api.nvim_create_autocmd('filetype', {
-	group = 'FernNoNumber',
+vim.api.nvim_create_autocmd('FileType', {
+	group = vim.api.nvim_create_augroup('FernNoNumber', { clear = true }),
 	pattern = 'fern',
 	callback = function()
 		vim.opt_local.number = false
-		vim.opt_local.relativenumber  = false
+		vim.opt_local.relativenumber = false
 	end,
 })
 
