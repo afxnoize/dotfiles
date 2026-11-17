@@ -32,9 +32,7 @@ presets:
     # until a root-owned managed-settings file is used.
     allow:
       - "$CLAUDE_CONFIG_DIR"
-      - "$CODEX_HOME"
-      - "$HOME/.serena"
-      - ".serena"
+      - "$XDG_RUNTIME_DIR/cc-socks"
       - "$XDG_STATE_HOME/happy"
 
   dev-tools:
