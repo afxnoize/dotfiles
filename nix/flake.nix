@@ -49,6 +49,14 @@
       url = "github:marycache/imozuru";
       flake = false;
     };
+    plugins-pstack = {
+      url = "github:michael-denyer/pstack-claude";
+      flake = false;
+    };
+    plugins-voltagent = {
+      url = "github:VoltAgent/awesome-claude-code-subagents";
+      flake = false;
+    };
 
     nix-index-database = {
       url = "github:nix-community/nix-index-database";

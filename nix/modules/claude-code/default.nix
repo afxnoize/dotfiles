@@ -13,6 +13,8 @@
 
     plugins = [
       "${inputs.plugin-imozuru}"
+      "${inputs.plugins-pstack}/plugins/pstack"
+      "${inputs.plugins-voltagent}/categories/10-research-analysis"
     ];
   };
 }

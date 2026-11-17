@@ -431,6 +431,38 @@
         "type": "github"
       }
     },
+    "plugins-pstack": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794585184,
+        "narHash": "sha256-3DHKsSIdqyNjGEnCNbOnp2JZLkVnLIOB8jFqqGMJIIU=",
+        "owner": "michael-denyer",
+        "repo": "pstack-claude",
+        "rev": "a12b04786023e762f12f5de7bb5fafb8c23f8c36",
+        "type": "github"
+      },
+      "original": {
+        "owner": "michael-denyer",
+        "repo": "pstack-claude",
+        "type": "github"
+      }
+    },
+    "plugins-voltagent": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793602202,
+        "narHash": "sha256-JMtJ2jtUxkEjEGfFADXgp6F2ZPjmVHdulr55dukBnKs=",
+        "owner": "VoltAgent",
+        "repo": "awesome-claude-code-subagents",
+        "rev": "ed74d115b7fb7026a22a4f816a8e3250f425e3b4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "VoltAgent",
+        "repo": "awesome-claude-code-subagents",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "bun-linux-aarch64": "bun-linux-aarch64",
@@ -444,6 +476,8 @@
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "plugin-imozuru": "plugin-imozuru",
+        "plugins-pstack": "plugins-pstack",
+        "plugins-voltagent": "plugins-voltagent",
         "skill-stop-ai-slop-jp": "skill-stop-ai-slop-jp",
         "skills-mattpocock": "skills-mattpocock"
       }
