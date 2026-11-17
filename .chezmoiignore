@@ -27,6 +27,7 @@ serena/
 .config/zabrze/**
 .config/systemd/**
 .local/bin/flake-latest-update
+.local/bin/nix-sweep-thin
 .local/bin/telegram-supercharged
 {{ end }}
 
