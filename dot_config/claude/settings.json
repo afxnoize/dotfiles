@@ -152,6 +152,16 @@
             "command": "bash ${XDG_DATA_HOME:-$HOME/.local/share}/tmux/plugins/tmux-agent-sidebar/hook.sh claude session-start"
           }
         ]
+      },
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/herdr-agent-state.sh\" session",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionEnd": [
