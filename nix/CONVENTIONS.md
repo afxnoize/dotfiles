@@ -67,6 +67,13 @@
 - 動作確認は `bash .github/scripts/nixos-release-bump.sh --check`（変更せずに採用候補だけ表示）と `bash .github/scripts/nixos-release-bump.test.sh`（判定ロジックのテスト）
 - merge すると、次回の `flake-latest-update` が main の内容でビルドして switch する。起きているうちに手元で `hms` を実行し、activation の問題を先に確認する
 
+### Claude Code の skills / plugins
+- 外部リポジトリの skill と plugin は `modules/claude-code/` の `programs.claude-code` で入れる。取得元は `flake = false` の入力にし、版は `flake.lock` で固定する。更新は `hmu <入力名>`
+- skill は `skills.<名前>` に入力のパスを渡す。リポジトリの一部だけを使うときは `"${inputs.<入力>}/skills/<パス>"` のようにディレクトリを指す。`configDir/skills/<名前>/` にファイルごとのリンクが張られる
+- plugin は `plugins` にリポジトリのパスを渡す。module が `claude` を `--plugin-dir <パス>` 付きの wrapper で包むので、`claude-code` は `packages.nix` に入れない（`bin/claude` が衝突する）
+- `settings` と `marketplaces` は使わない。どちらかを設定すると module が `settings.json` を生成し、chezmoi が管理する `dot_config/claude/settings.json` と衝突する
+- 自分の skill は今までどおり `dot_config/claude/skills/` に置く。リポジトリ固有の skill と plugin は、そのリポジトリの `.claude/` で管理する
+
 ### Gotchas
 - `builtins.getEnv` を使っているため `--impure` 必須
 - `flake.lock` の更新は `nix flake update` で行う（手動編集しない）

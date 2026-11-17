@@ -415,6 +415,22 @@
         "type": "github"
       }
     },
+    "plugin-imozuru": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793197058,
+        "narHash": "sha256-LrYzlLo4LYLmgFdQcHjlL3ALP1jbOr+oqTgoAdunWGU=",
+        "owner": "marycache",
+        "repo": "imozuru",
+        "rev": "808407e501bc5a1e596655b0a6d62e1f3b20ba1b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "marycache",
+        "repo": "imozuru",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "bun-linux-aarch64": "bun-linux-aarch64",
@@ -426,7 +442,42 @@
         "neovim-nightly-overlay": "neovim-nightly-overlay",
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_4",
-        "nixpkgs-unstable": "nixpkgs-unstable"
+        "nixpkgs-unstable": "nixpkgs-unstable",
+        "plugin-imozuru": "plugin-imozuru",
+        "skill-stop-ai-slop-jp": "skill-stop-ai-slop-jp",
+        "skills-mattpocock": "skills-mattpocock"
+      }
+    },
+    "skill-stop-ai-slop-jp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781179477,
+        "narHash": "sha256-LsCBtbaQwQkiYtObhTmyZOZlL2MmCRd4EM5PZuH8Is0=",
+        "owner": "iKora128",
+        "repo": "stop-ai-slop-jp",
+        "rev": "e09d32796f253a62693885757cea484c275d06f2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "iKora128",
+        "repo": "stop-ai-slop-jp",
+        "type": "github"
+      }
+    },
+    "skills-mattpocock": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794472958,
+        "narHash": "sha256-AYSRCvBL8TDDdW3rgKu2T7gl4YYDoDId0jYbabEFyfs=",
+        "owner": "mattpocock",
+        "repo": "skills",
+        "rev": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mattpocock",
+        "repo": "skills",
+        "type": "github"
       }
     },
     "systems": {

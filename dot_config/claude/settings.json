@@ -253,7 +253,6 @@
     "telegram@claude-plugins-official": true,
     "voltagent-research@voltagent-subagents": false,
     "claude-md-management@anthropic-plugin-directory": true,
-    "imozuru@imozuru": true,
     "pstack@pstack-claude": true
   },
   "extraKnownMarketplaces": {

@@ -37,6 +37,19 @@
       flake = false;
     };
 
+    skill-stop-ai-slop-jp = {
+      url = "github:iKora128/stop-ai-slop-jp";
+      flake = false;
+    };
+    skills-mattpocock = {
+      url = "github:mattpocock/skills";
+      flake = false;
+    };
+    plugin-imozuru = {
+      url = "github:marycache/imozuru";
+      flake = false;
+    };
+
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -78,7 +91,7 @@
             nix-index-database.homeModules.nix-index
           ];
           extraSpecialArgs = {
-            inherit username homeDirectory pkgs-unstable;
+            inherit inputs username homeDirectory pkgs-unstable;
           };
         };
     };
