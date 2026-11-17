@@ -76,6 +76,10 @@ winget にないツールとフォントは、構成ファイルの Script リ�
 
 - `AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/app-volume.ahk`: ログオン時に起動する AutoHotkey v2 スクリプト。NirCmd で前面のアプリの音量とミュートを切り替える
   - 個人用のマシンにだけ配る。AutoHotkey がないマシンに置くと、ログオン時に `.ahk` を開くアプリの選択画面が出るため
+- `AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/kando-gesture.ahk`: ログオン時に起動する AutoHotkey v2 スクリプト。マウスカーソルを円を描くように回すと、Kando のメニューを開く
+  - Kando にはマウスジェスチャーで開く機能がないため、カーソルの動きを監視して、メニューのショートカット `Ctrl+Alt+Shift+F18` を送る
+  - Kando の設定は chezmoi で管理していない。Kando の設定画面で、メニューのショートカットを `Ctrl+Alt+Shift+F18` にする
+  - app-volume.ahk と同じく、個人用のマシンにだけ配る
 
 - `dot_config/git/config.tmpl`: git の設定。Linux と共通の設定 `nix/modules/git/common.gitconfig` を、apply のときにテンプレートで埋め込む
   - 実行時の `[include]` でリポジトリのファイルを読まないのは、working copy の書き換えが apply を経ずに反映されないようにするため。clone 先を動かしても、設定が黙って消えることもない
