@@ -11,12 +11,12 @@ detach = "prefix+d"
 new_tab = "prefix+c"
 new_workspace = "prefix+ctrl+c"
 
-previous_workspace = "prefix+("
-next_workspace = "prefix+)"
+previous_workspace = "prefix+9"
+next_workspace = "prefix+0"
 
 previous_tab = ["prefix+p", "prefix+ctrl+p"]
 next_tab = ["prefix+n", "prefix+ctrl+n"]
-switch_tab = "prefix+1..9"
+switch_tab = ["prefix+1", "prefix+2", "prefix+3", "prefix+4", "prefix+5", "prefix+6", "prefix+7", "prefix+8"]
 
 move_tab_previous = "prefix+shift+p"
 move_tab_next = "prefix+shift+n"
