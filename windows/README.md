@@ -39,6 +39,10 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
    chezmoi apply
    ```
 
+## winget にないものの入れ方
+
+winget にないツールとフォントは、構成ファイルの Script リソースから `scripts/release.ps1` の関数を呼んで、リリースから入れる。ダウンロードを SHA256 で検証し、入れたもののハッシュを `%LOCALAPPDATA%\dotfiles\releases` に記録する。構成ファイルのハッシュと記録が違うもの、または本体（`sops.exe`、`nircmd.exe`）がなくなったものだけを入れ直す。
+
 ## configuration.dev.dsc.yaml が行うこと
 
 - 開発者モードを有効にする。chezmoi が管理者権限なしで symlink を作るために必要
@@ -51,10 +55,9 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
   - 入れた後は更新しない。新しい nightly にするときは、構成ファイルを流さず、インストーラを手で入れ直す
 - フォント（Cica、UDEV Gothic、PleckJP）を GitHub のリリースから取得し、現在のユーザーに入れる
   - 版と SHA256 は構成ファイルに固定している。更新するときは、TestScript と SetScript の両方のハッシュと、SetScript の URL を書き換える
-  - 入れた zip のハッシュを `%LOCALAPPDATA%\dotfiles\fonts` に記録し、構成ファイルのハッシュと違うフォントだけを入れ直す
 - `packages.nix` にない T3 Code（コーディングエージェントの GUI）を winget の `T3Tools.T3Code` で入れる
 - sops は winget から削除された（`Mozilla.SOPS`）ため、GitHub のリリースから `sops.exe` を取得して `%LOCALAPPDATA%\Programs\sops` に置き、ユーザーの `Path` に追加する
-  - 版と SHA256 は構成ファイルに固定している。更新するときは、TestScript と SetScript の両方の `$version` と、`$expected` を一緒に書き換える。ハッシュはリリースの `sops-v<版>.checksums.txt` にある amd64.exe の行を使う
+  - 版と SHA256 は構成ファイルに固定している。更新するときは、SetScript の URL と、TestScript と SetScript の両方のハッシュを書き換える。ハッシュはリリースの `sops-v<版>.checksums.txt` にある amd64.exe の行を使う
 
 `packages.nix` から入れないもの:
 
@@ -67,7 +70,7 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 
 - AutoHotkey v2 と Argus（タスクマネージャ）を winget で入れる
 - NirCmd は winget に登録されていないため、NirSoft の zip を取得して `%LOCALAPPDATA%\Programs\NirCmd` に展開し、ユーザーの `Path` に追加する
-  - zip は SHA256 で検証する。NirSoft は版を上げると同じ URL の zip を差し替えるため、版が上がるとハッシュ不一致で失敗する。そのときは新しい版を確認して `$expected` を更新する
+  - zip は SHA256 で検証する。NirSoft は版を上げると同じ URL の zip を差し替えるため、版が上がるとハッシュ不一致で失敗する。そのときは新しい版を確認して、TestScript と SetScript の両方のハッシュを更新する
 
 ## 配布するファイル
 
