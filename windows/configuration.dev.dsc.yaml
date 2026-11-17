@@ -358,16 +358,3 @@ properties:
       settings:
         id: T3Tools.T3Code
         source: winget
-
-    - resource: PSDscResources/Script
-      id: herdrApp
-      directives:
-        description: Install the herdr desktop app with its official installer
-      settings:
-        GetScript: |
-          $exe = Join-Path $env:LOCALAPPDATA 'Programs\herdr-app\herdr-app.exe'
-          @{ Result = (Test-Path $exe).ToString() }
-        TestScript: |
-          Test-Path (Join-Path $env:LOCALAPPDATA 'Programs\herdr-app\herdr-app.exe')
-        SetScript: |
-          Invoke-RestMethod 'https://releases.herdr.dev/app/install.ps1' | Invoke-Expression
