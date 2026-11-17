@@ -69,6 +69,11 @@ snippet = "$abbr -i"
 evaluate = true
 
 [[snippets]]
+name = "rm -rf"
+trigger = "rmf"
+snippet = "rm -rf"
+
+[[snippets]]
 name = "mkdir -p"
 trigger = "mkdir"
 snippet = "mkdir -p"
