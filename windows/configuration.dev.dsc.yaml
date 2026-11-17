@@ -243,10 +243,12 @@ properties:
           @{ Result = $(if (Test-Path $exe) { [string](& $exe --disable-version-check --version) } else { '' }) }
         TestScript: |
           . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
-          Test-Release -Name sops -Sha256 'a4a9a398858fe8b2ef72d9686d930bf7c5cece9be74ad83ac3b53cfdd70e6b1c' -PathDir (Join-Path $env:LOCALAPPDATA 'Programs\sops')
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\sops'
+          Test-Release -Name sops -Sha256 'a4a9a398858fe8b2ef72d9686d930bf7c5cece9be74ad83ac3b53cfdd70e6b1c' -Require (Join-Path $dir 'sops.exe') -PathDir $dir
         SetScript: |
           . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
-          Install-Release -Name sops -Sha256 'a4a9a398858fe8b2ef72d9686d930bf7c5cece9be74ad83ac3b53cfdd70e6b1c' -Dir (Join-Path $env:LOCALAPPDATA 'Programs\sops') -FileName sops.exe -AddToPath `
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\sops'
+          Install-Release -Name sops -Sha256 'a4a9a398858fe8b2ef72d9686d930bf7c5cece9be74ad83ac3b53cfdd70e6b1c' -Dir $dir -FileName sops.exe -Require (Join-Path $dir 'sops.exe') -AddToPath `
             -Url 'https://github.com/getsops/sops/releases/download/v3.13.3/sops-v3.13.3.amd64.exe'
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: age

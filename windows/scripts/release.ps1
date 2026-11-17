@@ -56,15 +56,19 @@ function Add-UserPath([string]$Dir) {
   [Environment]::SetEnvironmentVariable('DOTFILES_INSTALLING', $null, 'User')
 }
 
-# True when the release with this hash is installed (and -PathDir is on user PATH).
+# True when the release with this hash is installed, every -Require file exists,
+# and -PathDir is on user PATH.
 function Test-Release {
   param(
     [Parameter(Mandatory)][string]$Name,
     [Parameter(Mandatory)][string]$Sha256,
+    [string[]]$Require,
     [string]$PathDir
   )
   $stamp = Get-ReleaseStampPath $Name
-  (Test-Path $stamp) -and ([IO.File]::ReadAllText($stamp).Trim() -eq $Sha256) -and (-not $PathDir -or (Test-UserPath $PathDir))
+  (Test-Path $stamp) -and ([IO.File]::ReadAllText($stamp).Trim() -eq $Sha256) -and
+    -not ($Require | Where-Object { -not (Test-Path -LiteralPath $_) }) -and
+    (-not $PathDir -or (Test-UserPath $PathDir))
 }
 
 # -FileName installs the download itself under that name; -Extract installs the zip entries matching the wildcard.
@@ -76,11 +80,12 @@ function Install-Release {
     [Parameter(Mandatory)][string]$Dir,
     [string]$FileName,
     [string]$Extract,
+    [string[]]$Require,
     [switch]$AddToPath,
     [switch]$RegisterFont
   )
   if ([bool]$FileName -eq [bool]$Extract) { throw "${Name}: pass exactly one of -FileName and -Extract" }
-  if (Test-Release -Name $Name -Sha256 $Sha256 -PathDir $(if ($AddToPath) { $Dir })) { return }
+  if (Test-Release -Name $Name -Sha256 $Sha256 -Require $Require -PathDir $(if ($AddToPath) { $Dir })) { return }
 
   $download = Save-Download -Url $Url -Sha256 $Sha256
   $extracted = "$download-extracted"

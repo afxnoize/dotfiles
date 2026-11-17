@@ -33,9 +33,11 @@ properties:
           @{ Result = (Test-Path (Join-Path $dir 'nircmd.exe')).ToString() }
         TestScript: |
           . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
-          Test-Release -Name NirCmd -Sha256 '51e34ed379dd099a96bbf0a2266003361e2864fe3ef2f8baed76634909763a7c' -PathDir (Join-Path $env:LOCALAPPDATA 'Programs\NirCmd')
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\NirCmd'
+          Test-Release -Name NirCmd -Sha256 '51e34ed379dd099a96bbf0a2266003361e2864fe3ef2f8baed76634909763a7c' -Require (Join-Path $dir 'nircmd.exe') -PathDir $dir
         SetScript: |
           . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
           # SHA256 of nircmd-x64.zip v2.87 (same value as Scoop's main bucket manifest)
-          Install-Release -Name NirCmd -Sha256 '51e34ed379dd099a96bbf0a2266003361e2864fe3ef2f8baed76634909763a7c' -Dir (Join-Path $env:LOCALAPPDATA 'Programs\NirCmd') -Extract '*' -AddToPath `
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\NirCmd'
+          Install-Release -Name NirCmd -Sha256 '51e34ed379dd099a96bbf0a2266003361e2864fe3ef2f8baed76634909763a7c' -Dir $dir -Extract '*' -Require (Join-Path $dir 'nircmd.exe') -AddToPath `
             -Url 'https://www.nirsoft.net/utils/nircmd-x64.zip'
