@@ -9,6 +9,7 @@
 - rules/writing.md: 文書・commit message などの文章出力、ドキュメント運用
 - rules/delegation.md: subagent 運用、モデルルーティング
 - rules/environment.md: Telegram、aws CLI
+- rules/pstack-models.md: pstack の役割ごとのモデルと effort（/pstack:setup-pstack が作る。session hook の行だけは ~/.config/claude/pstack-models.md にないと hook が読まない）
 - CLAUDE.local.md: persona（口調だけ）。chezmoi 管理外で、この repo には入れない
 rules/ は自動で見つかるため、ここに import を足さない。場面を限って読ませたいものは skill にする。
 -->
