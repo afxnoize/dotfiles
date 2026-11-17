@@ -249,12 +249,8 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "moonbit-practice@moonbit-practice": false,
     "telegram@claude-plugins-official": true,
-    "voltagent-research@voltagent-subagents": false,
-    "claude-md-management@anthropic-plugin-directory": true,
-    "imozuru@imozuru": true,
-    "pstack@pstack-claude": true
+    "claude-md-management@anthropic-plugin-directory": true
   },
   "extraKnownMarketplaces": {
     "anthropics-skills": {
@@ -273,18 +269,6 @@
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
-      }
-    },
-    "voltagent-subagents": {
-      "source": {
-        "source": "git",
-        "url": "https://github.com/VoltAgent/awesome-claude-code-subagents.git"
-      }
-    },
-    "pstack-claude": {
-      "source": {
-        "source": "github",
-        "repo": "michael-denyer/pstack-claude"
       }
     }
   },
