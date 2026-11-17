@@ -74,7 +74,7 @@ properties:
       settings:
         GetScript: |
           $dir = Join-Path $env:LOCALAPPDATA 'dotfiles\releases'
-          @{ Result = $(if (Test-Path $dir) { (Get-ChildItem -Path $dir -Name) -join ',' } else { '' }) }
+          @{ Result = ('Cica', 'UDEVGothic', 'PleckJP' | Where-Object { Test-Path (Join-Path $dir $_) }) -join ',' }
         TestScript: |
           . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
           (Test-Release -Name Cica -Sha256 'cbd1bcf1f3fd1ddbffe444369c76e42529add8538b25aeb75ab682d398b0506f') -and
