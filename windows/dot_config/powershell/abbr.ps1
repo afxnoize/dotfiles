@@ -55,7 +55,7 @@ function Expand-AbbrLine {
 
   if ($Cursor -lt $Line.Length -and -not [char]::IsWhiteSpace($Line[$Cursor])) { return }
   $left = $Line.Substring(0, $Cursor)
-  $word = [regex]::Match($left, '\S+$')
+  $word = [regex]::Match($left, '[^\s|;&({]+$')
   if (-not $word.Success) { return }
   $prefix = $left.Substring(0, $word.Index)
   if (Test-AbbrInQuote $prefix) { return }
