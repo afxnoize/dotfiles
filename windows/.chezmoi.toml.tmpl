@@ -5,3 +5,9 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 [data]
 personal = {{ $personal }}
+
+# chezmoi runs .ps1 scripts with Windows PowerShell 5.1, whose default execution
+# policy (Restricted) refuses to load them. Bypass it for the script process only.
+[interpreters.ps1]
+command = "powershell"
+args = ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File"]
