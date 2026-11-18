@@ -60,6 +60,10 @@ winget にないツールとフォントは、構成ファイルの Script リ�
   - 版と SHA256 は構成ファイルに固定している。更新するときは、SetScript の URL と、TestScript と SetScript の両方のハッシュを書き換える。ハッシュはリリースの `sops-v<版>.checksums.txt` にある amd64.exe の行を使う
 - git-wt は winget に登録されていないため、GitHub のリリースの `windows_amd64.tar.gz` から `git-wt.exe` を取り出して `%LOCALAPPDATA%\Programs\git-wt` に置き、ユーザーの `Path` に追加する
   - 版と SHA256 は構成ファイルに固定している。更新するときは、SetScript の URL と、TestScript と SetScript の両方のハッシュを書き換える。ハッシュはリリースの `checksums.txt` にある windows_amd64 の行を使う
+- Pester 6（`windows/tests` のテストに使う）を、PowerShell Gallery から現在のユーザーに入れる
+  - winget が動かす PowerShell ではなく `pwsh.exe` を起動して `Install-PSResource` を呼ぶ。winget の PowerShell はモジュールのパスが独自で、PSResourceGet が読めないことがあるため
+  - `pwsh.exe` は、MSI 版なら `Program Files\PowerShell\7` に、MSIX 版（winget の `Microsoft.PowerShell` が入れるもの）なら `%LOCALAPPDATA%\Microsoft\WindowsApps` にある。両方を探す
+  - 版は構成ファイルに固定している。更新するときは、TestScript と SetScript の両方の版を書き換える
 
 `packages.nix` から入れないもの:
 

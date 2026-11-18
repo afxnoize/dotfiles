@@ -241,6 +241,26 @@ properties:
       settings:
         id: twpayne.chezmoi
         source: winget
+    # Runs pwsh.exe instead of the hosted PowerShell, whose module path may lack PSResourceGet.
+    # pwsh.exe is under Program Files for the MSI build and an app execution alias for the MSIX build.
+    # On upgrade, change the version in both scripts.
+    - resource: PSDscResources/Script
+      id: pester
+      dependsOn:
+        - powershell
+      directives:
+        description: Install Pester 6 for PowerShell 7 (tests under windows/tests)
+      settings:
+        GetScript: |
+          $pwsh = "$env:ProgramFiles\PowerShell\7\pwsh.exe", "$env:LOCALAPPDATA\Microsoft\WindowsApps\pwsh.exe" | Where-Object { Test-Path $_ } | Select-Object -First 1
+          @{ Result = [string](& $pwsh -NoProfile -Command 'Get-Module Pester -ListAvailable | ForEach-Object { $_.Version.ToString() }') }
+        TestScript: |
+          $pwsh = "$env:ProgramFiles\PowerShell\7\pwsh.exe", "$env:LOCALAPPDATA\Microsoft\WindowsApps\pwsh.exe" | Where-Object { Test-Path $_ } | Select-Object -First 1
+          [string](& $pwsh -NoProfile -Command '[bool](Get-Module Pester -ListAvailable | Where-Object Version -EQ 6.2.0)') -eq 'True'
+        SetScript: |
+          $pwsh = "$env:ProgramFiles\PowerShell\7\pwsh.exe", "$env:LOCALAPPDATA\Microsoft\WindowsApps\pwsh.exe" | Where-Object { Test-Path $_ } | Select-Object -First 1
+          & $pwsh -NoProfile -Command 'Install-PSResource Pester -Version 6.2.0 -Scope CurrentUser -Repository PSGallery -TrustRepository'
+          if ($LASTEXITCODE) { throw "Pester install failed with exit code $LASTEXITCODE" }
 
     # On upgrade, change the URL and the hash in both scripts (amd64.exe line of sops-v<version>.checksums.txt).
     - resource: PSDscResources/Script
