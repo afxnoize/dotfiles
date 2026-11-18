@@ -58,11 +58,12 @@ winget にないツールとフォントは、構成ファイルの Script リ�
 - `packages.nix` にない T3 Code（コーディングエージェントの GUI）を winget の `T3Tools.T3Code` で入れる
 - sops は winget から削除された（`Mozilla.SOPS`）ため、GitHub のリリースから `sops.exe` を取得して `%LOCALAPPDATA%\Programs\sops` に置き、ユーザーの `Path` に追加する
   - 版と SHA256 は構成ファイルに固定している。更新するときは、SetScript の URL と、TestScript と SetScript の両方のハッシュを書き換える。ハッシュはリリースの `sops-v<版>.checksums.txt` にある amd64.exe の行を使う
+- git-wt は winget に登録されていないため、GitHub のリリースの `windows_amd64.tar.gz` から `git-wt.exe` を取り出して `%LOCALAPPDATA%\Programs\git-wt` に置き、ユーザーの `Path` に追加する
+  - 版と SHA256 は構成ファイルに固定している。更新するときは、SetScript の URL と、TestScript と SetScript の両方のハッシュを書き換える。ハッシュはリリースの `checksums.txt` にある windows_amd64 の行を使う
 
 `packages.nix` から入れないもの:
 
 - Nix 関連、cage、tmux: Windows 版がない
-- git-wt: winget に登録されていない
 - gti: 使わない
 - rtk、ccusage: 未確認。必要なら mise か npm で入れる
 

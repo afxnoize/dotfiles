@@ -119,6 +119,24 @@ properties:
       settings:
         id: x-motemen.ghq
         source: winget
+    # On upgrade, change the URL and the hash in both scripts (windows_amd64 line of checksums.txt).
+    - resource: PSDscResources/Script
+      id: gitWt
+      directives:
+        description: Install git-wt into %LOCALAPPDATA%\Programs\git-wt and add it to user PATH
+      settings:
+        GetScript: |
+          $exe = Join-Path $env:LOCALAPPDATA 'Programs\git-wt\git-wt.exe'
+          @{ Result = $(if (Test-Path $exe) { [string](& $exe --version) } else { '' }) }
+        TestScript: |
+          . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\git-wt'
+          Test-Release -Name git-wt -Sha256 '03bd9a2988d7fb28ed05cbdbfb7b20ee3faa49e1842167d5ca777aa3d9f0e4d9' -Require (Join-Path $dir 'git-wt.exe') -PathDir $dir
+        SetScript: |
+          . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\git-wt'
+          Install-Release -Name git-wt -Sha256 '03bd9a2988d7fb28ed05cbdbfb7b20ee3faa49e1842167d5ca777aa3d9f0e4d9' -Dir $dir -Extract 'git-wt.exe' -Require (Join-Path $dir 'git-wt.exe') -AddToPath `
+            -Url 'https://github.com/k1LoW/git-wt/releases/download/v0.30.0/git-wt_v0.30.0_windows_amd64.tar.gz'
 
     # --- Editor ---
     - resource: Microsoft.WinGet.DSC/WinGetPackage
