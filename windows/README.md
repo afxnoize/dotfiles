@@ -103,6 +103,16 @@ winget にないツールとフォントは、構成ファイルの Script リ�
   - PowerShell 7 が読む profile（`$PROFILE`）は Documents フォルダの下にあり、Documents は `$HOME` の外に移されていることがある。そのため chezmoi は `$PROFILE` をファイルとして持たない
   - 代わりに `.chezmoiscripts/run_onchange_after_powershell-profile.ps1` が、`$PROFILE` をこのファイルを読み込む一行だけに書き換える。元の中身が違えば `Microsoft.PowerShell_profile.ps1.bak` に退避する
   - 環境変数 `PROFILE` を設定しても、PowerShell が読む profile の場所は変わらない。`$PROFILE` は PowerShell が起動時に値を入れる自動変数で、環境変数とは別物
+- `dot_config/powershell/abbr.ps1`: zabrze と同じ要領の略語展開。PSReadLine の Space と Enter に割り当て、カーソルの直前の語を展開する
+  - zabrze は zsh 専用で、既存の PowerShell 向けモジュール（PowerShell Gallery の `Abbr`）は正規表現のトリガーと `context` を持たない。そのため自作した
+  - 外部プロセスを呼ばず、PowerShell の中で展開する。Space のたびにプロセスを起動しないため
+  - 規則は `dot_config/powershell/abbr/*.ps1` に置く。各ファイルは規則を 1 つにつき 1 個のハッシュテーブルとして出力し、ファイル名順・記述順で最初に一致した規則を使う
+  - 規則のキーは zabrze の項目に対応する: `Trigger`（完全一致）/ `TriggerPattern`（正規表現）、`Snippet` / `Evaluate`、`Global`、`Context`、`Cursor`、`If`
+  - `Evaluate` と `If` はスクリプトブロックで書く。`Evaluate` は名前付きグループのハッシュテーブルを引数に受け取る。`.psd1` にしないのは、データファイルにスクリプトブロックを書けないため
+  - `Global` でない規則は、行頭か `|` `;` `&` `(` `{` の直後でだけ展開する。`Context` は、行頭からカーソルまでの文字列（トリガー自身を含む）に対して評価する
+  - 引用符の内側では展開しない
+  - zsh の規則のうち、Windows に入っていないツール（nix、tmux、pueue、cage など）と、coreutils 固有のフラグを使うものは移していない
+  - テストは `pwsh -NoProfile -File windows/tests/abbr.tests.ps1` で走らせる
 
 ## 未対応
 

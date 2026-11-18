@@ -58,6 +58,12 @@ function prompt {
   $text
 }
 
+# Expand abbreviations on Space and Enter. PSReadLine is absent in non-interactive sessions.
+if (Get-Module PSReadLine) {
+  . "$PSScriptRoot\abbr.ps1"
+  Enable-Abbr "$PSScriptRoot\abbr"
+}
+
 # Initialize after prompt is defined, in case zoxide wraps it.
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
   Invoke-Expression (& { (zoxide init powershell | Out-String) })
