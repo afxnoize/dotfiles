@@ -39,12 +39,6 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
    chezmoi apply
    ```
 
-5. PowerShell 7 の `$PROFILE` の末尾に、chezmoi が配る `~/.config/powershell/profile.ps1` を読み込む一行を足す。一度だけ行う
-
-   ```powershell
-   Add-Content $PROFILE ". (Join-Path `$HOME '.config\powershell\profile.ps1')"
-   ```
-
 ## winget にないものの入れ方
 
 winget にないツールとフォントは、構成ファイルの Script リソースから `scripts/release.ps1` の関数を呼んで、リリースから入れる。ダウンロードを SHA256 で検証し、入れたもののハッシュを `%LOCALAPPDATA%\dotfiles\releases` に記録する。構成ファイルのハッシュと記録が違うもの、または本体（`sops.exe`、`nircmd.exe`）がなくなったものだけを入れ直す。
@@ -101,8 +95,12 @@ winget にないツールとフォントは、構成ファイルの Script リ�
   - トークンは Windows Credential Manager（ghtkn の既定の keyring backend）に入る。Windows の ghtkn は refresh token に対応しないため、8 時間ごとに `ghtkn auth <App 名>` でブラウザ承認をやり直す
 - `dot_config/git/ignore.tmpl`: グローバルの gitignore。Linux と共通の `nix/modules/git/ignore` を埋め込む
 - `dot_config/symlink_wezterm.tmpl`: `~/.config/wezterm` を、リポジトリ直下の `dot_config/wezterm` への symlink にする
-- `dot_config/powershell/profile.ps1`: PowerShell 7 の設定。zoxide を初期化する
-  - `$PROFILE` は Documents フォルダの下にあり、Documents は `$HOME` の外に移されていることがある。そのため chezmoi は `$PROFILE` を持たず、セットアップの手順 5 で `$PROFILE` からこのファイルを読み込む
+- `dot_config/powershell/profile.ps1`: PowerShell 7 の設定。zoxide を初期化し、プロンプトにカレントディレクトリと git の状態を出す
+  - git の状態は、ブランチ名、upstream との差（`↑` `↓`）、競合（`!`）、ステージ済み（`+`）、未ステージ（`~`）、未追跡（`?`）の件数
+  - 起動を軽くするため、oh-my-posh や posh-git は使わない。git リポジトリの外では git を呼ばない
+  - PowerShell 7 が読む profile（`$PROFILE`）は Documents フォルダの下にあり、Documents は `$HOME` の外に移されていることがある。そのため chezmoi は `$PROFILE` をファイルとして持たない
+  - 代わりに `.chezmoiscripts/run_onchange_after_powershell-profile.ps1` が、`$PROFILE` をこのファイルを読み込む一行だけに書き換える。元の中身が違えば `Microsoft.PowerShell_profile.ps1.bak` に退避する
+  - 環境変数 `PROFILE` を設定しても、PowerShell が読む profile の場所は変わらない。`$PROFILE` は PowerShell が起動時に値を入れる自動変数で、環境変数とは別物
 
 ## 未対応
 
