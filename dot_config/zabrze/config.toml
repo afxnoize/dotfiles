@@ -193,31 +193,36 @@ global = true
 [[snippets]]
 name = "$XDG_CACHE_HOME"
 trigger = "x-ca"
-snippet = '$XDG_CACHE_HOME'
+snippet = '$XDG_CACHE_HOME{}'
+cursor = "{}"
 global = true
 
 [[snippets]]
 name = "$XDG_CONFIG_HOME"
 trigger = "x-co"
-snippet = '$XDG_CONFIG_HOME'
+snippet = '$XDG_CONFIG_HOME{}'
+cursor = "{}"
 global = true
 
 [[snippets]]
 name = "$XDG_DATA_HOME"
 trigger = "x-da"
-snippet = '$XDG_DATA_HOME'
+snippet = '$XDG_DATA_HOME{}'
+cursor = "{}"
 global = true
 
 [[snippets]]
 name = "$XDG_STATE_HOME"
 trigger = "x-st"
-snippet = '$XDG_STATE_HOME'
+snippet = '$XDG_STATE_HOME{}'
+cursor = "{}"
 global = true
 
 [[snippets]]
 name = "$XDG_BIN_HOME"
 trigger = "x-bi"
-snippet = '$XDG_BIN_HOME'
+snippet = '$XDG_BIN_HOME{}'
+cursor = "{}"
 global = true
 # }}}
 
