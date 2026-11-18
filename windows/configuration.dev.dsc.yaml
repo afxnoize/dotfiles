@@ -224,14 +224,6 @@ properties:
         id: twpayne.chezmoi
         source: winget
 
-    # --- Secrets ---
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: bitwardenCli
-      directives:
-        description: Install Bitwarden CLI
-      settings:
-        id: Bitwarden.CLI
-        source: winget
     # On upgrade, change the URL and the hash in both scripts (amd64.exe line of sops-v<version>.checksums.txt).
     - resource: PSDscResources/Script
       id: sops
