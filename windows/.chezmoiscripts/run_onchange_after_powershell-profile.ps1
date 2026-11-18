@@ -5,7 +5,7 @@
 $ErrorActionPreference = 'Stop'
 
 $profilePath = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'PowerShell\Microsoft.PowerShell_profile.ps1'
-$line = '. "$env:XDG_CONFIG_HOME\powershell\profile.ps1"'
+$line = '. (Join-Path ($env:XDG_CONFIG_HOME ?? "$HOME\.config") ''powershell\profile.ps1'')'
 
 if (Test-Path $profilePath) {
   if ((Get-Content -Raw $profilePath).Trim() -eq $line) { return }
