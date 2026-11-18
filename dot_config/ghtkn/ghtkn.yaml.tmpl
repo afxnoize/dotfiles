@@ -1,17 +1,16 @@
-{{- /* Shared by Linux and Windows (windows/AppData/Roaming/ghtkn/ghtkn.yaml.tmpl
-       renders this file). Apps for accounts that must stay out of this public
-       repository go in ~/.config/ghtkn/apps.local.yaml as list items. */ -}}
+{{- /* Also rendered on Windows by windows/AppData/Roaming/ghtkn/ghtkn.yaml.tmpl. */ -}}
+{{- $config := dict
+      "apps" (list (dict "name" "afxnoize/write" "client_id" "Iv23lidPieirCb7WNvZe" "git_owner" "afxnoize"))
+      "skip_account_picker" false -}}
+{{- /* Refresh tokens need the agent backend; the Windows ghtkn uses the keyring. */ -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   $_ := set $config "backend" (dict "type" "agent") -}}
+{{- end -}}
+{{- /* Accounts that must stay out of this public repository. */ -}}
 {{- $local := joinPath .chezmoi.homeDir ".config" "ghtkn" "apps.local.yaml" -}}
-apps:
-  - name: afxnoize/write
-    client_id: Iv23lidPieirCb7WNvZe
-    git_owner: afxnoize
-{{- if stat $local }}
-{{ include $local | trimSuffix "\n" }}
-{{- end }}
-skip_account_picker: false
-{{- if eq .chezmoi.os "linux" }}
-# Refresh tokens need the agent backend; the Windows ghtkn uses the keyring.
-backend:
-  type: agent
-{{- end }}
+{{- if stat $local -}}
+{{-   $override := include $local | fromYaml | default dict -}}
+{{-   $_ := set $override "apps" (concat $config.apps (get $override "apps" | default list)) -}}
+{{-   $config = mergeOverwrite $config $override -}}
+{{- end -}}
+{{ toYaml $config | trimSuffix "\n" }}

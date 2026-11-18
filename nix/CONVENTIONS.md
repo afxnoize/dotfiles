@@ -54,7 +54,8 @@
 - どのアカウントのトークンを使うかは、`~/.config/ghtkn/ghtkn.yaml` の `git_owner` でリポジトリの owner ごとに決める
 - 設定ファイルは chezmoi のテンプレート `dot_config/ghtkn/ghtkn.yaml.tmpl` で配る。Windows も同じテンプレートを展開する（`windows/README.md`）
   - リポジトリには個人アカウント（`afxnoize`）の App だけを書く。Client ID は秘密ではない（Device Flow は Client Secret を使わない）が、仕事のアカウント名は公開リポジトリに出さない
-  - 仕事のアカウントなど、マシンごとの App は `~/.config/ghtkn/apps.local.yaml` に `apps` の要素として書く（行頭 2 文字下げの `  - name: ...`）。apply のときにテンプレートが `apps` の末尾に埋め込む。Windows でも同じパス（`%USERPROFILE%\.config\ghtkn\apps.local.yaml`）
+  - 仕事のアカウントなど、マシンごとの App は `~/.config/ghtkn/apps.local.yaml` に書く。中身は ghtkn の設定ファイルと同じ形の YAML。apply のときにテンプレートが YAML として読み、`apps` は共通の App の後ろに足し、ほかのキーは共通の値を上書きする。Windows でも同じパス（`%USERPROFILE%\.config\ghtkn\apps.local.yaml`）
+  - `apps.local.yaml` は、ないときだけ chezmoi が雛形（`create_apps.local.yaml`、`apps: []`）を作る。既にあれば触らない
   - `apps.local.yaml` を書き換えたら `chezmoi apply` し直す。生成された `ghtkn.yaml` を直接書き換えても、次の apply で上書きされる
 - Linux のトークンの保存先は agent backend にする（テンプレートが Linux のときだけ `backend: type: agent` を出す）。refresh token による自動更新は agent backend でしか使えない。keyring backend は Secret Service を要するが、導入時の Manjaro（KDE）では Secret Service が動いていなかった
 - agent は systemd user unit `ghtkn-agent`（`dot_config/systemd/user/`）で cage の外に常駐させる。有効化は初回だけ手動で `systemctl --user daemon-reload && systemctl --user enable --now ghtkn-agent`

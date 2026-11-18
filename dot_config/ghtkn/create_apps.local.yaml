@@ -1,0 +1,6 @@
+# Merged into ghtkn.yaml on `chezmoi apply`: apps are appended,
+# other keys override. chezmoi creates this file once and never overwrites it.
+apps: []
+#  - name: example/write
+#    client_id: Iv23xxxxxxxxxxxxxxxx
+#    git_owner: example
