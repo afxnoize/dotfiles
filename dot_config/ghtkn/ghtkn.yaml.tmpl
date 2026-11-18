@@ -1,0 +1,17 @@
+{{- /* Shared by Linux and Windows (windows/AppData/Roaming/ghtkn/ghtkn.yaml.tmpl
+       renders this file). Apps for accounts that must stay out of this public
+       repository go in ~/.config/ghtkn/apps.local.yaml as list items. */ -}}
+{{- $local := joinPath .chezmoi.homeDir ".config" "ghtkn" "apps.local.yaml" -}}
+apps:
+  - name: afxnoize/write
+    client_id: Iv23lidPieirCb7WNvZe
+    git_owner: afxnoize
+{{- if stat $local }}
+{{ include $local | trimSuffix "\n" }}
+{{- end }}
+skip_account_picker: false
+{{- if eq .chezmoi.os "linux" }}
+# Refresh tokens need the agent backend; the Windows ghtkn uses the keyring.
+backend:
+  type: agent
+{{- end }}

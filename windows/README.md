@@ -90,8 +90,9 @@ winget にないツールとフォントは、構成ファイルの Script リ�
   - マシン固有の設定は、Linux と同じく `~/.config/git/local.config` に書く
   - GitHub（`github.com` と `gist.github.com`）の credential helper は `ghtkn git-credential` にする
   - Git for Windows のインストーラは、system の設定に Git Credential Manager を入れる。GitHub に限り、空の `helper =` でこれを外す。ほかのホストは Git Credential Manager のまま
-  - ghtkn の設定ファイルは `%APPDATA%\ghtkn\ghtkn.yaml` に置く。Windows の ghtkn は `XDG_CONFIG_HOME` を見ない。App の Client ID と `git_owner` を書くファイルで、chezmoi では管理しない
-  - 設定ファイルは `ghtkn init` で作り、Client ID と `git_owner` を書き換える。ないまま apply すると、GitHub への HTTPS の push と fetch が認証で失敗する
+  - ghtkn の設定ファイルは `AppData/Roaming/ghtkn/ghtkn.yaml.tmpl` で配る。Windows の ghtkn は `XDG_CONFIG_HOME` を見ず、`%APPDATA%\ghtkn\ghtkn.yaml` を読む
+  - 中身は Linux と共通の `dot_config/ghtkn/ghtkn.yaml.tmpl` を apply のときに展開したもの。書き方は `nix/CONVENTIONS.md` の「GitHub の認証（ghtkn）」を見る
+  - backend は書かず、既定の keyring にする
   - トークンは Windows Credential Manager（ghtkn の既定の keyring backend）に入る。Windows の ghtkn は refresh token に対応しないため、8 時間ごとに `ghtkn auth <App 名>` でブラウザ承認をやり直す
 - `dot_config/git/ignore.tmpl`: グローバルの gitignore。Linux と共通の `nix/modules/git/ignore` を埋め込む
 - `dot_config/symlink_wezterm.tmpl`: `~/.config/wezterm` を、リポジトリ直下の `dot_config/wezterm` への symlink にする

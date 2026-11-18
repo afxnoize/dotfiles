@@ -51,8 +51,12 @@
 
 ### GitHub の認証（ghtkn）
 - git の `github.com` と `gist.github.com` の credential helper は `ghtkn git-credential`（`modules/git/default.nix`）。GitHub App の User Access Token を使い、8 時間で失効する
-- どのアカウントのトークンを使うかは、`~/.config/ghtkn/ghtkn.yaml` の `git_owner` でリポジトリの owner ごとに決める。この設定ファイルはアカウント名と Client ID を含むため、chezmoi でも Nix でも管理しない
-- トークンの保存先は agent backend にする（`ghtkn.yaml` に `backend: type: agent`）。refresh token による自動更新は agent backend でしか使えない。keyring backend は Secret Service を要するが、導入時の Manjaro（KDE）では Secret Service が動いていなかった
+- どのアカウントのトークンを使うかは、`~/.config/ghtkn/ghtkn.yaml` の `git_owner` でリポジトリの owner ごとに決める
+- 設定ファイルは chezmoi のテンプレート `dot_config/ghtkn/ghtkn.yaml.tmpl` で配る。Windows も同じテンプレートを展開する（`windows/README.md`）
+  - リポジトリには個人アカウント（`afxnoize`）の App だけを書く。Client ID は秘密ではない（Device Flow は Client Secret を使わない）が、仕事のアカウント名は公開リポジトリに出さない
+  - 仕事のアカウントなど、マシンごとの App は `~/.config/ghtkn/apps.local.yaml` に `apps` の要素として書く（行頭 2 文字下げの `  - name: ...`）。apply のときにテンプレートが `apps` の末尾に埋め込む。Windows でも同じパス（`%USERPROFILE%\.config\ghtkn\apps.local.yaml`）
+  - `apps.local.yaml` を書き換えたら `chezmoi apply` し直す。生成された `ghtkn.yaml` を直接書き換えても、次の apply で上書きされる
+- Linux のトークンの保存先は agent backend にする（テンプレートが Linux のときだけ `backend: type: agent` を出す）。refresh token による自動更新は agent backend でしか使えない。keyring backend は Secret Service を要するが、導入時の Manjaro（KDE）では Secret Service が動いていなかった
 - agent は systemd user unit `ghtkn-agent`（`dot_config/systemd/user/`）で cage の外に常駐させる。有効化は初回だけ手動で `systemctl --user daemon-reload && systemctl --user enable --now ghtkn-agent`
 - agent は起動するたびにロックされた状態で始まる。ログイン後と ghtkn の更新後は、自分の端末で `ghtkn agent unlock --enable-refresh` を実行する。トークンが 7 日使われず消えたときは `ghtkn auth <App 名>` で取り直す
 - socket は `$XDG_RUNTIME_DIR/ghtkn/agent.sock` に置く。`XDG_RUNTIME_DIR` がない端末では ghtkn が `~/.cache` に socket を探しに行くため、`dot_zshenv` で `/run/user/$UID` を補う。cage は `~/.cache` に書き込めるので、socket をそこに置くと偽の socket に差し替えられて unlock のパスフレーズを盗まれうる
