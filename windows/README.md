@@ -60,6 +60,10 @@ winget にないツールとフォントは、構成ファイルの Script リ�
   - 版と SHA256 は構成ファイルに固定している。更新するときは、SetScript の URL と、TestScript と SetScript の両方のハッシュを書き換える。ハッシュはリリースの `sops-v<版>.checksums.txt` にある amd64.exe の行を使う
 - git-wt は winget に登録されていないため、GitHub のリリースの `windows_amd64.tar.gz` から `git-wt.exe` を取り出して `%LOCALAPPDATA%\Programs\git-wt` に置き、ユーザーの `Path` に追加する
   - 版と SHA256 は構成ファイルに固定している。更新するときは、SetScript の URL と、TestScript と SetScript の両方のハッシュを書き換える。ハッシュはリリースの `checksums.txt` にある windows_amd64 の行を使う
+- Pester 6（`windows/tests` のテストに使う）を、PowerShell Gallery から現在のユーザーに入れる
+  - winget が動かす PowerShell ではなく `pwsh.exe` を起動して `Install-PSResource` を呼ぶ。winget の PowerShell はモジュールのパスが独自で、PSResourceGet が読めないことがあるため
+  - `pwsh.exe` は、MSI 版なら `Program Files\PowerShell\7` に、MSIX 版（winget の `Microsoft.PowerShell` が入れるもの）なら `%LOCALAPPDATA%\Microsoft\WindowsApps` にある。両方を探す
+  - 版は構成ファイルに固定している。更新するときは、TestScript と SetScript の両方の版を書き換える
 
 `packages.nix` から入れないもの:
 
@@ -103,6 +107,27 @@ winget にないツールとフォントは、構成ファイルの Script リ�
   - PowerShell 7 が読む profile（`$PROFILE`）は Documents フォルダの下にあり、Documents は `$HOME` の外に移されていることがある。そのため chezmoi は `$PROFILE` をファイルとして持たない
   - 代わりに `.chezmoiscripts/run_onchange_after_powershell-profile.ps1` が、`$PROFILE` をこのファイルを読み込む一行だけに書き換える。元の中身が違えば `Microsoft.PowerShell_profile.ps1.bak` に退避する
   - 環境変数 `PROFILE` を設定しても、PowerShell が読む profile の場所は変わらない。`$PROFILE` は PowerShell が起動時に値を入れる自動変数で、環境変数とは別物
+- `dot_config/powershell/abbr.ps1`: zabrze と同じ要領の略語展開。PSReadLine の Space と Enter に割り当て、カーソルの直前の語を展開する
+  - zabrze は zsh 専用で、既存の PowerShell 向けモジュール（PowerShell Gallery の `Abbr`）は正規表現のトリガーと `context` を持たない。そのため自作した
+  - 外部プロセスを呼ばず、PowerShell の中で展開する。Space のたびにプロセスを起動しないため
+  - 規則は `dot_config/powershell/abbr/*.ps1` に置く。各ファイルは規則を 1 つにつき 1 個のハッシュテーブルとして出力し、ファイル名順・記述順で最初に一致した規則を使う
+  - 規則のキーは zabrze の項目に対応する: `Trigger`（完全一致）/ `TriggerPattern`（正規表現）、`Snippet` / `Evaluate`、`Global`、`Context`、`Cursor`、`If`
+  - `Evaluate` と `If` はスクリプトブロックで書く。`Evaluate` は名前付きグループのハッシュテーブルを引数に受け取る。`.psd1` にしないのは、データファイルにスクリプトブロックを書けないため
+  - `Global` でない規則は、コマンド位置でだけ展開する。コマンド位置は、行頭と、`|` `;` `&` 改行 `(` `{` の直後。ハッシュテーブル（`@{ }`）の直下はキーの位置なので展開しない
+  - `Context` は、いま書いている文の先頭からカーソルまでの文字列（トリガー自身を含む）に対して評価する。文の先頭は、上のコマンド位置の区切りの直後で、先頭の空白は除く。zabrze は行頭から評価するため、`cd x; git st` のような 2 つ目以降の文では展開しない。こちらでは展開する
+  - 文字列（here-string を含む）とコメントの中では展開しない
+  - 規則の `If` と `Evaluate` は打鍵のたびに動く。例外は握りつぶして次の規則に進み、`$LASTEXITCODE` は展開の前の値に戻す
+  - `Cursor` の印の位置にカーソルを置いたときは、Enter でも行を実行せず入力を待つ
+  - 貼り付けた文字列は展開しない。端末への貼り付けは、PSReadLine には 1 文字ずつのキー入力として届く。そこで Space や Enter の時点で後ろにキーが控えていれば、貼り付けとみなす
+    - PSReadLine はハンドラを呼ぶ前に入力を読み切り、非公開の `_queuedKeys` に溜める。そのため `[Console]::KeyAvailable` だけでは見分けられず、`_queuedKeys` をリフレクションで読む
+    - PSReadLine の版が変わってこのフィールドがなくなったときは、`[Console]::KeyAvailable` だけで判定する。その場合、貼り付けでも展開されることがある
+  - 規則ファイルに誤り（未知のキー、Trigger と TriggerPattern の両方など）があると、profile は警告を出して略語展開だけを無効にする
+  - zsh の規則のうち、Windows に入っていないツール（nix、tmux、pueue、cage など）と、coreutils 固有のフラグを使うものは移していない
+  - テストは Pester 6 で書いている。Pester は `configuration.dev.dsc.yaml` が入れる。Windows 付属の Pester 3.4 では動かない
+
+    ```powershell
+    pwsh -NoProfile -Command 'Invoke-Pester windows/tests -Output Detailed'
+    ```
 
 ## 未対応
 
