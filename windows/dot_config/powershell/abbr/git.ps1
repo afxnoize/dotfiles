@@ -49,4 +49,4 @@ $sub = '^git\s+\S+$'
 @{ Name = 'git current branch name'; Trigger = 'B'; Global = $true; Context = '^git\s+'
   Evaluate = { git symbolic-ref --short HEAD 2>$null } }
 @{ Name = 'git main/master'; Trigger = 'M'; Global = $true; Context = '^git\s+'
-  Evaluate = { git show-ref --verify --quiet refs/heads/main; $LASTEXITCODE -eq 0 ? 'main' : 'master' } }
+  Evaluate = { git show-ref --verify --quiet refs/heads/main 2>$null; $LASTEXITCODE -eq 0 ? 'main' : 'master' } }

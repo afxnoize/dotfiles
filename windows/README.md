@@ -113,10 +113,18 @@ winget にないツールとフォントは、構成ファイルの Script リ�
   - 規則は `dot_config/powershell/abbr/*.ps1` に置く。各ファイルは規則を 1 つにつき 1 個のハッシュテーブルとして出力し、ファイル名順・記述順で最初に一致した規則を使う
   - 規則のキーは zabrze の項目に対応する: `Trigger`（完全一致）/ `TriggerPattern`（正規表現）、`Snippet` / `Evaluate`、`Global`、`Context`、`Cursor`、`If`
   - `Evaluate` と `If` はスクリプトブロックで書く。`Evaluate` は名前付きグループのハッシュテーブルを引数に受け取る。`.psd1` にしないのは、データファイルにスクリプトブロックを書けないため
-  - `Global` でない規則は、行頭か `|` `;` `&` `(` `{` の直後でだけ展開する。`Context` は、行頭からカーソルまでの文字列（トリガー自身を含む）に対して評価する
-  - 引用符の内側では展開しない
+  - `Global` でない規則は、コマンド位置でだけ展開する。コマンド位置は、行頭と、`|` `;` `&` 改行 `(` `{` の直後。ハッシュテーブル（`@{ }`）の直下はキーの位置なので展開しない
+  - `Context` は、いま書いている文の先頭からカーソルまでの文字列（トリガー自身を含む）に対して評価する。文の先頭は、上のコマンド位置の区切りの直後で、先頭の空白は除く。zabrze は行頭から評価するため、`cd x; git st` のような 2 つ目以降の文では展開しない。こちらでは展開する
+  - 文字列（here-string を含む）とコメントの中では展開しない
+  - 規則の `If` と `Evaluate` は打鍵のたびに動く。例外は握りつぶして次の規則に進み、`$LASTEXITCODE` は展開の前の値に戻す
+  - `Cursor` の印の位置にカーソルを置いたときは、Enter でも行を実行せず入力を待つ
+  - 規則ファイルに誤り（未知のキー、Trigger と TriggerPattern の両方など）があると、profile は警告を出して略語展開だけを無効にする
   - zsh の規則のうち、Windows に入っていないツール（nix、tmux、pueue、cage など）と、coreutils 固有のフラグを使うものは移していない
-  - テストは `pwsh -NoProfile -File windows/tests/abbr.tests.ps1` で走らせる
+  - テストは Pester 6 で書いている。Pester は `configuration.dev.dsc.yaml` が入れる。Windows 付属の Pester 3.4 では動かない
+
+    ```powershell
+    pwsh -NoProfile -Command 'Invoke-Pester windows/tests -Output Detailed'
+    ```
 
 ## 未対応
 
