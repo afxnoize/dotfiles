@@ -43,6 +43,22 @@ function Get-GitPromptSegment {
   $out
 }
 
+# Same as zsh's ^g^g: pick a ghq repository, most recently modified first, and cd into it.
+# The cd goes through AcceptLine so it lands in history and the prompt redraws.
+if (Get-Module PSReadLine) {
+  Set-PSReadLineKeyHandler -Chord 'Ctrl+g,Ctrl+g' -BriefDescription ghq-fzf -ScriptBlock {
+    $root = ghq root
+    $src = ghq list |
+      Sort-Object { [IO.Directory]::GetLastWriteTimeUtc((Join-Path $root $_)) } -Descending |
+      fzf --preview "bat --color=always --style=header,grid --line-range :80 $root/{}/README.md"
+    if (-not $src) { return }
+    $dir = (Join-Path $root $src).Replace("'", "''")
+    [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+    [Microsoft.PowerShell.PSConsoleReadLine]::Insert("cd '$dir'")
+    [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+  }
+}
+
 function prompt {
   $ok = $?
   $exitCode = $global:LASTEXITCODE
