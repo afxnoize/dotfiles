@@ -44,6 +44,7 @@ Assert-Expand 'git rebase c' 'git rebase --continue'
 Assert-Expand 'git push origin f' 'git push origin --force-with-lease'
 Assert-Expand 'git log g' 'git log --grep=""' -ExpectedCursor 16
 Assert-Expand 'c' 'z'
+Assert-Expand 'gh' 'ghtkn exec -e GH_TOKEN -- gh'
 Assert-Expand 'chezmoi app' 'chezmoi apply'
 Assert-Expand 'eza -l :n' 'eza -l -s modified -r'
 Assert-Expand 'ls x-co' 'ls $env:XDG_CONFIG_HOME' -ExpectedCursor 23
