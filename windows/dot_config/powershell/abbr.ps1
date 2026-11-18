@@ -154,20 +154,34 @@ function Expand-AbbrLine {
 
 # Decides what a key does: the expansion to apply, then what to do after it.
 # A cursor placed at a marker waits for input, so Enter does not run the line.
+# Keys still pending mean the text is being pasted, which is never expanded.
 function Resolve-AbbrKey {
-  param([ValidateSet('Space', 'Enter')] [string] $Key, [string] $Line, [int] $Cursor, [object[]] $Rules)
+  param([ValidateSet('Space', 'Enter')] [string] $Key, [string] $Line, [int] $Cursor, [object[]] $Rules, [switch] $InputPending)
 
-  $expansion = Expand-AbbrLine -Line $Line -Cursor $Cursor -Rules $Rules
+  $expansion = if (-not $InputPending) { Expand-AbbrLine -Line $Line -Cursor $Cursor -Rules $Rules }
   [pscustomobject]@{
     Expansion = $expansion
     Then      = if ($expansion.Placed) { 'None' } elseif ($Key -eq 'Space') { 'InsertSpace' } else { 'AcceptLine' }
   }
 }
 
+# A terminal paste arrives as a burst of keys. PSReadLine drains the console input
+# into its private _queuedKeys before calling a handler, so Console.KeyAvailable
+# alone misses it. Without that field (another PSReadLine version) only
+# KeyAvailable is checked.
+function Test-AbbrInputPending {
+  if ($(try { [Console]::KeyAvailable } catch { $false })) { return $true }
+  $flags = [Reflection.BindingFlags]'NonPublic,Static,Instance'
+  $type = [Microsoft.PowerShell.PSConsoleReadLine]
+  $singleton = $type.GetField('_singleton', $flags)?.GetValue($null)
+  $queued = $type.GetField('_queuedKeys', $flags)?.GetValue($singleton)
+  [bool]$queued.Count
+}
+
 function Invoke-AbbrKey([string] $Key, [object[]] $Rules) {
   $line = $null; $cursor = $null
   [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
-  $action = Resolve-AbbrKey -Key $Key -Line $line -Cursor $cursor -Rules $Rules
+  $action = Resolve-AbbrKey -Key $Key -Line $line -Cursor $cursor -Rules $Rules -InputPending:(Test-AbbrInputPending)
   if ($action.Expansion) {
     [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $action.Expansion.Line)
     [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($action.Expansion.Cursor)

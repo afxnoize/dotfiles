@@ -262,6 +262,16 @@ Describe 'Resolve-AbbrKey' {
     $action.Then | Should-Be $Then
     ($null -ne $action.Expansion) | Should-Be $Expands
   }
+
+  It '<Key> on "<Line>" while more keys are pending (a paste) does <Then> without expanding' -ForEach @(
+    @{ Key = 'Space'; Line = 'g'; Then = 'InsertSpace' }
+    @{ Key = 'Enter'; Line = 'g'; Then = 'AcceptLine' }
+    @{ Key = 'Enter'; Line = 'cm'; Then = 'AcceptLine' }
+  ) {
+    $action = Resolve-AbbrKey -Key $Key -Line $Line -Cursor $Line.Length -Rules $rules -InputPending
+    $action.Then | Should-Be $Then
+    $action.Expansion | Should-BeNull
+  }
 }
 
 Describe 'ConvertTo-AbbrRule' {

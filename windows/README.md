@@ -118,6 +118,9 @@ winget にないツールとフォントは、構成ファイルの Script リ�
   - 文字列（here-string を含む）とコメントの中では展開しない
   - 規則の `If` と `Evaluate` は打鍵のたびに動く。例外は握りつぶして次の規則に進み、`$LASTEXITCODE` は展開の前の値に戻す
   - `Cursor` の印の位置にカーソルを置いたときは、Enter でも行を実行せず入力を待つ
+  - 貼り付けた文字列は展開しない。端末への貼り付けは、PSReadLine には 1 文字ずつのキー入力として届く。そこで Space や Enter の時点で後ろにキーが控えていれば、貼り付けとみなす
+    - PSReadLine はハンドラを呼ぶ前に入力を読み切り、非公開の `_queuedKeys` に溜める。そのため `[Console]::KeyAvailable` だけでは見分けられず、`_queuedKeys` をリフレクションで読む
+    - PSReadLine の版が変わってこのフィールドがなくなったときは、`[Console]::KeyAvailable` だけで判定する。その場合、貼り付けでも展開されることがある
   - 規則ファイルに誤り（未知のキー、Trigger と TriggerPattern の両方など）があると、profile は警告を出して略語展開だけを無効にする
   - zsh の規則のうち、Windows に入っていないツール（nix、tmux、pueue、cage など）と、coreutils 固有のフラグを使うものは移していない
   - テストは Pester 6 で書いている。Pester は `configuration.dev.dsc.yaml` が入れる。Windows 付属の Pester 3.4 では動かない
