@@ -39,6 +39,12 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
    chezmoi apply
    ```
 
+5. PowerShell 7 の `$PROFILE` の末尾に、chezmoi が配る `~/.config/powershell/profile.ps1` を読み込む一行を足す。一度だけ行う
+
+   ```powershell
+   Add-Content $PROFILE ". (Join-Path `$HOME '.config\powershell\profile.ps1')"
+   ```
+
 ## winget にないものの入れ方
 
 winget にないツールとフォントは、構成ファイルの Script リソースから `scripts/release.ps1` の関数を呼んで、リリースから入れる。ダウンロードを SHA256 で検証し、入れたもののハッシュを `%LOCALAPPDATA%\dotfiles\releases` に記録する。構成ファイルのハッシュと記録が違うもの、または本体（`sops.exe`、`nircmd.exe`）がなくなったものだけを入れ直す。
@@ -95,10 +101,12 @@ winget にないツールとフォントは、構成ファイルの Script リ�
   - トークンは Windows Credential Manager（ghtkn の既定の keyring backend）に入る。Windows の ghtkn は refresh token に対応しないため、8 時間ごとに `ghtkn auth <App 名>` でブラウザ承認をやり直す
 - `dot_config/git/ignore.tmpl`: グローバルの gitignore。Linux と共通の `nix/modules/git/ignore` を埋め込む
 - `dot_config/symlink_wezterm.tmpl`: `~/.config/wezterm` を、リポジトリ直下の `dot_config/wezterm` への symlink にする
+- `dot_config/powershell/profile.ps1`: PowerShell 7 の設定。zoxide を初期化する
+  - `$PROFILE` は Documents フォルダの下にあり、Documents は `$HOME` の外に移されていることがある。そのため chezmoi は `$PROFILE` を持たず、セットアップの手順 5 で `$PROFILE` からこのファイルを読み込む
 
 ## 未対応
 
-- PowerShell profile は、まだリポジトリ直下の `readonly_Documents/` にある。scoop（posh-git、scoop-completion、mise のパス）と、マシン固有の oh-my-posh の init パスに依存している
+- 以前の PowerShell profile は、まだリポジトリ直下の `readonly_Documents/` にある。scoop（posh-git、scoop-completion、mise のパス）と、マシン固有の oh-my-posh の init パスに依存している
 - Neovim の設定は、まだリンクしていない
 - nvim-treesitter のパーサのビルドに使う C コンパイラは入れていない
 - Claude Code の設定は、どのファイルを持っていくか決めていない
