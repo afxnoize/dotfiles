@@ -19,6 +19,13 @@ properties:
       settings:
         id: Ray-lea.Argus
         source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: kando
+      directives:
+        description: Install Kando pie menu
+      settings:
+        id: KandoMenu.Kando
+        source: winget
 
     # NirCmd is not in the winget repository, so fetch the official zip.
     # NirSoft overwrites the zip in place on each release; when the hash check
