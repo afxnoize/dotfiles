@@ -1,0 +1,6 @@
+# gh {{{
+[[snippets]]
+name = "gh with ghtkn token"
+trigger = "gh"
+snippet = "GH_TOKEN=$(ghtkn get) gh"
+# }}}
