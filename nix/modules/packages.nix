@@ -31,6 +31,7 @@ let
     bottom
     eza
     jq
+    jnv
     zoxide
     yazi
   ];
