@@ -42,8 +42,9 @@ mcp
 # nix result
 result
 
-# repo-level tests (not shipped to user)
+# repo-level tests and docs (not shipped to user)
 tests
+docs
 
 # windows/ is a separate chezmoi source for Windows (sourceDir points there)
 windows
