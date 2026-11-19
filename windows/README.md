@@ -43,6 +43,12 @@ Windows 環境は、このディレクトリを chezmoi のソースとして独
 
 winget にないツールとフォントは、構成ファイルの Script リソースから `scripts/release.ps1` の関数を呼んで、リリースから入れる。ダウンロードを SHA256 で検証し、入れたもののハッシュを `%LOCALAPPDATA%\dotfiles\releases` に記録する。構成ファイルのハッシュと記録が違うもの、または本体（`sops.exe`、`nircmd.exe`）がなくなったものだけを入れ直す。
 
+GitHub のリリースから入れるものは、週次の workflow（`.github/workflows/windows-release-bump.yaml`）が最新版を調べ、URL と SHA256 を書き換えた PR を作る。
+
+- 対象は、`-Sha256 '<hash>'` の次の行に `-Url 'https://github.com/<owner>/<repo>/releases/download/<tag>/<asset>'` がある `Install-Release` の呼び出し。一覧ファイルはなく、構成ファイルから直接拾う
+- 新しい asset 名は、古い asset 名の版の部分を置き換えて作る。新しいリリースにその名前の asset がないとき（改名など）は書き換えず、workflow を失敗させて知らせる
+- NirCmd（GitHub 外）と WezTerm nightly（ハッシュなし）は対象外
+
 ## configuration.dev.dsc.yaml が行うこと
 
 - 開発者モードを有効にする。chezmoi が管理者権限なしで symlink を作るために必要

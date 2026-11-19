@@ -1,0 +1,56 @@
+name: Bump Windows release pins
+
+on:
+  schedule:
+    - cron: "0 20 * * 0" # 毎週月曜 05:00 JST (= 日曜 20:00 UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Test the bump script
+        run: bash .github/scripts/windows-release-bump.test.sh
+
+      - name: Move GitHub release pins to the latest releases
+        id: bump
+        run: bash .github/scripts/windows-release-bump.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8.1.0
+        if: steps.bump.outputs.bumped == 'true'
+        with:
+          commit-message: |
+            chore(windows): GitHub リリースから入れるツールを更新
+
+            構成ファイルに固定した GitHub リリースのうち、新しい版が出たものの
+            URL と SHA256 を書き換えた。
+
+            ${{ steps.bump.outputs.updated }}
+          branch: chore/windows-release-bump
+          title: "chore(windows): GitHub リリースから入れるツールを更新"
+          body: |
+            `windows/*.dsc.yaml` に固定した GitHub リリースのうち、新しい版が出たものを更新する。
+
+            ${{ steps.bump.outputs.updated }}
+
+            - SHA256 は GitHub が asset に記録した digest を使う。digest がない古い asset は、ダウンロードして計算する
+            - 適用前に、各リリースの変更点を確認する。winget configure での動作確認はしていない
+          add-paths: windows/*.dsc.yaml
+
+      # asset 名が変わったものは自動で追えないため、ジョブを失敗させて知らせる。
+      - name: Report pins that could not be bumped
+        if: steps.bump.outputs.failed != ''
+        run: |
+          echo "::error::新しいリリースに同じ名前の asset がない。構成ファイルを手で更新する"
+          echo "$FAILED"
+          exit 1
+        env:
+          FAILED: ${{ steps.bump.outputs.failed }}
