@@ -104,5 +104,5 @@ typeset -U FPATH
 # End of Paths }}}
 
 # Local {{{
-source "$ZDOTDIR/.zshenv.local"(N) 2>/dev/null
+[[ -f $ZDOTDIR/local.env.zsh ]] && source "$ZDOTDIR/local.env.zsh"
 # }}}

@@ -212,7 +212,8 @@ bindkey '^fp' zaw-process
 bindkey '^t' zaw-tmux
 # }}}
 
-[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+# Machine- and account-specific settings, not tracked (like git's local.config).
+[[ -f $ZDOTDIR/local.rc.zsh ]] && source "$ZDOTDIR/local.rc.zsh"
 
 ensure_integration direnv 'direnv version' 'direnv hook zsh'
 ensure_integration zoxide 'zoxide --version' 'zoxide init zsh'
