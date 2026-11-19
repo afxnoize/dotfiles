@@ -237,6 +237,41 @@ ensure_integration direnv 'direnv version' 'direnv hook zsh'
 ensure_integration zoxide 'zoxide --version' 'zoxide init zsh'
 ensure_integration git-wt 'git wt --version' 'git wt --init zsh'
 
+# Replace _git-wt from `git wt --init zsh`, which lists candidates alphabetically.
+# Keep worktrees before plain branches, and order each by last commit, newest first.
+# Describe branches as "<age> [gone] [merged] <subject>" to spot cleanup candidates.
+_git-wt() {
+	local -a keyed completions
+	local -A rank info merged
+	local ref age track subject mark comp desc group base i=0 n=0
+	base=$(command git rev-parse --verify -q main >/dev/null && echo main || echo master)
+	for ref in ${(f)"$(command git branch --merged $base --format='%(refname:short)' 2>/dev/null)"}; do
+		[[ $ref != $base ]] && merged[$ref]=1
+	done
+	# \x1f separates fields: read with IFS=tab would merge empty fields (no upstream)
+	while IFS=$'\x1f' read -r ref age track subject; do
+		rank[$ref]=$(( ++i ))
+		mark=
+		[[ $track == *gone* ]] && mark+=' [gone]'
+		(( ${+merged[$ref]} )) && mark+=' [merged]'
+		info[$ref]="$age$mark $subject"
+	done < <(command git for-each-ref --sort=-committerdate \
+		--format=$'%(refname:short)\x1f%(committerdate:relative)\x1f%(upstream:track)\x1f%(contents:subject)' refs/heads 2>/dev/null)
+	local args=("${words[@]:1}")
+	while IFS=$'\t' read -r comp desc; do
+		[[ $comp == :* ]] && continue
+		[[ $desc == *worktree* ]] && group=0 || group=1
+		[[ -n ${info[$comp]} ]] && desc=${info[$comp]}
+		# Sort key: group(1) + commit rank(5) + original position(5) = 11 chars
+		keyed+=("$(printf '%d%05d%05d' $group ${rank[$comp]:-99999} $(( ++n )))${comp}${desc:+:$desc}")
+	done < <(command git-wt __complete "${args[@]}" 2>/dev/null)
+	completions=(${${(o)keyed}#???????????})
+	_describe -V -t worktrees 'git-wt' completions
+}
+# Colors: age dim, [gone] red, [merged] yellow. Groups match "<name>  -- <age> [gone] [merged] <subject>".
+zstyle ':completion:*:worktrees' list-colors \
+	'=(#b)(*-- )(<-> [a-z]## ago|<-> [a-z]##, <-> [a-z]## ago)( \[gone\]|)( \[merged\]|)(*)=0=0=2=31=33=0'
+
 zinit wait"2" lucid \
 	as"null" id-as"mise" \
 	atload"source $ZRCDIR/pluginconfig/mise.zsh" \
