@@ -19,9 +19,6 @@ sakura/**
 # temp
 cheatsheet/**
 
-# serena
-serena/
-
 {{ if ne .chezmoi.os "linux" }}
 .config/zsh/**
 .config/zabrze/**

@@ -1,28 +1,3 @@
-# scaffolding {{{
-[[snippets]]
-name = "cc-sdd (system design doc)"
-trigger-pattern = "^(?:cc)?-?sdd$"
-snippet = "bunx cc-sdd@latest --lang ja"
-
-[[snippets]]
-name = "difit"
-trigger = "difit"
-snippet = "bunx difit"
-
-[[snippets]]
-name = "specify init"
-trigger = "specify"
-snippet = "uvx --from git+https://github.com/github/spec-kit.git specify init"
-
-[[snippets]]
-name = "mcp add serena"
-trigger = "mcp-add-serena"
-snippet = """
-claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena
-start-mcp-server --context claude-code --mode planning --mode no-onboarding --project-from-cwd
-"""
-# }}}
-
 # commit / review {{{
 [[snippets]]
 name = "ai commit message"

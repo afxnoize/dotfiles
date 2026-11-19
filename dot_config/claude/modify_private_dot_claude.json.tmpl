@@ -15,7 +15,7 @@ jq --slurpfile secrets /dev/fd/3 '
   .mcpServers.tavily = {
     "type": "stdio",
     "command": "bun",
-    "args": ["x", "-y", "tavily-mcp@0.1.3"],
+    "args": ["x", "-y", "tavily-mcp@0.2.22"],
     "env": {
       "TAVILY_API_KEY": $s.tavily_api_key
     }
