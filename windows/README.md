@@ -107,6 +107,12 @@ winget にないツールとフォントは、構成ファイルの Script リ�
   - PowerShell 7 が読む profile（`$PROFILE`）は Documents フォルダの下にあり、Documents は `$HOME` の外に移されていることがある。そのため chezmoi は `$PROFILE` をファイルとして持たない
   - 代わりに `.chezmoiscripts/run_onchange_after_powershell-profile.ps1` が、`$PROFILE` をこのファイルを読み込む一行だけに書き換える。元の中身が違えば `Microsoft.PowerShell_profile.ps1.bak` に退避する
   - 環境変数 `PROFILE` を設定しても、PowerShell が読む profile の場所は変わらない。`$PROFILE` は PowerShell が起動時に値を入れる自動変数で、環境変数とは別物
+  - マシン・アカウント固有の設定は、同じディレクトリの `profile.local.ps1` に書く。あれば zoxide の初期化より前に dot-source する。git の `local.config`、ghtkn の `apps.local.yaml` と同じ位置づけ
+    - chezmoi は `create_profile.local.ps1` から、ファイルが無いときだけ雛形を置く。既にあれば上書きしない
+  - プロンプトを出すたびに、カレントディレクトリの `...\github.com\<owner>\` から owner を取り、`$GhtknAppByOwner`（owner → ghtkn の App 名）を引いて環境変数 `GHTKN_APP` を設定する。一致しなければ `GHTKN_APP` を消す
+    - `$GhtknAppByOwner` は `profile.local.ps1` で定義する。定義が無ければ `GHTKN_APP` に触らない
+    - `ghtkn exec` は `GHTKN_APP` の App を使い、無ければ `ghtkn.yaml` の先頭の App を使う。`git_owner` で App を選ぶのは git の credential helper として動くときだけ。そのため略語の `gh`（`ghtkn exec -e GH_TOKEN -- gh`）は、この切り替えが無いと owner に関係なく先頭の App で動く
+    - owner と App の対応は `ghtkn.yaml` の `git_owner` と重複する。PowerShell 標準に YAML パーサが無いため、`ghtkn.yaml` からは引かない
 - `dot_config/powershell/abbr.ps1`: zabrze と同じ要領の略語展開。PSReadLine の Space と Enter に割り当て、カーソルの直前の語を展開する
   - zabrze は zsh 専用で、既存の PowerShell 向けモジュール（PowerShell Gallery の `Abbr`）は正規表現のトリガーと `context` を持たない。そのため自作した
   - 外部プロセスを呼ばず、PowerShell の中で展開する。Space のたびにプロセスを起動しないため

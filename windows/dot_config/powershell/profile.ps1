@@ -59,9 +59,23 @@ if (Get-Module PSReadLine) {
   }
 }
 
+# Set GHTKN_APP from the owner directory (...\github.com\<owner>\...). ghtkn exec uses
+# GHTKN_APP, else the first app in ghtkn.yaml; git_owner only applies to git-credential.
+# $GhtknAppByOwner (owner -> app name) is set in profile.local.ps1; without it, do nothing.
+function Update-GhtknApp {
+  if ($null -eq $global:GhtknAppByOwner) { return }
+  $loc = $ExecutionContext.SessionState.Path.CurrentLocation
+  $app = $null
+  if ($loc.Provider.Name -eq 'FileSystem' -and $loc.ProviderPath -match '[\\/]github\.com[\\/]([^\\/]+)') {
+    $app = $global:GhtknAppByOwner[$Matches[1]]
+  }
+  $env:GHTKN_APP = $app
+}
+
 function prompt {
   $ok = $?
   $exitCode = $global:LASTEXITCODE
+  Update-GhtknApp
 
   $path = $ExecutionContext.SessionState.Path.CurrentLocation.Path
   if ($path -eq $HOME -or $path.StartsWith($HOME + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
@@ -73,6 +87,12 @@ function prompt {
   $global:LASTEXITCODE = $exitCode
   $text
 }
+
+# Machine- and account-specific settings, not tracked (like git's local.config).
+# Loaded before zoxide so that a prompt wrapped here is wrapped again by zoxide.
+$localProfile = Join-Path $PSScriptRoot 'profile.local.ps1'
+if (Test-Path $localProfile) { . $localProfile }
+Remove-Variable localProfile
 
 # Expand abbreviations on Space and Enter. PSReadLine is absent in non-interactive sessions.
 if (Get-Module PSReadLine) {
