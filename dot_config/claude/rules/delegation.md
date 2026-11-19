@@ -16,3 +16,4 @@
 
 重い設計判断や多段推論を要するタスクは effort を上げて処理し、軽い確認は低めに保つ。
 定義済み subagent（plugin・.claude/agents/）は frontmatter の model に従う。
+pstack の skill が役割ごとに subagent を起こすときは、上のルーティングより `pstack-models.md` を優先する（役割ごとに決めた値をここで上書きしないため）。
