@@ -215,6 +215,24 @@ bindkey '^t' zaw-tmux
 # Machine- and account-specific settings, not tracked (like git's local.config).
 [[ -f $ZDOTDIR/local.rc.zsh ]] && source "$ZDOTDIR/local.rc.zsh"
 
+# Set GHTKN_APP from the owner directory (.../github.com/<owner>/...). ghtkn exec uses
+# GHTKN_APP, else the first app in ghtkn.yaml; git_owner only applies to git-credential.
+# ghtkn_app_by_owner (owner -> app name) is set in local.rc.zsh; without it, do nothing.
+_update_ghtkn_app() {
+	(( ${+ghtkn_app_by_owner} )) || return
+	local app=
+	if [[ $PWD =~ '/github\.com/([^/]+)' ]]; then
+		app=${ghtkn_app_by_owner[$match[1]]}
+	fi
+	if [[ -n $app ]]; then
+		export GHTKN_APP=$app
+	else
+		unset GHTKN_APP
+	fi
+}
+add-zsh-hook chpwd _update_ghtkn_app
+_update_ghtkn_app
+
 ensure_integration direnv 'direnv version' 'direnv hook zsh'
 ensure_integration zoxide 'zoxide --version' 'zoxide init zsh'
 ensure_integration git-wt 'git wt --version' 'git wt --init zsh'

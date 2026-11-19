@@ -1,6 +1,9 @@
 # gh {{{
+# ghtkn exec uses the app in GHTKN_APP, or the first app in ghtkn.yaml; it does not
+# look at the repository owner. .zshrc sets GHTKN_APP per owner from
+# ghtkn_app_by_owner in local.rc.zsh.
 [[snippets]]
 name = "gh with ghtkn token"
 trigger = "gh"
-snippet = "GH_TOKEN=$(ghtkn get) gh"
+snippet = "ghtkn exec -e GH_TOKEN -- gh"
 # }}}
