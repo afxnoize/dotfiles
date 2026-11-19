@@ -1,0 +1,12 @@
+# Claude Code statusline settings (read by statusline.js).
+# chezmoi creates this file only when it does not exist, so local edits are kept.
+
+# [repos]: emoji shown before the repository name.
+# - Key: "owner/repo" taken from the origin remote URL (host is ignored).
+# - "owner/*" matches every repository of that owner. An exact key wins.
+# - Value: any string; usually a single emoji.
+# - Repositories without origin or without a match show no emoji.
+[repos]
+"afxnoize/dotfiles" = "🧬"
+"afxnoize/nz-homelab-services" = "🏠"
+"afxnoize/*" = "🌠"

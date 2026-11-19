@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
-import { basename } from "node:path";
+import { readFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 
 const data = JSON.parse(await Bun.stdin.text());
 
@@ -8,7 +9,7 @@ const DIM = "\x1b[2m";
 const BOLD = "\x1b[1m";
 const C = (n) => `\x1b[38;5;${n}m`;
 
-// --- Line 1: cwd | git-root | git-branch ---
+// --- Line 1: cwd | repo-emoji repo | git-branch ---
 
 const fishPath = (p) => {
   const home = Bun.env.HOME ?? "";
@@ -19,14 +20,18 @@ const fishPath = (p) => {
 };
 
 const cwd = data.workspace?.current_dir ?? Bun.env.PWD ?? "";
-const gitRoot = (() => {
+// Resolve the main repository name, not the linked worktree directory name.
+const repoName = (() => {
   try {
-    const res = Bun.spawnSync(["git", "rev-parse", "--show-toplevel"], {
-      cwd,
-      stdout: "pipe",
-      stderr: "ignore",
-    });
-    return res.exitCode === 0 ? res.stdout.toString().trim() : "";
+    const res = Bun.spawnSync(
+      ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+      { cwd, stdout: "pipe", stderr: "ignore" },
+    );
+    if (res.exitCode !== 0) return "";
+    const commonDir = res.stdout.toString().trim();
+    return basename(commonDir) === ".git"
+      ? basename(dirname(commonDir))
+      : basename(commonDir).replace(/\.git$/, "");
   } catch {
     return "";
   }
@@ -44,8 +49,40 @@ const gitBranch = (() => {
   }
 })();
 
+const repoEmojis = (() => {
+  try {
+    const path = join(import.meta.dir, "statusline.toml");
+    return Bun.TOML.parse(readFileSync(path, "utf8")).repos ?? {};
+  } catch {
+    return {};
+  }
+})();
+const repoEmoji = (() => {
+  try {
+    const res = Bun.spawnSync(["git", "remote", "get-url", "origin"], {
+      cwd,
+      stdout: "pipe",
+      stderr: "ignore",
+    });
+    if (res.exitCode !== 0) return "";
+    // Last two path segments of https/ssh/scp-style URLs: ".../owner/repo(.git)"
+    const m = res.stdout
+      .toString()
+      .trim()
+      .match(/[:/]([^/:]+)\/([^/]+?)(?:\.git)?\/?$/);
+    if (!m) return "";
+    const [, owner, repo] = m;
+    return repoEmojis[`${owner}/${repo}`] ?? repoEmojis[`${owner}/*`] ?? "";
+  } catch {
+    return "";
+  }
+})();
+
 const line1Parts = [`${C(188)}󰉋 ${R}${fishPath(cwd)}`];
-if (gitRoot) line1Parts.push(`${C(30)}${basename(gitRoot)}${R}`);
+if (repoName)
+  line1Parts.push(
+    `${repoEmoji ? `${repoEmoji} ` : ""}${C(30)}${repoName}${R}`,
+  );
 if (gitBranch) line1Parts.push(`${C(96)}⎇ ${gitBranch}${R}`);
 const line1 = line1Parts.join(` ${C(7)}|${R} `);
 
