@@ -41,6 +41,11 @@ zstyle ':completion:*' menu true select
 zstyle ':completion:*:rm:*' menu false
 # match lower and upper
 zstyle ':completion:*:(cd|less):*' matcher 'm:{a-z}={A-Z}'
+# group candidates by kind under a header (e.g. local branches, remote branches, files)
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
+# color files like ls; an empty LS_COLORS falls back to zsh's default colors
+zstyle ':completion:*:default' list-colors "${(@s.:.)LS_COLORS}"
 
 # End of Completion }}}
 
@@ -149,7 +154,7 @@ zinit wait"2" lucid \
 complete -C 'aws_completer' aws
 
 # Autoload functions {{{
-autoload -Uz ensure_completion ensure_integration ghq-fzf ghq-updated-fzf git-status ghq-tmux \
+autoload -Uz ensure_integration ghq-fzf ghq-updated-fzf git-status ghq-tmux \
 	_fzf_complete_chezmoi yq claude gi tsv
 
 # zle widgets
@@ -158,9 +163,6 @@ zle -N ghq-updated-fzf
 zle -N git-status
 zle -N ghq-tmux
 
-ensure_completion chezmoi "chezmoi --version" "chezmoi completion zsh"
-ensure_completion gh "gh --version" "gh completion -s zsh"
-ensure_completion just "just --version" "just --completions zsh"
 compdef _fzf_complete_chezmoi chezmoi
 # End of Autoload functions }}}
 
@@ -271,8 +273,3 @@ _git-wt() {
 # Colors: age dim, [gone] red, [merged] yellow. Groups match "<name>  -- <age> [gone] [merged] <subject>".
 zstyle ':completion:*:worktrees' list-colors \
 	'=(#b)(*-- )(<-> [a-z]## ago|<-> [a-z]##, <-> [a-z]## ago)( \[gone\]|)( \[merged\]|)(*)=0=0=2=31=33=0'
-
-zinit wait"2" lucid \
-	as"null" id-as"mise" \
-	atload"source $ZRCDIR/pluginconfig/mise.zsh" \
-	light-mode for @zdharma-continuum/null

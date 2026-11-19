@@ -96,6 +96,10 @@ fpath=(
 	$ZHOMEDIR/functions(N-/)
 	$ZHOMEDIR/completions.local(N-/)
 	$ZHOMEDIR/completions(N-/)
+	# Completions shipped with Nix packages. Home-Manager adds these only to the
+	# ~/.zshrc it generates, which zsh skips because ZDOTDIR points here.
+	$HOME/.nix-profile/share/zsh/site-functions(N-/)
+	/nix/var/nix/profiles/default/share/zsh/site-functions(N-/)
 	$fpath
 )
 export FPATH
