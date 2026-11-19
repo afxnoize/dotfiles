@@ -33,6 +33,12 @@
 - **カスタムバイナリ**: `tools/kakehashi/` のようにプラットフォーム別に分岐
 - **bun**: upstream の latest release に意図して固定し、nixpkgs の版には頼らない。理由は、nixpkgs の版が upstream より遅れ、同梱の brotli に脆弱性（bun 1.4.4 で修正）が残っていたため。`bun-linux-x64` / `bun-linux-aarch64` を `flake = false` のファイル入力（upstream の latest release の zip）として持ち、`overlays/bun.nix` の overlay で `pkgs.bun` の `src` だけを差し替える（`flake.nix` の `overlays` から import する）。`tools/bunx` と PATH 上の `bun` は同じ `pkgs.bun` なのでまとめて追従する。更新は `flake-latest-update` が毎日行う（手で上げるなら `nix flake update bun-linux-x64 bun-linux-aarch64`）。nixpkgs が追いついても、入力と overlay は削除しない。linux 以外の system は nixpkgs の bun のまま
 
+### パッケージを nix に移すときの確認
+- 名前の一致を同一性の根拠にしない。`nix eval --raw --inputs-from ./nix nixpkgs#<attr>.meta.homepage` が元の owner/repo と一致するか見る。nixpkgs には同名の別ソフトがある（例: `qq` は Tencent QQ）。逆に別名で入っていることもある（例: `hl` は `hl-log-viewer`）
+- nixpkgs の attribute と名前が衝突するときは、overlay で上書きせず、接頭辞付きの attribute 名で足す。上書きすると、その attribute に依存する他のパッケージにも中身の違うものが渡る
+- 移行元が入れていたコマンドが全部あるか、`nix build --no-link --print-out-paths` の `bin/` を見て比べる。`meta.mainProgram` は代表の 1 つしか示さない
+- `nix flake check` は評価しか見ない。bin の衝突は profile の構築で初めて出るため、activationPackage の build まで通す
+
 ### 最新版を追う入力の自動更新（flake-latest-update）
 - systemd user timer `flake-latest-update`（毎日 03:00 JST）が、次の 4 入力だけ `flake.lock` を更新し、`nh home switch` まで実行する。実体は `dot_local/bin/executable_flake-latest-update`、unit は `dot_config/systemd/user/`
   - `claude-code`: sadjow/claude-code-nix
