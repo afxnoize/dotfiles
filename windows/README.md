@@ -76,8 +76,9 @@ winget にないツールとフォントは、構成ファイルの Script リ�
 - AutoHotkey v2、Argus（タスクマネージャ）、Kando（パイメニュー）を winget で入れる
 - NirCmd は winget に登録されていないため、NirSoft の zip を取得して `%LOCALAPPDATA%\Programs\NirCmd` に展開し、ユーザーの `Path` に追加する
   - zip は SHA256 で検証する。NirSoft は版を上げると同じ URL の zip を差し替えるため、版が上がるとハッシュ不一致で失敗する。そのときは新しい版を確認して、TestScript と SetScript の両方のハッシュを更新する
-- Wireless Battery（ワイヤレス機器のバッテリー残量をタスクバーに出す）も winget に登録されていないため、GitHub リリースの portable zip を `%LOCALAPPDATA%\Programs\WirelessBattery` に展開する
-  - 版は URL で固定している。上げるときは URL と、TestScript と SetScript の両方のハッシュを更新する
+- BatteryHub（ワイヤレス機器のバッテリー残量をタスクバーに出す。旧名 Wireless Battery）も winget に登録されていないため、GitHub リリースの portable zip を `%LOCALAPPDATA%\Programs\BatteryHub` に展開する
+  - 版は URL で固定している。上げるときは URL と、TestScript と SetScript の両方のハッシュを更新する。ハッシュはリリースの `SHA256SUMS.txt` にある portable zip の行を使う
+  - 設定と電池の履歴は旧名のまま `HKCU\Software\WirelessBattery` と `%LOCALAPPDATA%\WirelessBattery` に残り、改名後もそのまま使われる
   - サインイン時の自動起動は、アプリのメニューの *Start with Windows* で設定する
 
 ## 配布するファイル

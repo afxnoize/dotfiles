@@ -49,23 +49,23 @@ properties:
           Install-Release -Name NirCmd -Sha256 '51e34ed379dd099a96bbf0a2266003361e2864fe3ef2f8baed76634909763a7c' -Dir $dir -Extract '*' -Require (Join-Path $dir 'nircmd.exe') -AddToPath `
             -Url 'https://www.nirsoft.net/utils/nircmd-x64.zip'
 
-    # Wireless Battery is not in the winget repository, so fetch the portable zip
-    # from the GitHub release. To upgrade, change the URL and the hash in both scripts.
+    # BatteryHub (formerly Wireless Battery) is not in the winget repository, so fetch
+    # the portable zip from the GitHub release. To upgrade, change the URL and the hash
+    # in both scripts (portable zip line of SHA256SUMS.txt).
     - resource: PSDscResources/Script
-      id: wirelessBattery
+      id: batteryHub
       directives:
-        description: Install Wireless Battery into %LOCALAPPDATA%\Programs\WirelessBattery
+        description: Install BatteryHub into %LOCALAPPDATA%\Programs\BatteryHub
       settings:
         GetScript: |
-          $dir = Join-Path $env:LOCALAPPDATA 'Programs\WirelessBattery'
-          @{ Result = (Test-Path (Join-Path $dir 'WirelessBattery.exe')).ToString() }
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\BatteryHub'
+          @{ Result = (Test-Path (Join-Path $dir 'BatteryHub.exe')).ToString() }
         TestScript: |
           . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
-          $dir = Join-Path $env:LOCALAPPDATA 'Programs\WirelessBattery'
-          Test-Release -Name WirelessBattery -Sha256 '6d5efb66d9384f6ab0320ced17cc0fc8e2c321283fecab84575794f005fb9a9e' -Require (Join-Path $dir 'WirelessBattery.exe')
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\BatteryHub'
+          Test-Release -Name BatteryHub -Sha256 '7a97a1ff0aefa895386077093b23a714df549a08fad3b1b9c37ccf2100a27026' -Require (Join-Path $dir 'BatteryHub.exe')
         SetScript: |
           . ([scriptblock]::Create([IO.File]::ReadAllText('${WinGetConfigRoot}\scripts\release.ps1')))
-          # SHA256 of WirelessBattery-1.0.4-portable.zip (digest shown on the GitHub release)
-          $dir = Join-Path $env:LOCALAPPDATA 'Programs\WirelessBattery'
-          Install-Release -Name WirelessBattery -Sha256 '6d5efb66d9384f6ab0320ced17cc0fc8e2c321283fecab84575794f005fb9a9e' -Dir $dir -Extract '*' -Require (Join-Path $dir 'WirelessBattery.exe') `
-            -Url 'https://github.com/krisgfx9/Wireless-Device-Battery-Monitor/releases/download/v1.0.4/WirelessBattery-1.0.4-portable.zip'
+          $dir = Join-Path $env:LOCALAPPDATA 'Programs\BatteryHub'
+          Install-Release -Name BatteryHub -Sha256 '7a97a1ff0aefa895386077093b23a714df549a08fad3b1b9c37ccf2100a27026' -Dir $dir -Extract '*' -Require (Join-Path $dir 'BatteryHub.exe') `
+            -Url 'https://github.com/krisgfx9/Wireless-Device-Battery-Monitor/releases/download/v1.1.0/BatteryHub-1.1.0-portable.zip'
