@@ -6,16 +6,21 @@
 # reached over HTTPS. Which account's token git gets is decided by git_owner in
 # ~/.config/ghtkn/ghtkn.yaml, not here.
 
-# One includeIf per owner and URL form. hasconfig:remote.*.url matches the URL
-# as written in the repository config, before insteadOf rewrites it.
+# One includeIf per owner and URL form (scp, ssh://, https). hasconfig:remote.*.url
+# matches the URL as written in the repository config, before insteadOf rewrites
+# it. A missing include path is silently ignored, so check the file name.
 [includeIf "hasconfig:remote.*.url:git@github.com:example-org/**"]
+	path = identities/work.config
+[includeIf "hasconfig:remote.*.url:ssh://git@github.com/example-org/**"]
 	path = identities/work.config
 [includeIf "hasconfig:remote.*.url:https://github.com/example-org/**"]
 	path = identities/work.config
 
-# Rewrite scp-style remotes of those owners to HTTPS. An SSH key is bound to one
-# account, so the helper (which picks the account per remote) only takes effect
-# over HTTPS. Scope it to the owners above instead of all of github.com: owners
-# that stay on an SSH key keep working on machines without ghtkn set up.
+# Rewrite SSH remotes (scp and ssh:// forms) of those owners to HTTPS. An SSH key
+# is bound to one account, so the helper (which picks the account per remote)
+# only takes effect over HTTPS. Scope it to the owners above instead of all of
+# github.com: owners that stay on an SSH key keep working on machines without
+# ghtkn set up.
 [url "https://github.com/example-org/"]
 	insteadOf = git@github.com:example-org/
+	insteadOf = ssh://git@github.com/example-org/
