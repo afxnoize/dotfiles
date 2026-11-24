@@ -67,7 +67,7 @@ function Test-Release {
   )
   $stamp = Get-ReleaseStampPath $Name
   (Test-Path $stamp) -and ([IO.File]::ReadAllText($stamp).Trim() -eq $Sha256) -and
-    -not ($Require | Where-Object { -not (Test-Path -LiteralPath $_) }) -and
+    -not ($Require | Where-Object { $_ -and -not (Test-Path -LiteralPath $_) }) -and
     (-not $PathDir -or (Test-UserPath $PathDir))
 }
 
