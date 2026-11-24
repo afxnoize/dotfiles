@@ -79,7 +79,7 @@ GitHub のリリースから入れるものは、週次の workflow（`.github/w
 
 ## configuration.personal.dsc.yaml が行うこと
 
-- AutoHotkey v2、Argus（タスクマネージャ）、Kando（パイメニュー）を winget で入れる
+- AutoHotkey v2、Argus（タスクマネージャ）、Kando（パイメニュー）、OpenInzone（INZONE Hub なしで Sony INZONE ヘッドセットを操作する）を winget で入れる
 - NirCmd は winget に登録されていないため、NirSoft の zip を取得して `%LOCALAPPDATA%\Programs\NirCmd` に展開し、ユーザーの `Path` に追加する
   - zip は SHA256 で検証する。NirSoft は版を上げると同じ URL の zip を差し替えるため、版が上がるとハッシュ不一致で失敗する。そのときは新しい版を確認して、TestScript と SetScript の両方のハッシュを更新する
 - BatteryHub（ワイヤレス機器のバッテリー残量をタスクバーに出す。旧名 Wireless Battery）も winget に登録されていないため、GitHub リリースの portable zip を `%LOCALAPPDATA%\Programs\BatteryHub` に展開する

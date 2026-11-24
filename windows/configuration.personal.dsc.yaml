@@ -26,6 +26,13 @@ properties:
       settings:
         id: KandoMenu.Kando
         source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: openInzone
+      directives:
+        description: Install OpenInzone (Sony INZONE headset control without INZONE Hub)
+      settings:
+        id: penguinwokrs.OpenInzone
+        source: winget
 
     # NirCmd is not in the winget repository, so fetch the official zip.
     # NirSoft overwrites the zip in place on each release; when the hash check
