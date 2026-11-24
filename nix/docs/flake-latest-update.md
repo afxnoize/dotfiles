@@ -7,7 +7,7 @@
 ## 仕組み
 - systemd user timer `flake-latest-update`（毎日 03:00 JST）が、次の 4 入力だけ `flake.lock` を更新し、`nh home switch` まで実行する。実体は `dot_local/bin/executable_flake-latest-update`、unit は `dot_config/systemd/user/`
   - `claude-code`: sadjow/claude-code-nix
-  - `llm-agents`: numtide/llm-agents.nix。rtk、ccusage、herdr、happy-coder などが一緒に上がる
+  - `llm-agents`: numtide/llm-agents.nix。rtk、ccusage、herdr などが一緒に上がる
   - `bun-linux-x64` / `bun-linux-aarch64`: upstream の latest release の zip（ファイル入力）
 - 追う入力の一覧は、スクリプト冒頭の `latest_inputs` 配列に 1 箇所だけ持つ。足すときはここに名前を足す
 - `claude-code` と `llm-agents` には `follows` を付けない。配布元が検証した nixpkgs から外れ、配布元の binary cache が使えなくなるため

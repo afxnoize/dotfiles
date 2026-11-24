@@ -61,7 +61,6 @@ let
   aiTools = with pkgs; [
     rtk
     ccusage
-    happy-coder # happy
     herdr
   ];
 

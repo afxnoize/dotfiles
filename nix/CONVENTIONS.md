@@ -2,7 +2,7 @@
 
 `nix/` を編集するときの規約。個別の仕組みの説明と運用手順は、次の文書に分けている。
 
-- [`docs/overlays.md`](docs/overlays.md): `overlays/` を編集・削除するとき、bun か happy-coder の挙動を調べるとき
+- [`docs/overlays.md`](docs/overlays.md): `overlays/` を編集・削除するとき、bun の挙動を調べるとき
 - [`docs/flake-latest-update.md`](docs/flake-latest-update.md): 毎日の自動更新で追う入力を変えるとき、timer やスクリプトを編集するとき、自動更新の結果を調べるとき
 - [`docs/nixos-release-bump.md`](docs/nixos-release-bump.md): `nixpkgs` / `home-manager` の URL を変えるとき、`chore/nixos-release-bump` の PR を確認するとき
 - [`../docs/ghtkn.md`](../docs/ghtkn.md): `modules/git/` の credential helper など、GitHub の認証（ghtkn）に触れるとき
@@ -35,7 +35,7 @@
 - **外部 flake**: llm-agents, cage 等（`inputs` で定義）
 - **mise**: moonbit だけ（nixpkgs にも llm-agents にも無いため）。グローバルのランタイムは Nix で持ち、プロジェクトのランタイムは flake の devShell と nix-direnv に任せる
 - 最新版が要るパッケージの取り方: nixpkgs-unstable で足りるならそれ、毎日追うなら llm-agents、どちらにもなければ mise
-- **overlay で包むもの**: happy-coder（`HAPPY_CLAUDE_PATH` の既定値）と bun（upstream の latest release に固定）。理由と更新方法は [`docs/overlays.md`](docs/overlays.md)
+- **overlay で包むもの**: bun（upstream の latest release に固定）。理由と更新方法は [`docs/overlays.md`](docs/overlays.md)
 - **Go のソースビルド**: nixpkgs に無い Go のツールは `tools/gh-infra/` のように `pkgs-unstable.buildGoModule` で build する。版を上げたら `hash` と `vendorHash` を更新する。gh の拡張は `xdg.dataFile."gh/extensions/<名前>"` に `bin` をつないで `gh <名前>` で呼べるようにする（`programs.gh` は `config.yml` を読み取り専用にするので使わない）
 - **カスタムバイナリ**: `tools/kakehashi/` のようにプラットフォーム別に分岐
 

@@ -1,4 +1,4 @@
-# Ported from dot_config/zabrze/ai.toml. cage and happy have no Windows build.
+# Ported from dot_config/zabrze/ai.toml. cage has no Windows build.
 $hasBunx = { [bool](Get-Command bunx -ErrorAction Ignore) }
 
 @{ Name = 'skills add'; Trigger = 'skills'; Snippet = 'bunx skills add'; If = $hasBunx }

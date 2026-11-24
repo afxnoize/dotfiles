@@ -33,7 +33,6 @@ presets:
     allow:
       - "$CLAUDE_CONFIG_DIR"
       - "$XDG_RUNTIME_DIR/cc-socks"
-      - "$XDG_STATE_HOME/happy"
 
   dev-tools:
     allow:

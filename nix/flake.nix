@@ -80,10 +80,6 @@
             herdr = llm-agents.packages.${system}.herdr;
           })
           (import ./overlays/bun.nix { inherit inputs system; })
-          (import ./overlays/happy-coder.nix {
-            inherit inputs system;
-            claudePath = "${homeDirectory}/.nix-profile/bin/claude";
-          })
         ];
         inherit system;
       };
