@@ -20,32 +20,34 @@ const fishPath = (p) => {
 };
 
 const cwd = data.workspace?.current_dir ?? Bun.env.PWD ?? "";
-// Resolve the main repository name, not the linked worktree directory name.
-const repoName = (() => {
+const { repoName, gitBranch } = (() => {
   try {
     const res = Bun.spawnSync(
-      ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
+      [
+        "git",
+        "rev-parse",
+        "--path-format=absolute",
+        "--git-common-dir",
+        "--abbrev-ref",
+        "HEAD",
+      ],
       { cwd, stdout: "pipe", stderr: "ignore" },
     );
-    if (res.exitCode !== 0) return "";
-    const commonDir = res.stdout.toString().trim();
-    return basename(commonDir) === ".git"
-      ? basename(dirname(commonDir))
-      : basename(commonDir).replace(/\.git$/, "");
+    const [commonDir = "", branch = ""] = res.stdout
+      .toString()
+      .trim()
+      .split("\n");
+    if (!commonDir) return { repoName: "", gitBranch: "" };
+    return {
+      repoName:
+        basename(commonDir) === ".git"
+          ? basename(dirname(commonDir))
+          : basename(commonDir).replace(/\.git$/, ""),
+      // HEAD cannot be resolved in a repo with no commits; drop the branch then.
+      gitBranch: res.exitCode === 0 ? branch : "",
+    };
   } catch {
-    return "";
-  }
-})();
-const gitBranch = (() => {
-  try {
-    const res = Bun.spawnSync(["git", "rev-parse", "--abbrev-ref", "HEAD"], {
-      cwd,
-      stdout: "pipe",
-      stderr: "ignore",
-    });
-    return res.exitCode === 0 ? res.stdout.toString().trim() : "";
-  } catch {
-    return "";
+    return { repoName: "", gitBranch: "" };
   }
 })();
 
@@ -78,13 +80,12 @@ const repoEmoji = (() => {
   }
 })();
 
-const line1Parts = [`${C(188)}󰉋 ${R}${fishPath(cwd)}`];
-if (repoName)
-  line1Parts.push(
-    `${repoEmoji ? `${repoEmoji} ` : ""}${C(30)}${repoName}${R}`,
-  );
-if (gitBranch) line1Parts.push(`${C(96)}⎇ ${gitBranch}${R}`);
-const line1 = line1Parts.join(` ${C(7)}|${R} `);
+const repoPart = repoName ? `${repoEmoji}${C(30)}${repoName}${R}` : "";
+const branchPart = gitBranch ? `${C(96)}⎇ ${gitBranch}${R}` : "";
+const cwdPart = `${C(188)}󰉋 ${R}${fishPath(cwd)}`;
+const line1 = [repoPart, branchPart, cwdPart]
+  .filter(Boolean)
+  .join(` ${C(7)}|${R} `);
 
 // --- Line 2: model + ring meters ---
 
@@ -113,29 +114,27 @@ const kFmt = (n) => {
 };
 
 const model = data.model?.display_name ?? "Claude";
-const line2Parts = [`${C(188)}󰧑 ${R}${BOLD}${model}${R}`];
 
-const ctxPct = data.context_window?.used_percentage;
-const ctxSize = data.context_window?.context_window_size;
-const ctxUsage = data.context_window?.current_usage;
-if (ctxPct != null && ctxUsage && ctxSize) {
+const modelPart = `${C(188)}󰧑 ${R}${BOLD}${model}${R}`;
+const ctxPart = (() => {
+  const pct = data.context_window?.used_percentage;
+  if (pct == null) return "";
+  const size = data.context_window?.context_window_size;
+  const usage = data.context_window?.current_usage;
+  if (!usage || !size) return fmt("ctx", pct);
   const used =
-    (ctxUsage.input_tokens ?? 0) +
-    (ctxUsage.cache_creation_input_tokens ?? 0) +
-    (ctxUsage.cache_read_input_tokens ?? 0);
-  line2Parts.push(
-    `${DIM}ctx${R} ${gradient(ctxPct)}${ring(ctxPct)} ${kFmt(used)}/${kFmt(ctxSize)}${R}`,
-  );
-} else if (ctxPct != null) {
-  line2Parts.push(fmt("ctx", ctxPct));
-}
+    (usage.input_tokens ?? 0) +
+    (usage.cache_creation_input_tokens ?? 0) +
+    (usage.cache_read_input_tokens ?? 0);
+  return `${DIM}ctx${R} ${gradient(pct)}${ring(pct)} ${kFmt(used)}/${kFmt(size)}${R}`;
+})();
 
-const five = data.rate_limits?.five_hour?.used_percentage;
-if (five != null) line2Parts.push(fmt("5h", five));
+const rate = (label, pct) => (pct == null ? "" : fmt(label, pct));
+const fivePart = rate("5h", data.rate_limits?.five_hour?.used_percentage);
+const weekPart = rate("7d", data.rate_limits?.seven_day?.used_percentage);
 
-const week = data.rate_limits?.seven_day?.used_percentage;
-if (week != null) line2Parts.push(fmt("7d", week));
-
-const line2 = line2Parts.join("  ");
+const line2 = [modelPart, ctxPart, fivePart, weekPart]
+  .filter(Boolean)
+  .join("  ");
 
 process.stdout.write(`${line1}\n${line2}`);
