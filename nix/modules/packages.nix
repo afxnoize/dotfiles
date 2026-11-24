@@ -62,6 +62,7 @@ let
     rtk
     ccusage
     herdr
+    paseo
   ];
 
   sandboxTools = with pkgs; [

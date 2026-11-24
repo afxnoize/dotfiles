@@ -78,6 +78,7 @@
             rtk = llm-agents.packages.${system}.rtk;
             ccusage = llm-agents.packages.${system}.ccusage;
             herdr = llm-agents.packages.${system}.herdr;
+            paseo = llm-agents.packages.${system}.paseo;
           })
           (import ./overlays/bun.nix { inherit inputs system; })
         ];

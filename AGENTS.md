@@ -16,6 +16,7 @@ chezmoi + Nix Home-Manager の二段構成 dotfiles リポジトリ。役割分�
 ## Directory Guide
 - `nix/` を編集するとき → [`nix/CONVENTIONS.md`](nix/CONVENTIONS.md)（Flake & Home-Manager 設定の規約）
 - GitHub の認証（ghtkn のテンプレート、credential helper、`gh` の略語、`ghtkn-agent`）を編集するとき → [`docs/ghtkn.md`](docs/ghtkn.md)
+- Paseo の agent を操作するとき、Paseo のインストールや daemon の起動方法を変えるとき → [`docs/paseo.md`](docs/paseo.md)
 - `dot_config/nvim/` を編集するとき → [`dot_config/nvim/CONVENTIONS.md`](dot_config/nvim/CONVENTIONS.md)（Neovim 設定の規約）
 - `dot_config/claude/` の指示ファイルを編集するとき → 常時ロードするルールは `rules/*.md` に領域ごとに置く（`paths` frontmatter がないため全部起動時に読まれる）。入口の `CLAUDE.md` には import と構成メモだけを置く。persona は `~/.config/claude/CLAUDE.local.md` に置き、chezmoi 管理外・repo 外のままにする
 
