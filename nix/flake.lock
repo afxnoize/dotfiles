@@ -415,6 +415,22 @@
         "type": "github"
       }
     },
+    "plugin-claude-timeline": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794871401,
+        "narHash": "sha256-KM/dWVJXEw7ktzGDMarDCkQr2S71LAto234gJNW440E=",
+        "owner": "skanehira",
+        "repo": "claude-timeline",
+        "rev": "d5be094220839262953e1bf6e568d772d3aa0e29",
+        "type": "github"
+      },
+      "original": {
+        "owner": "skanehira",
+        "repo": "claude-timeline",
+        "type": "github"
+      }
+    },
     "plugin-imozuru": {
       "flake": false,
       "locked": {
@@ -475,6 +491,7 @@
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "plugin-claude-timeline": "plugin-claude-timeline",
         "plugin-imozuru": "plugin-imozuru",
         "plugins-pstack": "plugins-pstack",
         "plugins-voltagent": "plugins-voltagent",

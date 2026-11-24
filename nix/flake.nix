@@ -57,6 +57,10 @@
       url = "github:VoltAgent/awesome-claude-code-subagents";
       flake = false;
     };
+    plugin-claude-timeline = {
+      url = "github:skanehira/claude-timeline";
+      flake = false;
+    };
 
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
