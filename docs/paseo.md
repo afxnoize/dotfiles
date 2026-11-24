@@ -17,6 +17,17 @@
 - `restart` は supervisor の起動のしかたを引き継ぐ。ランタイムを変えたあとは `paseo daemon stop` してから `paseo daemon start` で起動し直し、`daemonNode` を確かめる
 - `config.json` を書き換えただけなら `paseo daemon reload` で読み直せる
 
+## 設定ファイル
+- `~/.paseo` のうち chezmoi で管理するのは `config.json` だけにする。ほかは agent の記録、ログ、鍵、pid などの状態なので管理しない
+- 実体は `~/.config/paseo/config.json` に置き、`~/.paseo/config.json` から symlink を張る（`dot_paseo/symlink_config.json.tmpl`）
+  - daemon は `config.json` を temp ファイルからの rename で書き戻すが、先に symlink を解決してから書く（paseo 0.17.4 の `private-files.js` の `resolveSymlinkedFile`）。そのため link は残り、実体が更新される
+- 実体は modify script（`dot_config/paseo/modify_private_config.json.tmpl`）で作る。既存のファイルに、管理するキーだけを jq で上書きする
+  - daemon はアプリからの設定変更や `paseo plugin add` で `config.json` を自分で書き換える。ファイル全体をテンプレートにすると、`chezmoi apply` のたびにその変更が消える
+  - `plugins` は管理しない。`paseo plugin add` がインストールごとのパスを書き込むため
+  - 管理するキーを変えるときは、アプリや `paseo` で変えたあと、modify script の jq 式にも同じ値を書く。書かないと次の `chezmoi apply` で戻る
+- `daemon.listen` のアドレスとポートは公開したくないので、sops で暗号化した `dot_config/paseo/secrets.yaml` の `paseo_listen` に置く。中身の編集は `sops dot_config/paseo/secrets.yaml`
+- 新しいマシンでは、`chezmoi apply` の前に `~/.paseo/config.json` があれば `~/.config/paseo/config.json` へ移す。移さずに apply すると、空の入力から管理するキーだけのファイルができる。そのファイルには `plugins` が入らない。また、chezmoi が `~/.paseo/config.json` を symlink で置き換えるときに、元のファイルの中身も失われる
+
 ## agent の操作
 ID は前方一致で指定できる（例: `86b0cca`）。
 
