@@ -296,3 +296,10 @@ properties:
       settings:
         id: Anthropic.ClaudeCode
         source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: paseo
+      directives:
+        description: Install Paseo
+      settings:
+        id: Paseo.Paseo
+        source: winget
