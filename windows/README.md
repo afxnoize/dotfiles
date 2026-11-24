@@ -61,7 +61,6 @@ GitHub のリリースから入れるものは、週次の workflow（`.github/w
   - 入れた後は更新しない。新しい nightly にするときは、構成ファイルを流さず、インストーラを手で入れ直す
 - フォント（Cica、UDEV Gothic、PleckJP）を GitHub のリリースから取得し、現在のユーザーに入れる
   - 版と SHA256 は構成ファイルに固定している。更新するときは、TestScript と SetScript の両方のハッシュと、SetScript の URL を書き換える
-- `packages.nix` にない T3 Code（コーディングエージェントの GUI）を winget の `T3Tools.T3Code` で入れる
 - sops は winget から削除された（`Mozilla.SOPS`）ため、GitHub のリリースから `sops.exe` を取得して `%LOCALAPPDATA%\Programs\sops` に置き、ユーザーの `Path` に追加する
   - 版と SHA256 は構成ファイルに固定している。更新するときは、SetScript の URL と、TestScript と SetScript の両方のハッシュを書き換える。ハッシュはリリースの `sops-v<版>.checksums.txt` にある amd64.exe の行を使う
 - git-wt は winget に登録されていないため、GitHub のリリースの `windows_amd64.tar.gz` から `git-wt.exe` を取り出して `%LOCALAPPDATA%\Programs\git-wt` に置き、ユーザーの `Path` に追加する

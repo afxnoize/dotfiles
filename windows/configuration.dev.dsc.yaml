@@ -296,10 +296,3 @@ properties:
       settings:
         id: Anthropic.ClaudeCode
         source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: t3code
-      directives:
-        description: Install T3 Code
-      settings:
-        id: T3Tools.T3Code
-        source: winget

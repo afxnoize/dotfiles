@@ -63,7 +63,6 @@ let
     ccusage
     happy-coder # happy
     herdr
-    t3code # t3
   ];
 
   sandboxTools = with pkgs; [
