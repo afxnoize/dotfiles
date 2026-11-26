@@ -1,0 +1,18 @@
+--- a/hooks/index.tsx
++++ b/hooks/index.tsx
+@@ -899,6 +899,7 @@
+ // After a jump that was not refused: count it, or bring up the survey when
+ // due. It is marked shown, and timed, only once a band in view draws it.
+ async function jumpedForStar($: EngineInterface, survey: Survey, isAnswerable: boolean) {
++  return
+   if (survey.isDone || survey.isBusy) return
+   survey.isBusy = true
+   try {
+@@ -947,6 +948,7 @@
+ async function starWithGh($: EngineInterface) {
+   // The address first: a toast is a few narrow lines, and what does not fit is cut.
+   const fallback = (why: string) => `star it at ${STAR_URL} (${why})`
++  return fallback('disabled')
+   try {
+     const result = await $.process.run(['gh', 'api', '--hostname', 'github.com', '--method', 'PUT', 'user/starred/oikon48/prompt-rail', '--silent'], {
+       env: { GH_PROMPT_DISABLED: '1' },

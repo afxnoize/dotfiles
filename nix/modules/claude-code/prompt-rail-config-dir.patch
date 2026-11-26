@@ -1,0 +1,11 @@
+--- a/hooks/index.tsx
++++ b/hooks/index.tsx
+@@ -761,7 +761,7 @@
+     const at = root.lastIndexOf(`${sep}plugins${sep}cache${sep}`)
+     if (at > 0) return { dir: root.slice(0, at), sep }
+   }
+-  return undefined
++  return { dir: '@claudeConfigDir@', sep: '/' }
+ }
+ 
+ // Where the engine files a session's transcript: `<config>/projects/<folder>/

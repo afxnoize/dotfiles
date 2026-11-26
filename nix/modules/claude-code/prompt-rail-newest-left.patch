@@ -1,0 +1,44 @@
+--- a/hooks/index.tsx
++++ b/hooks/index.tsx
+@@ -2103,9 +2103,9 @@
+         return entry ? `#${i + 1} ${withTurn(entry, width - `#${i + 1} `.length)}` : ''
+       }
+       const bars = [
+-        isOverflowing ? <Text dimColor>{first > 0 ? '‹' : ' '}</Text> : null,
++        isOverflowing ? <Text dimColor>{hidesAfter ? '‹' : ' '}</Text> : null,
+         ...shown.map((entry, offset) => {
+-          const i = first + offset
++          const i = first + shown.length - 1 - offset
+           return (
+             <Button
+               key={`jump-${i}`}
+@@ -2118,7 +2118,7 @@
+             />
+           )
+         }),
+-        hidesAfter ? <Text dimColor>›</Text> : null,
++        isOverflowing && first > 0 ? <Text dimColor>›</Text> : null,
+       ]
+       if (!isCellGrid) {
+         // Each bar and mark a cell wide, then a gap.
+@@ -2198,9 +2198,9 @@
+       <Box flexDirection="column">
+         {engine}
+         <Box flexDirection="row" height={1}>
+-          {step('step-prev', '‹', stepFrom(current, entries.length, -1, isUnreachable))}
++          {step('step-next', '‹', stepFrom(current, entries.length, 1, isUnreachable))}
+           {shown.map((entry, offset) => {
+-            const i = first + offset
++            const i = first + shown.length - 1 - offset
+             return (
+               <Button
+                 key={`jump-${i}`}
+@@ -2212,7 +2212,7 @@
+               />
+             )
+           })}
+-          {step('step-next', '›', stepFrom(current, entries.length, 1, isUnreachable))}
++          {step('step-prev', '›', stepFrom(current, entries.length, -1, isUnreachable))}
+           <Box marginLeft={1} width={room} height={1}>
+             {/* With no prompt known on screen, the newest: bars alone read as a broken rail. */}
+             <Text dimColor wrap="truncate-end">{`${reading}${oneLine(entries[center]?.text ?? '', room - reading.length)}`}</Text>

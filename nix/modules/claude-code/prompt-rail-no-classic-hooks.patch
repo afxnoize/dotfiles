@@ -1,0 +1,22 @@
+--- a/.claude-plugin/plugin.json
++++ b/.claude-plugin/plugin.json
+@@ -33,7 +33,7 @@
+       "type": "boolean",
+       "title": "Classic hooks",
+       "description": "Register the classic.SessionStart and classic.Stop hooks, which name the transcript exactly. Off silences Claude Code's notes about the security default skipping them on a machine with managed settings or in a Team or Enterprise organization, where they never ran anyway; elsewhere, off leaves a session resumed from another directory, or an install loaded with --plugin-dir, with no transcript to read.",
+-      "default": true
++      "default": false
+     }
+   }
+ }
+--- a/hooks/index.tsx
++++ b/hooks/index.tsx
+@@ -1651,7 +1651,7 @@
+   // security default passes the classic events over installed plugins, the
+   // engine notes the skipped hooks each session; off registers neither hook,
+   // which silences those notes and changes nothing else there.
+-  if (options.classicHooks !== false) {
++  if (options.classicHooks === true) {
+     on('classic.SessionStart', async ($, e, next) => {
+       foldedFor = await keepFold($, folded, foldedFor)
+       if (e.source === 'clear') {

@@ -1,0 +1,12 @@
+--- a/hooks/register.tsx
++++ b/hooks/register.tsx
+@@ -201,8 +201,7 @@
+       name: 'timeline',
+       description: 'Open the timeline pane. "/timeline report" writes a report now.',
+     })
+-    const language = await $.settings.read({ key: 'language' })
+-    await update($, localeAtom, () => resolveLocale(typeof language === 'string' ? language : undefined))
++    await update($, localeAtom, () => 'en' as const)
+     await restore($)
+     $.clock.every(reportMinutes * 60_000, () => void runReport($, 'timer', reportMinutes))
+     return next(e)
