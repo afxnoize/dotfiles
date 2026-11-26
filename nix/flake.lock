@@ -447,6 +447,38 @@
         "type": "github"
       }
     },
+    "plugin-md-prompt": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793007506,
+        "narHash": "sha256-tL2ip41sInEn4M9mBuT2x/wgTPFwEueB7N3lOROdgkI=",
+        "owner": "nogu66",
+        "repo": "md-prompt",
+        "rev": "062d02961f0dd0a8255165239ee4cab0926e741b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nogu66",
+        "repo": "md-prompt",
+        "type": "github"
+      }
+    },
+    "plugin-prompt-rail": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794898393,
+        "narHash": "sha256-iOXpsTlcIhPneBDp4qfYXVmnWfu2DvBvEj8pci3apCI=",
+        "owner": "oikon48",
+        "repo": "prompt-rail",
+        "rev": "0a978141165392f310f6ebd6afb401bffa492287",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oikon48",
+        "repo": "prompt-rail",
+        "type": "github"
+      }
+    },
     "plugins-pstack": {
       "flake": false,
       "locked": {
@@ -493,6 +525,8 @@
         "nixpkgs-unstable": "nixpkgs-unstable",
         "plugin-claude-timeline": "plugin-claude-timeline",
         "plugin-imozuru": "plugin-imozuru",
+        "plugin-md-prompt": "plugin-md-prompt",
+        "plugin-prompt-rail": "plugin-prompt-rail",
         "plugins-pstack": "plugins-pstack",
         "plugins-voltagent": "plugins-voltagent",
         "skill-stop-ai-slop-jp": "skill-stop-ai-slop-jp",

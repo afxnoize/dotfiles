@@ -24,6 +24,8 @@ in
       "${inputs.plugins-pstack}/plugins/pstack"
       "${inputs.plugins-voltagent}/categories/10-research-analysis"
       "${claude-timeline}"
+      "${inputs.plugin-prompt-rail}/plugins/prompt-rail"
+      "${inputs.plugin-md-prompt}/plugins/md-prompt"
     ];
   };
 }

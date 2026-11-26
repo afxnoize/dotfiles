@@ -61,6 +61,14 @@
       url = "github:skanehira/claude-timeline";
       flake = false;
     };
+    plugin-prompt-rail = {
+      url = "github:oikon48/prompt-rail";
+      flake = false;
+    };
+    plugin-md-prompt = {
+      url = "github:nogu66/md-prompt";
+      flake = false;
+    };
 
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
