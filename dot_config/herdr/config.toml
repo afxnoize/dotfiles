@@ -21,8 +21,8 @@ switch_tab = ["prefix+1", "prefix+2", "prefix+3", "prefix+4", "prefix+5", "prefi
 move_tab_previous = "prefix+shift+p"
 move_tab_next = "prefix+shift+n"
 
-goto = "prefix+w"
-workspace_picker = "prefix+s"
+goto = "prefix+g"
+workspace_picker = "prefix+w"
 
 rename_tab = "prefix+comma"
 rename_workspace = "prefix+$"
@@ -54,9 +54,22 @@ edit_scrollback = "prefix+shift+b"
 toggle_sidebar = "prefix+e"
 settings = "prefix+shift+s"
 
+[[keys.command]]
+key = "prefix+s"
+type = "plugin_action"
+command = "herdr-bar.open"
+description = "command bar"
+
 [ui]
 status_indicators = "symbols"
 prompt_new_tab_name = false
+
+[ui.sidebar.spaces]
+rows = [
+  ["state_icon", "workspace"],
+  ["branch", "git_status"],
+  ["$usage"],
+]
 
 [ui.toast]
 delivery = "herdr"
