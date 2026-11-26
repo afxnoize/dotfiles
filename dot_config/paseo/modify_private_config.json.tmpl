@@ -19,20 +19,6 @@ jq --arg listen '{{ output "sops" "-d" "--extract" "[\"paseo_listen\"]" (joinPat
         "command": "claude",
         "args": ["{{ "{{{prompt}}}" }}"],
         "icon": "claude"
-      },
-      {
-        "id": "opencode",
-        "name": "OpenCode",
-        "command": "opencode",
-        "args": ["--prompt={{ "{{{prompt}}}" }}"],
-        "icon": "opencode"
-      },
-      {
-        "id": "pi",
-        "name": "Pi",
-        "command": "pi",
-        "args": ["{{ "{{{prompt}}}" }}"],
-        "icon": "pi"
       }
     ]
   | .daemon.cors.allowedOrigins = ["https://app.paseo.sh"]
