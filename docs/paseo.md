@@ -56,3 +56,28 @@ paseo delete <id>              # 削除
 - `paseo plugin add <source>` で入れる。source は registry、ディレクトリ、Git リポジトリ、npm パッケージのどれか（例: `paseo plugin add stevecastaneda/progress`）
 - 一覧は `paseo plugin ls`、出力は `paseo plugin logs <id>`。ほかに `enable`、`disable`、`update`、`remove` がある
 - plugin はサンドボックスなしで動く。信頼できるものだけを入れる
+- plugin は Nix でも chezmoi でも入れず、paseo に管理させる。入れた plugin は `~/.paseo/plugins/` に置かれ、`config.json` の `plugins` に登録される
+  - Nix で入れない理由: 依存の `node_modules` まで Nix でビルドする手間に見合わない。また、paseo は更新前に差分を見せ、git の commit や npm の成果物を照合する。この確認を残すため
+
+### 入れている plugin
+新しいマシンでは、次のコマンドで入れ直す。どれも Paseo の registry（`plugins.paseo.sh`）から入れている。
+
+```bash
+paseo plugin add stevecastaneda/progress   # progress: worktree ごとの進み具合のダッシュボード（npm）
+paseo plugin add paseo-cafe/cafe           # paseo-cafe（npm）
+paseo plugin add a31521424/host-monitor    # host-monitor（git: a31521424/paseo-kit）
+paseo plugin add sojuhub/pele              # pele（git: sojuhub/paseo-plugin-pele）
+```
+
+plugin を足したり外したりしたら、この一覧も直す。
+
+### 更新
+自動では更新されない。paseo 0.17.4 には定期的に更新を確かめる仕組みがなく、CLI やアプリから頼んだときだけ確かめる。
+
+```bash
+paseo plugin update --all --check   # 更新があるかだけ見る
+paseo plugin update --all           # 差分を見て、確認してから更新する
+paseo plugin update <id>            # 1 つだけ更新する
+```
+
+`--yes`（確認を飛ばす）を timer などで定期的に回さない。plugin はサンドボックスなしで動くので、中身を見ないまま新しい版が入る。
