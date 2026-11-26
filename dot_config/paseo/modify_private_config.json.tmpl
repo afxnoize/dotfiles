@@ -1,0 +1,31 @@
+#!/bin/bash
+# chezmoi modify script: merge managed keys into the existing Paseo config.json
+# `plugins` is left to `paseo plugin add`, which writes per-install paths.
+set -euo pipefail
+
+existing=$(cat)
+if [ -z "$existing" ]; then
+  existing='{}'
+fi
+
+jq --arg listen '{{ output "sops" "-d" "--extract" "[\"paseo_listen\"]" (joinPath .chezmoi.sourceDir "dot_config/paseo/secrets.yaml") | trim }}' '
+  ."$schema" = "https://paseo.sh/schemas/paseo.config.v1.json"
+  | .version = 1
+  | .daemon.listen = $listen
+  | .daemon.terminalProfiles = [
+      {
+        "id": "claude",
+        "name": "Claude Code",
+        "command": "claude",
+        "args": ["{{ "{{{prompt}}}" }}"],
+        "icon": "claude"
+      }
+    ]
+  | .daemon.cors.allowedOrigins = ["https://app.paseo.sh"]
+  | .daemon.relay.enabled = true
+  | .app.baseUrl = "https://app.paseo.sh"
+  | .pluginsEnabled = true
+  | .agents.providers.claude.enabled = true
+  | .features.dictation.enabled = true
+  | .features.voiceMode.enabled = true
+  ' <<< "$existing"
