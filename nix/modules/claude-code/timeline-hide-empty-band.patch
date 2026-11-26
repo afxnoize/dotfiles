@@ -1,0 +1,18 @@
+--- a/hooks/register.tsx
++++ b/hooks/register.tsx
+@@ -288,14 +288,7 @@
+       />
+     )
+     const rootId = await shownTree($, tasks)
+-    if (rootId === null) {
+-      return (
+-        <Box flexDirection="row" gap={1}>
+-          <Text>{m.title}</Text>
+-          {openButton}
+-        </Box>
+-      )
+-    }
++    if (rootId === null) return next(e)
+     const s = subtreeShares(tasks, rootId)
+     const treeIds = new Set([rootId, ...treeRows(tasks, rootId).map(row => row.task.id)])
+     const current = tasks.find(

@@ -1,5 +1,13 @@
 { config, pkgs, inputs, ... }:
 
+let
+  # Hide the band above the prompt until a task tree exists.
+  claude-timeline = pkgs.applyPatches {
+    name = "claude-timeline";
+    src = inputs.plugin-claude-timeline;
+    patches = [ ./timeline-hide-empty-band.patch ];
+  };
+in
 {
   programs.claude-code = {
     enable = true;
@@ -15,7 +23,7 @@
       "${inputs.plugin-imozuru}"
       "${inputs.plugins-pstack}/plugins/pstack"
       "${inputs.plugins-voltagent}/categories/10-research-analysis"
-      "${inputs.plugin-claude-timeline}"
+      "${claude-timeline}"
     ];
   };
 }
